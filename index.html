@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>UniThrift – B.Tech Student Marketplace & Campus Hub</title>
+  <meta name="description" content="UniThrift is the go-to campus hub for B.Tech students. Buy & sell academic essentials, find PG/flat listings — all sorted by branch and college." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── TOP NAVBAR (Desktop) ─── -->
+<header class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">Uni<span class="logo-accent">Thrift</span></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#how">How It Works</a>
+      <a href="#colleges">Colleges</a>
+      <a href="#branches">Branches</a>
+      <a href="#listings">Marketplace</a>
+      <a href="#housing">Housing</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" id="loginBtn">Login</button>
+      <button class="btn btn-primary" id="signupBtn">Sign Up Free</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <div class="hero-blob blob1"></div>
+    <div class="hero-blob blob2"></div>
+    <div class="hero-blob blob3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      India's #1 B.Tech Student Campus Hub
+    </div>
+    <h1 class="hero-title">
+      Buy. Sell.<br />
+      <span class="gradient-text">Thrift Smart.</span>
+    </h1>
+    <p class="hero-desc">
+      Seniors sell. Freshers save. Academic essentials, PG listings &amp; campus deals — 
+      organized by branch, college and neighbourhood.
+    </p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" onclick="scrollToSection('listings')">
+        <span class="material-symbols-outlined">shopping_bag</span> Browse Listings
+      </button>
+      <button class="btn btn-outline btn-lg" onclick="openModal('sell')">Start Selling</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">500+</span>
+        <span class="stat-label">Colleges</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">12K+</span>
+        <span class="stat-label">Listings</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">8</span>
+        <span class="stat-label">Branches</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="floating-card card-a">
+      <span class="card-emoji">📐</span>
+      <div><strong>Mini Drafter</strong><br /><small>₹120 · CSE Branch</small></div>
+    </div>
+    <div class="floating-card card-b">
+      <span class="card-emoji">🧮</span>
+      <div><strong>Calculator FX-991</strong><br /><small>₹650 · ECE Branch</small></div>
+    </div>
+    <div class="floating-card card-c">
+      <span class="card-emoji">📚</span>
+      <div><strong>Lab Manual Set</strong><br /><small>₹80 · ME Branch</small></div>
+    </div>
+    <div class="hero-phone">
+      <div class="phone-screen">
+        <div class="phone-header">
+          <span>UniThrift</span>
+          <span class="phone-badge">LIVE</span>
+        </div>
+        <div class="phone-item" style="--d:0s"><span>📐</span> Mini Drafter · ₹120</div>
+        <div class="phone-item" style="--d:.1s"><span>🧮</span> Calculator · ₹650</div>
+        <div class="phone-item" style="--d:.2s"><span>📏</span> Drawing Sheet · ₹15</div>
+        <div class="phone-item" style="--d:.3s"><span>🥼</span> Lab Coat · ₹200</div>
+        <div class="phone-item" style="--d:.4s"><span>📓</span> Practical Copy · ₹45</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SEGMENT CONTROL + QUICK DROPS (Hub Feed) ─── -->
+<section class="section" id="hub" style="padding: 0; background: var(--surface);">
+
+  <!-- Sticky Segment Control -->
+  <div class="segment-control-wrap">
+    <div class="segment-control" id="segmentControl">
+      <div class="segment-indicator" id="segmentIndicator"></div>
+      <button class="segment-btn active" data-tab="thrift" data-section="thrift-content">Thrift</button>
+      <button class="segment-btn" data-tab="pgs" data-section="pg-content">PGs &amp; Flats</button>
+      <button class="segment-btn" data-tab="flatmates" data-section="flatmate-content">Flatmates</button>
+    </div>
+  </div>
+
+  <!-- Tab: THRIFT -->
+  <div class="tab-content active" id="thrift-content">
+    <div class="container" style="padding-top: 32px; padding-bottom: 64px;">
+
+      <!-- Category Pills -->
+      <div class="category-pills" id="categoryPills">
+        <button class="category-pill active" data-category="all" onclick="filterByCategory('all', this)">All Items</button>
+        <button class="category-pill" data-category="Textbooks" onclick="filterByCategory('Textbooks', this)">Textbooks</button>
+        <button class="category-pill" data-category="Electronics" onclick="filterByCategory('Electronics', this)">Electronics</button>
+        <button class="category-pill" data-category="Stationery" onclick="filterByCategory('Stationery', this)">Stationery</button>
+        <button class="category-pill" data-category="Lab Gear" onclick="filterByCategory('Lab Gear', this)">Lab Gear</button>
+        <button class="category-pill" data-category="Clothing" onclick="filterByCategory('Clothing', this)">Lab Coat &amp; Clothing</button>
+      </div>
+
+      <!-- Stories / Quick Actions Row -->
+      <div class="stories-row">
+        <button class="story-btn" onclick="openModal('sell')">
+          <div class="story-avatar add-border">
+            <span class="material-symbols-outlined" style="color: var(--primary-fixed-dim); font-size: 28px;">add</span>
+          </div>
+          <span class="story-label">List Item</span>
+        </button>
+        <button class="story-btn active-story">
+          <div class="story-avatar gradient-border">
+            <span style="font-size: 32px; line-height: 64px; display: block; text-align: center;">📚</span>
+          </div>
+          <span class="story-label" style="color: var(--on-surface);">Books</span>
+        </button>
+        <button class="story-btn">
+          <div class="story-avatar" style="background: var(--surface-container);">
+            <span style="font-size: 32px; line-height: 64px; display: block; text-align: center;">🧮</span>
+          </div>
+          <span class="story-label">Calculators</span>
+        </button>
+        <button class="story-btn">
+          <div class="story-avatar" style="background: var(--surface-container);">
+            <span style="font-size: 32px; line-height: 64px; display: block; text-align: center;">📐</span>
+          </div>
+          <span class="story-label">Drafters</span>
+        </button>
+        <button class="story-btn">
+          <div class="story-avatar" style="background: var(--surface-container);">
+            <span style="font-size: 32px; line-height: 64px; display: block; text-align: center;">🥼</span>
+          </div>
+          <span class="story-label">Lab Gear</span>
+        </button>
+        <button class="story-btn">
+          <div class="story-avatar" style="background: var(--surface-container);">
+            <span style="font-size: 32px; line-height: 64px; display: block; text-align: center;">💡</span>
+          </div>
+          <span class="story-label">Electronics</span>
+        </button>
+      </div>
+
+      <!-- Fresh Drops – Bento Grid -->
+      <div class="bento-section" style="margin-top: 32px;">
+        <div class="bento-header">
+          <h2>Fresh Drops</h2>
+          <a class="view-all-link" href="#listings" onclick="scrollToSection('listings')">
+            View all <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- Featured Full-width Card -->
+        <div class="listing-featured" id="featuredDrop">
+          <div style="position:relative; height: 220px; overflow: hidden;">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--surface-container-low) 0%,var(--surface-container-high) 100%);display:flex;align-items:center;justify-content:center;font-size:5rem;">📐</div>
+            <div class="listing-featured-hot">
+              <span class="material-symbols-outlined" style="font-size:14px;">local_fire_department</span> Hot
+            </div>
+            <div style="position:absolute;top:16px;right:16px;padding:4px 10px;border-radius:999px;background:var(--error-container);color:var(--error);font-family:var(--font-headline);font-size:0.72rem;font-weight:700;">-73%</div>
+          </div>
+          <div class="listing-featured-body">
+            <div class="listing-featured-row">
+              <div>
+                <div class="listing-featured-name">Pro Mini-Drafter Set</div>
+                <div class="listing-featured-meta">
+                  <span class="material-symbols-outlined" style="font-size:14px;color:var(--primary);">verified</span>
+                  3rd Year · Mechanical · IIT Bombay
+                </div>
+              </div>
+              <div>
+                <div class="listing-featured-price">₹120</div>
+                <div class="listing-featured-price-orig">₹450</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="contactSeller('Rahul S.', 'Pro Mini-Drafter Set')">
+              <span class="material-symbols-outlined" style="font-size:16px;">chat_bubble</span>
+              Message Seller
+            </button>
+          </div>
+        </div>
+
+        <!-- 2-Column Mini Grid -->
+        <div class="listing-grid-2col" id="bentoGrid"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tab: PGs & FLATS -->
+  <div class="tab-content" id="pg-content" style="display:none;">
+    <div class="container" style="padding-top: 32px; padding-bottom: 64px;">
+      <div class="housing-section" id="housingListings"></div>
+    </div>
+  </div>
+
+  <!-- Tab: FLATMATES -->
+  <div class="tab-content" id="flatmate-content" style="display:none;">
+    <div class="container" style="padding-top: 32px; padding-bottom: 64px;">
+      <div style="text-align:center; padding: 60px 20px; color: var(--on-surface-variant);">
+        <div style="font-size: 3rem; margin-bottom: 16px;">🤝</div>
+        <h3 style="font-family: var(--font-headline); font-size: 1.3rem; color: var(--on-surface); margin-bottom: 8px;">Flatmate Finder</h3>
+        <p>Connect with students looking to share accommodation near your college.</p>
+        <button class="btn btn-primary" style="margin-top: 24px;" onclick="showToast('🔜 Flatmate Finder launching soon!', 'success')">
+          <span class="material-symbols-outlined" style="font-size:16px;">notifications</span>
+          Notify Me at Launch
+        </button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="section how-section" id="how">
+  <div class="container">
+    <div class="section-label">Simple Process</div>
+    <h2 class="section-title">How UniThrift Works</h2>
+    <p class="section-desc">Three easy steps between seniors and freshers</p>
+    <div class="steps-grid">
+      <div class="step-card" style="--d:0ms">
+        <div class="step-num">01</div>
+        <div class="step-icon">🏫</div>
+        <h3>Pick Your College &amp; Branch</h3>
+        <p>Select your university from 500+ colleges and choose your engineering branch to see relevant listings.</p>
+      </div>
+      <div class="step-card" style="--d:100ms">
+        <div class="step-num">02</div>
+        <div class="step-icon">🛒</div>
+        <h3>Browse &amp; Connect</h3>
+        <p>Freshers browse verified listings from seniors in their own college. Chat directly to negotiate and confirm.</p>
+      </div>
+      <div class="step-card" style="--d:200ms">
+        <div class="step-num">03</div>
+        <div class="step-icon">🤝</div>
+        <h3>Meet &amp; Exchange</h3>
+        <p>Meet on campus, exchange items safely, and rate your experience. Simple, trusted, peer-to-peer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COLLEGES ─── -->
+<section class="section colleges-section" id="colleges">
+  <div class="container">
+    <div class="section-label">500+ Institutes</div>
+    <h2 class="section-title">Top B.Tech Colleges</h2>
+    <p class="section-desc">Find your college and start trading within your campus community</p>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="collegeSearch" placeholder="Search your college or city..." oninput="filterColleges()" />
+    </div>
+
+    <div class="college-tabs" id="collegeTabs">
+      <button class="tab-btn active" onclick="filterByState('all', this)">All</button>
+      <button class="tab-btn" onclick="filterByState('IIT', this)">IITs</button>
+      <button class="tab-btn" onclick="filterByState('NIT', this)">NITs</button>
+      <button class="tab-btn" onclick="filterByState('IIIT', this)">IIITs</button>
+      <button class="tab-btn" onclick="filterByState('State', this)">State Univs</button>
+      <button class="tab-btn" onclick="filterByState('Private', this)">Private</button>
+      <button class="tab-btn" onclick="filterByState('Deemed', this)">Deemed</button>
+    </div>
+
+    <div class="college-grid" id="collegeGrid"></div>
+    <button class="btn btn-outline show-more-btn" id="showMoreCollegesBtn" onclick="showMoreColleges()">Show More Colleges</button>
+  </div>
+</section>
+
+<!-- ─── BRANCHES ─── -->
+<section class="section branches-section" id="branches">
+  <div class="container">
+    <div class="section-label">8 Disciplines</div>
+    <h2 class="section-title">Browse by Branch</h2>
+    <p class="section-desc">Every branch has its own essential tools and materials</p>
+    <div class="branch-grid" id="branchGrid"></div>
+  </div>
+</section>
+
+<!-- ─── LISTINGS (Full Grid) ─── -->
+<section class="section listings-section" id="listings">
+  <div class="container">
+    <div class="listings-header">
+      <div>
+        <div class="section-label">Fresh Listings</div>
+        <h2 class="section-title">Latest Items</h2>
+      </div>
+      <div class="listings-filters">
+        <select id="branchFilter" onchange="filterListings()" class="filter-select">
+          <option value="all">All Branches</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="ME">Mechanical</option>
+          <option value="CE">Civil</option>
+          <option value="EE">Electrical</option>
+          <option value="CH">Chemical</option>
+          <option value="BT">Biotech</option>
+          <option value="IT">IT</option>
+        </select>
+        <select id="priceFilter" onchange="filterListings()" class="filter-select">
+          <option value="all">Any Price</option>
+          <option value="0-100">₹0 – ₹100</option>
+          <option value="100-500">₹100 – ₹500</option>
+          <option value="500-2000">₹500 – ₹2000</option>
+        </select>
+      </div>
+    </div>
+    <div class="listings-grid" id="listingsGrid"></div>
+    <button class="btn btn-primary show-more-btn" onclick="showMoreListings()">
+      <span class="bounce-dot"></span>
+      <span class="bounce-dot"></span>
+      <span class="bounce-dot"></span>
+      &nbsp;Load More
+    </button>
+  </div>
+</section>
+
+<!-- ─── HOUSING SECTION (Standalone) ─── -->
+<section class="section" id="housing" style="background: var(--surface-container-lowest);">
+  <div class="container">
+    <div class="section-label">PGs &amp; Flats</div>
+    <h2 class="section-title">Hot PGs &amp; Flats</h2>
+    <p class="section-desc">Student housing near top campuses — verified, affordable, move-in ready</p>
+    <div class="housing-section" id="housingGrid"></div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section">
+  <div class="cta-bg"><div class="cta-blob"></div></div>
+  <div class="container cta-inner">
+    <h2>Ready to sell your old study material?</h2>
+    <p>Join 12,000+ students already thrifting smarter. Free, fast and campus-safe.</p>
+    <div class="cta-actions">
+      <button class="btn btn-primary btn-lg" onclick="openModal('sell')">
+        <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+        Post a Listing — Free
+      </button>
+      <button class="btn btn-outline btn-lg" onclick="openModal('buy')">Create Buyer Profile</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <span class="logo-icon">🎓</span>
+          <span class="logo-text">Uni<span class="logo-accent">Thrift</span></span>
+        </a>
+        <p>India's trusted peer-to-peer marketplace for B.Tech students. Academic essentials, PG listings and campus deals.</p>
+        <div class="social-links">
+          <a href="#" class="social-btn" title="Instagram">📸</a>
+          <a href="#" class="social-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-btn" title="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="#listings">Browse Listings</a>
+          <a href="#" onclick="openModal('sell')">Post an Item</a>
+          <a href="#colleges">Colleges</a>
+          <a href="#branches">Branches</a>
+          <a href="#housing">Housing</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Help Center</a>
+          <a href="#">Safety Tips</a>
+          <a href="#">Report an Issue</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 UniThrift. Made with ❤️ for India's B.Tech students.</p>
+      <p>Not affiliated with any university. Student-to-student only.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── BOTTOM NAV (Mobile) ─── -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-item active" id="bnHome" onclick="switchBottomNav('home', this)">
+      <span class="material-symbols-outlined">home</span>
+      <span>Home</span>
+    </button>
+    <button class="bottom-nav-item" id="bnMarket" onclick="switchBottomNav('listings', this)">
+      <span class="material-symbols-outlined">shopping_bag</span>
+      <span>Market</span>
+    </button>
+    <button class="bottom-nav-item" id="bnHousing" onclick="switchBottomNav('housing', this)">
+      <span class="material-symbols-outlined">apartment</span>
+      <span>Housing</span>
+    </button>
+    <button class="bottom-nav-item" id="bnProfile" onclick="openModal('signup')">
+      <span class="material-symbols-outlined">person</span>
+      <span>Profile</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── MODAL ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" id="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ─── PG DETAIL MODAL ─── -->
+<div class="modal-overlay pg-detail-modal" id="pgModalOverlay" onclick="closePgModal()">
+  <div class="modal" id="pgModal" onclick="event.stopPropagation()" style="max-width:600px;">
+    <button class="modal-close" onclick="closePgModal()">✕</button>
+    <div id="pgModalContent"></div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
