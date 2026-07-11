@@ -317,11 +317,12 @@ input, select, textarea { font-family: inherit; }
 ═══════════════════════════════════ */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 90vh;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding-top: 64px;
+  padding: 80px 0;
+  margin-top: 64px;
 }
 
 .hero-bg {
@@ -369,12 +370,20 @@ input, select, textarea { font-family: inherit; }
   background-size: 60px 60px;
 }
 
+.hero-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  width: 100%;
+}
+
 .hero-content {
   position: relative;
   z-index: 2;
-  flex: 1;
-  padding: 80px 24px 80px calc((100vw - 1200px)/2 + 24px);
-  max-width: 640px;
+  flex: 1.2;
+  padding: 20px 0;
+  max-width: 620px;
 }
 
 .hero-badge {
@@ -461,23 +470,23 @@ input, select, textarea { font-family: inherit; }
   margin: 0 24px 0 0;
 }
 
-/* Hero visual / phone mock */
 .hero-visual {
   position: relative;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 80px 24px;
+  padding: 40px 0;
+  height: 520px;
 }
 
 .hero-phone {
-  width: 260px;
-  background: var(--surface-container-low);
-  border: 1px solid var(--outline-variant);
-  border-radius: 32px;
+  width: 280px;
+  background: var(--surface-container-lowest);
+  border: 8px solid var(--surface-container-highest);
+  border-radius: 40px;
   overflow: hidden;
-  box-shadow: var(--shadow-lg), 0 0 60px rgba(107,251,154,0.1);
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(107,251,154,0.15);
   position: relative;
   z-index: 2;
 }
@@ -1838,9 +1847,12 @@ input, select, textarea { font-family: inherit; }
    RESPONSIVE
 ═══════════════════════════════════ */
 @media (max-width: 900px) {
-  .hero { flex-direction: column; min-height: auto; padding: 120px 0 60px; }
-  .hero-content { max-width: 100%; padding: 0 20px 40px; }
+  .hero { min-height: auto; padding: 60px 0 40px; }
+  .hero-inner { flex-direction: column; gap: 40px; text-align: center; }
+  .hero-content { max-width: 100%; padding: 0; }
   .hero-visual { display: none; }
+  .hero-actions { justify-content: center; }
+  .hero-stats { justify-content: center; }
   .steps-grid { grid-template-columns: 1fr; gap: 16px; }
   .footer-top { grid-template-columns: 1fr; gap: 32px; }
   .footer-links { grid-template-columns: repeat(2, 1fr); gap: 24px; }
