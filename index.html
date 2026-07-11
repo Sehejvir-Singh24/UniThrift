@@ -206,7 +206,7 @@
                 <div class="listing-featured-name">Pro Mini-Drafter Set</div>
                 <div class="listing-featured-meta">
                   <span class="material-symbols-outlined" style="font-size:14px;color:var(--primary);">verified</span>
-                  3rd Year · Mechanical · IIT Bombay
+                  3rd Year · Mechanical · MAIT, Rohini
                 </div>
               </div>
               <div>
@@ -284,23 +284,19 @@
 <!-- ─── COLLEGES ─── -->
 <section class="section colleges-section" id="colleges">
   <div class="container">
-    <div class="section-label">500+ Institutes</div>
-    <h2 class="section-title">Top B.Tech Colleges</h2>
-    <p class="section-desc">Find your college and start trading within your campus community</p>
+    <div class="section-label">GGSIPU Affiliated</div>
+    <h2 class="section-title">GGSIPU Delhi Colleges</h2>
+    <p class="section-desc">Find your IP University college and start trading B.Tech study material on your campus</p>
 
     <div class="search-bar">
       <span class="search-icon">🔍</span>
-      <input type="text" id="collegeSearch" placeholder="Search your college or city..." oninput="filterColleges()" />
+      <input type="text" id="collegeSearch" placeholder="Search GGSIPU college..." oninput="filterColleges()" />
     </div>
 
     <div class="college-tabs" id="collegeTabs">
-      <button class="tab-btn active" onclick="filterByState('all', this)">All</button>
-      <button class="tab-btn" onclick="filterByState('IIT', this)">IITs</button>
-      <button class="tab-btn" onclick="filterByState('NIT', this)">NITs</button>
-      <button class="tab-btn" onclick="filterByState('IIIT', this)">IIITs</button>
-      <button class="tab-btn" onclick="filterByState('State', this)">State Univs</button>
-      <button class="tab-btn" onclick="filterByState('Private', this)">Private</button>
-      <button class="tab-btn" onclick="filterByState('Deemed', this)">Deemed</button>
+      <button class="tab-btn active" onclick="filterByState('all', this)">All Colleges</button>
+      <button class="tab-btn" onclick="filterByState('Govt', this)">Govt/USS Campus</button>
+      <button class="tab-btn" onclick="filterByState('Affiliated', this)">Affiliated Colleges</button>
     </div>
 
     <div class="college-grid" id="collegeGrid"></div>
