@@ -1,0 +1,113 @@
+﻿<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed-dim": "#bec6e0", "surface": "#f8f9ff", "secondary": "#565e74", "surface-tint": "#006e2f", "on-error-container": "#93000a", "tertiary-fixed": "#d9e6dd", "on-primary-fixed-variant": "#005321", "on-secondary-container": "#5c647a", "surface-container-high": "#dce9ff", "on-tertiary": "#ffffff", "on-secondary": "#ffffff", "primary-fixed": "#6bff8f", "surface-bright": "#f8f9ff", "on-tertiary-container": "#37433c", "on-surface": "#0b1c30", "error": "#ba1a1a", "surface-container": "#e5eeff", "tertiary-fixed-dim": "#bdcac1", "surface-container-highest": "#d3e4fe", "primary": "#006e2f", "primary-fixed-dim": "#4ae176", "on-tertiary-fixed-variant": "#3e4943", "on-background": "#0b1c30", "on-surface-variant": "#3d4a3d", "tertiary": "#55615a", "secondary-fixed": "#dae2fd", "outline-variant": "#bccbb9", "on-secondary-fixed-variant": "#3f465c", "background": "#f8f9ff", "surface-container-low": "#eff4ff", "surface-container-lowest": "#ffffff", "outline": "#6d7b6c", "on-primary-fixed": "#002109", "inverse-surface": "#213145", "inverse-on-surface": "#eaf1ff", "on-primary": "#ffffff", "surface-dim": "#cbdbf5", "secondary-container": "#dae2fd", "on-tertiary-fixed": "#131e19", "error-container": "#ffdad6", "on-primary-container": "#004b1e", "on-error": "#ffffff", "inverse-primary": "#4ae176", "tertiary-container": "#a2afa7", "primary-container": "#22c55e", "on-secondary-fixed": "#131b2e", "surface-variant": "#d3e4fe" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "stack-md": "16px", "stack-sm": "8px", "stack-lg": "32px", "gutter": "16px", "container-padding-mobile": "20px", "container-padding-desktop": "48px", "unit": "4px" }, "fontFamily": { "label-caps": ["Geist"], "headline-lg": ["Geist"], "display-lg": ["Geist"], "body-sm": ["Geist"], "title-md": ["Geist"], "headline-lg-mobile": ["Geist"], "body-lg": ["Geist"] }, "fontSize": { "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script><style>@layer base { body { overscroll-behavior: none; } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-lg text-on-surface"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 flex items-center px-container-padding-mobile gap-stack-md"><button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all" onclick="history.back()"><span class="material-symbols-outlined text-on-surface">arrow_back</span></button><span class="font-title-md text-title-md text-on-surface truncate">Create Listing</span></div></header><main class="pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full pb-[100px] gap-stack-lg">
+<!-- Progress Indicator -->
+<div class="px-container-padding-mobile pt-stack-sm flex items-center gap-stack-sm w-full">
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-surface-variant rounded-full"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant ml-stack-sm">2/3</span>
+</div>
+<!-- Photos Section -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md">
+<div class="flex flex-col gap-unit">
+<h2 class="font-title-md text-title-md text-on-surface">Photos & Media</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Add clear, bright photos of the room and amenities.</p>
+</div>
+<!-- Cover Photo Upload -->
+<div class="w-full aspect-video bg-surface-container rounded-xl flex flex-col items-center justify-center gap-stack-sm relative overflow-hidden active:scale-[0.99] transition-transform" onclick="document.getElementById('file-upload').click()" role="button" tabindex="0">
+<div class="w-12 h-12 bg-surface rounded-full shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">add_a_photo</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Add Cover Photo</span>
+<input accept="image/*" class="hidden" id="file-upload" type="file"/>
+</div>
+<!-- Gallery Grid -->
+<div class="grid grid-cols-3 gap-gutter">
+<div class="aspect-square bg-surface-container rounded-lg flex flex-col items-center justify-center gap-unit active:scale-[0.98] transition-transform" role="button" tabindex="0">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">add</span>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg flex flex-col items-center justify-center gap-unit active:scale-[0.98] transition-transform" role="button" tabindex="0">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">add</span>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg flex flex-col items-center justify-center gap-unit active:scale-[0.98] transition-transform" role="button" tabindex="0">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">add</span>
+</div>
+</div>
+</div>
+<!-- Amenities Section -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md">
+<div class="flex flex-col gap-unit">
+<h2 class="font-title-md text-title-md text-on-surface">Amenities</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select all that apply to your property.</p>
+</div>
+<div class="flex flex-wrap gap-stack-sm" id="amenities-container">
+<!-- Chips generated via JS for interactivity -->
+</div>
+</div>
+<!-- Description Section -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md">
+<div class="flex flex-col gap-unit">
+<h2 class="font-title-md text-title-md text-on-surface">Property Description</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tell potential tenants what makes this place special.</p>
+</div>
+<div class="flex flex-col">
+<textarea class="w-full bg-surface-container-low text-on-surface font-body-lg p-stack-md rounded-xl resize-none outline-none focus:ring-2 focus:ring-primary transition-shadow placeholder:text-on-surface-variant/50" placeholder="e.g. Spacious corner room with natural light. 5 minutes walk from North Campus. Quiet study environment..." rows="5"></textarea>
+</div>
+</div>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom,20px)] pt-stack-md px-container-padding-mobile shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
+<div class="flex gap-gutter">
+<button class="w-1/3 bg-surface-container text-on-surface font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all">Back</button>
+<button onclick="window.location.href='pg_review_publish.html'" class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all shadow-sm">Continue</button>
+</div>
+</div>
+</div>
+<script>
+  const amenities = [
+    { icon: 'wifi', label: 'High-Speed WiFi' },
+    { icon: 'ac_unit', label: 'Air Conditioning' },
+    { icon: 'restaurant', label: 'Meals Included' },
+    { icon: 'local_laundry_service', label: 'Laundry' },
+    { icon: 'bathtub', label: 'Attached Bath' },
+    { icon: 'security', label: '24/7 Security' },
+    { icon: 'kitchen', label: 'Shared Kitchen' },
+    { icon: 'fitness_center', label: 'Gym Access' },
+    { icon: 'cleaning_services', label: 'Housekeeping' },
+    { icon: 'directions_bus', label: 'Near Transit' }
+  ];
+
+  const container = document.getElementById('amenities-container');
+  
+  amenities.forEach(item => {
+    const chip = document.createElement('button');
+    chip.className = 'flex items-center gap-unit px-4 py-2 rounded-full bg-surface-container text-on-surface transition-all active:scale-95 border border-transparent';
+    
+    chip.innerHTML = `
+      <span class="material-symbols-outlined text-[18px] opacity-70 transition-opacity">${item.icon}</span>
+      <span class="font-body-sm text-body-sm whitespace-nowrap">${item.label}</span>
+    `;
+
+    let isSelected = false;
+    chip.addEventListener('click', () => {
+      isSelected = !isSelected;
+      if (isSelected) {
+        chip.classList.remove('bg-surface-container', 'text-on-surface');
+        chip.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
+        chip.querySelector('.material-symbols-outlined').classList.remove('opacity-70');
+      } else {
+        chip.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
+        chip.classList.add('bg-surface-container', 'text-on-surface');
+        chip.querySelector('.material-symbols-outlined').classList.add('opacity-70');
+      }
+    });
+
+    container.appendChild(chip);
+  });
+</script></main></body></html>
+
