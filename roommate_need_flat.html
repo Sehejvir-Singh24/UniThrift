@@ -1,0 +1,199 @@
+﻿<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface":"#f8f9ff","on-secondary-container":"#5c647a","secondary-fixed-dim":"#bec6e0","secondary-fixed":"#dae2fd","background":"#f8f9ff","inverse-primary":"#4ae176","secondary":"#565e74","outline-variant":"#bccbb9","on-error":"#ffffff","primary-fixed-dim":"#4ae176","tertiary-fixed-dim":"#bdcac1","on-primary":"#ffffff","tertiary-fixed":"#d9e6dd","primary-fixed":"#6bff8f","on-background":"#0b1c30","surface-container-low":"#eff4ff","surface-container-highest":"#d3e4fe","tertiary-container":"#a2afa7","primary":"#006e2f","on-primary-fixed-variant":"#005321","on-tertiary-container":"#37433c","surface-bright":"#f8f9ff","surface-container-high":"#dce9ff","surface-container":"#e5eeff","on-tertiary-fixed-variant":"#3e4943","on-primary-container":"#004b1e","inverse-on-surface":"#eaf1ff","on-secondary-fixed":"#131b2e","on-error-container":"#93000a","on-tertiary":"#ffffff","error":"#ba1a1a","tertiary":"#55615a","on-tertiary-fixed":"#131e19","outline":"#6d7b6c","inverse-surface":"#213145","on-surface-variant":"#3d4a3d","on-secondary":"#ffffff","surface-variant":"#d3e4fe","secondary-container":"#dae2fd","surface-tint":"#006e2f","surface-container-lowest":"#ffffff","primary-container":"#22c55e","on-primary-fixed":"#002109","on-surface":"#0b1c30","on-secondary-fixed-variant":"#3f465c","surface-dim":"#cbdbf5","error-container":"#ffdad6"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"stack-lg":"32px","unit":"4px","container-padding-mobile":"20px","container-padding-desktop":"48px","stack-sm":"8px","stack-md":"16px","gutter":"16px"},"fontFamily":{"headline-lg":["Geist"],"body-lg":["Geist"],"body-sm":["Geist"],"title-md":["Geist"],"label-caps":["Geist"],"headline-lg-mobile":["Geist"],"display-lg":["Geist"]},"fontSize":{"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"title-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"label-caps":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"600"}],"display-lg":["48px",{"lineHeight":"56px","letterSpacing":"-0.04em","fontWeight":"700"}]}}}}</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-4 flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-on-surface/5 rounded-full transition-colors" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface">Post Requirement</h1><div class="ml-auto w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative w-full pt-16 pb-safe bg-background"><div class="flex flex-col w-full bg-surface">
+<div class="px-container-padding-mobile pt-stack-md pb-stack-lg space-y-stack-lg">
+<!-- Budget Section -->
+<section class="space-y-stack-md">
+<div class="flex items-center justify-between">
+<h2 class="font-title-md text-title-md text-on-surface">Monthly Budget</h2>
+<span class="font-title-md text-title-md text-primary" id="budget-display">â‚¹15,000</span>
+</div>
+<div class="relative w-full h-8 flex items-center">
+<div class="absolute w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" id="budget-fill" style="width: 50%;"></div>
+</div>
+<input class="absolute w-full h-full opacity-0 cursor-pointer z-10" id="budget-slider" max="25000" min="5000" step="1000" type="range" value="15000"/>
+<div class="absolute w-6 h-6 bg-on-primary rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] transform -translate-x-1/2 flex items-center justify-center transition-transform pointer-events-none" id="budget-thumb" style="left: 50%;">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant">
+<span>â‚¹5K</span>
+<span>â‚¹25K</span>
+</div>
+</section>
+<!-- Location Section -->
+<section class="space-y-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface">Preferred Areas</h2>
+<div class="flex flex-wrap gap-unit">
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-primary text-on-primary transition-all shadow-[0_4px_12px_rgba(34,197,94,0.2)]">North Campus</button>
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">GTB Nagar</button>
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Hudson Lane</button>
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Rohini</button>
+</div>
+</section>
+<!-- Logistics Section (Date & Type) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-stack-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">MOVE-IN DATE</label>
+<div class="relative bg-surface-container rounded-xl p-4 flex items-center justify-between">
+<input class="w-full bg-transparent font-body-lg text-body-lg text-on-surface focus:outline-none appearance-none" type="date" value="2023-09-01"/>
+<span class="material-symbols-outlined text-on-surface-variant pointer-events-none absolute right-4">calendar_today</span>
+</div>
+</div>
+<div class="space-y-stack-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">ROOM TYPE</label>
+<div class="relative bg-surface-container rounded-xl p-4 flex items-center">
+<select class="w-full bg-transparent font-body-lg text-body-lg text-on-surface focus:outline-none appearance-none pr-8">
+<option>Single Room</option>
+<option>Shared Room</option>
+<option>Entire Flat</option>
+</select>
+<span class="material-symbols-outlined text-on-surface-variant pointer-events-none absolute right-4">expand_more</span>
+</div>
+</div>
+</section>
+<!-- About Me -->
+<section class="space-y-stack-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">ABOUT ME</label>
+<textarea class="w-full bg-surface-container rounded-[20px] p-4 font-body-lg text-body-lg text-on-surface focus:outline-none resize-none placeholder:text-on-surface-variant/50" placeholder="Hi! I'm a first-year student looking for a quiet place to study and relax..." rows="4"></textarea>
+</section>
+<!-- Lifestyle Tags -->
+<section class="space-y-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface">Lifestyle</h2>
+<div class="flex flex-wrap gap-unit">
+<button class="lifestyle-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">smoke_free</span> Non-Smoker
+        </button>
+<button class="lifestyle-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-primary text-on-primary transition-all flex items-center gap-1 shadow-[0_4px_12px_rgba(34,197,94,0.2)]">
+<span class="material-symbols-outlined text-[18px]">pets</span> Pet Friendly
+        </button>
+<button class="lifestyle-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">wb_sunny</span> Early Bird
+        </button>
+<button class="lifestyle-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">menu_book</span> Studious
+        </button>
+</div>
+</section>
+<!-- Roommate Preferences -->
+<section class="bg-surface-container-low rounded-[24px] p-6 space-y-stack-md shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="flex items-center justify-between">
+<div class="space-y-1">
+<h3 class="font-title-md text-title-md text-on-surface">Looking for Flatmates</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Include others in your search</p>
+</div>
+<button class="relative w-12 h-6 rounded-full bg-primary transition-colors duration-300" id="flatmate-toggle">
+<div class="absolute top-1 left-1 w-4 h-4 rounded-full bg-on-primary transform translate-x-6 transition-transform duration-300" id="flatmate-toggle-thumb"></div>
+</button>
+</div>
+<div class="space-y-stack-md pt-stack-sm" id="flatmate-options">
+<div class="space-y-stack-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">PREFERRED GENDER</label>
+<div class="flex bg-surface-container p-1 rounded-xl">
+<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm bg-surface text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition-all">Any</button>
+<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Boys</button>
+<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Girls</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<div class="sticky bottom-0 w-full p-container-padding-mobile bg-surface/90 backdrop-blur-[12px] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] pb-safe">
+<button onclick="window.location.href='roommate_preview.html'" class="w-full bg-primary text-on-primary py-4 rounded-[20px] font-title-md text-title-md shadow-[0_8px_24px_rgba(34,197,94,0.25)] hover:scale-[0.98] transition-transform active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">campaign</span>
+      Post Requirement
+    </button>
+</div>
+</div>
+<script>
+  // Budget Slider Logic
+  const slider = document.getElementById('budget-slider');
+  const fill = document.getElementById('budget-fill');
+  const thumb = document.getElementById('budget-thumb');
+  const display = document.getElementById('budget-display');
+
+  slider.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const min = e.target.min;
+    const max = e.target.max;
+    const percent = ((val - min) / (max - min)) * 100;
+    
+    fill.style.width = `${percent}%`;
+    thumb.style.left = `${percent}%`;
+    display.textContent = `â‚¹${parseInt(val).toLocaleString('en-IN')}`;
+    
+    // Scale effect on thumb
+    thumb.style.transform = `translate(-50%, 0) scale(1.1)`;
+    setTimeout(() => {
+      thumb.style.transform = `translate(-50%, 0) scale(1)`;
+    }, 150);
+  });
+
+  // Chip Selection Logic
+  const setupChips = (selector) => {
+    document.querySelectorAll(selector).forEach(chip => {
+      chip.addEventListener('click', () => {
+        const isActive = chip.classList.contains('bg-primary');
+        if (isActive) {
+          chip.classList.remove('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+          chip.classList.add('bg-surface-container', 'text-on-surface');
+        } else {
+          chip.classList.remove('bg-surface-container', 'text-on-surface');
+          chip.classList.add('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+          
+          // Subtle pop animation
+          chip.style.transform = 'scale(0.95)';
+          setTimeout(() => chip.style.transform = 'scale(1)', 150);
+        }
+      });
+    });
+  };
+
+  setupChips('.area-chip');
+  setupChips('.lifestyle-chip');
+
+  // Toggle Logic
+  const toggleBtn = document.getElementById('flatmate-toggle');
+  const toggleThumb = document.getElementById('flatmate-toggle-thumb');
+  const optionsDiv = document.getElementById('flatmate-options');
+  let isToggleOn = true;
+
+  toggleBtn.addEventListener('click', () => {
+    isToggleOn = !isToggleOn;
+    if (isToggleOn) {
+      toggleBtn.classList.remove('bg-surface-container-high');
+      toggleBtn.classList.add('bg-primary');
+      toggleThumb.style.transform = 'translateX(24px)';
+      optionsDiv.style.opacity = '1';
+      optionsDiv.style.pointerEvents = 'auto';
+      optionsDiv.style.height = 'auto';
+    } else {
+      toggleBtn.classList.remove('bg-primary');
+      toggleBtn.classList.add('bg-surface-container-high');
+      toggleThumb.style.transform = 'translateX(0)';
+      optionsDiv.style.opacity = '0.5';
+      optionsDiv.style.pointerEvents = 'none';
+    }
+  });
+
+  // Segmented Control Logic
+  const genderBtns = document.querySelectorAll('#flatmate-options .flex > button');
+  genderBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      genderBtns.forEach(b => {
+        b.classList.remove('bg-surface', 'shadow-[0_2px_8px_rgba(0,0,0,0.05)]', 'text-on-surface');
+        b.classList.add('text-on-surface-variant');
+      });
+      btn.classList.add('bg-surface', 'shadow-[0_2px_8px_rgba(0,0,0,0.05)]', 'text-on-surface');
+      btn.classList.remove('text-on-surface-variant');
+    });
+  });
+</script></main></body></html>
+
+
