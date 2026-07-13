@@ -1,12 +1,15 @@
 // Supabase Configuration
-// Requires the Supabase JS SDK to be loaded in HTML:
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+// Requires the Supabase JS UMD SDK to be loaded in HTML:
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 const SUPABASE_URL = 'https://bwhvbynmqubjwgonsywd.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G';
 
 // Initialize Supabase Client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// The UMD bundle exposes the library as window.supabase
+const supabaseLib = window.supabase || window.Supabase;
+if (!supabaseLib) { console.error('Supabase SDK not loaded! Check the CDN script tag.'); }
+window.supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper: Get Current User Profile
 async function getProfile() {
@@ -54,4 +57,20 @@ async function requireVerifiedSeller() {
     return false;
   }
   return true;
+}
+
+// Helper: Update Profile
+async function updateProfile(updates) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', session.user.id);
+
+  if (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
 }

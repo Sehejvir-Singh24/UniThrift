@@ -4,6 +4,10 @@ CREATE TABLE public.profiles (
   email TEXT NOT NULL,
   role TEXT CHECK (role IN ('customer', 'seller')) DEFAULT 'customer',
   is_verified BOOLEAN DEFAULT false,
+  full_name TEXT,
+  phone_number TEXT,
+  enrollment_number TEXT,
+  year_of_study TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -30,12 +34,16 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, is_verified)
+  INSERT INTO public.profiles (id, email, role, is_verified, full_name, phone_number, enrollment_number, year_of_study)
   VALUES (
     new.id,
     new.email,
     COALESCE(new.raw_user_meta_data->>'role', 'customer'),
-    CASE WHEN COALESCE(new.raw_user_meta_data->>'role', 'customer') = 'customer' THEN true ELSE false END
+    false,
+    NULL,
+    NULL,
+    NULL,
+    NULL
   );
   RETURN new;
 END;

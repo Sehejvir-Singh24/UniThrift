@@ -1,84 +1,41 @@
-# UniThrift — Codebase & Features Guide
+# UniThrift Codebase Architecture
 
-Welcome to the **UniThrift Campus Hub** codebase. This document outlines the updated architecture, file structure, design system, and all interactive features implemented in the project, which now perfectly mirrors the premium Stitch design.
+This document serves as a guide to the current structure of the UniThrift codebase, outlining how the different files connect and where data is managed.
 
----
+## Authentication & Backend Connectivity
+- **`supabase.js`**: The central brain for connecting the frontend UI to our Supabase database. 
+  - Initializes the Supabase client.
+  - Contains helper functions like `requireAuth()`, `requireVerifiedSeller()`, `getProfile()`, and `updateProfile()`.
+  - Included on every secure page to ensure session persistence.
 
-## 📂 Project Architecture
+- **`supabase_setup.sql`**: The master SQL script containing all table definitions (e.g., the `profiles` schema) and Row Level Security (RLS) policies.
 
-The application has been restructured from a Single Page Application (SPA) into a Multi-Page Application (MPA) to preserve the exact HTML rendering, inline scripts, and dynamic interactivity provided by the Stitch AI. It leverages Tailwind CSS via CDN.
+## The Onboarding Journey (Routing Flow)
 
-```
-d:\projects\Unithrift\
-├── splash.html       # The entry point. Features a logo and loading animation, automatically redirects to index.html.
-├── index.html        # The Home / Dashboard screen.
-├── marketplace.html  # The full marketplace listing feed.
-├── flatmates.html    # The Tinder-like swipe UI for finding roommates.
-├── pghostels.html    # Map view and listing directory for student accommodation.
-├── item.html         # Full-screen detailed product view (linked from Market).
-└── profile.html      # User profile, trust & verification, and activity.
-```
-*(Note: `styles.css` and `app.js` were intentionally removed to adhere strictly to the exact Stitch output.)*
+The app employs a strict, linear onboarding flow to ensure data integrity:
 
----
+### 1. `login.html` (Authentication)
+- Handles both **Sign In** and **Sign Up**.
+- **Data Stored:** Email and Password (securely hashed in Supabase's hidden `auth.users` table).
+- **Routing Logic:** On successful login, `onAuthStateChange` checks the user's `profiles` table.
+  - If `full_name` is missing -> Redirects to `profile_setup.html`
+  - If `is_verified` is false -> Redirects to `id_verification.html`
+  - Otherwise -> Redirects to `index.html`
 
-## 🎨 Design System: Stitch Premium Campus Ecosystem
+### 2. `profile_setup.html` (Data Collection)
+- The second step in onboarding.
+- **Data Stored:** Saves `full_name`, `phone_number`, `year_of_study`, and `enrollment_number` to the user's row in the `profiles` table.
+- **Logic:** Dynamically requires a 11-digit enrollment number for 2nd/3rd/4th year students, but makes it optional for 1st-year students.
+- **Routing Logic:** On submit, successfully calls `updateProfile()` and redirects to `id_verification.html`.
 
-The visual language is designed to reflect a high-contrast, premium aesthetic tailored for college students, utilizing the strict constraints of the Stitch Tailwind configuration.
+### 3. `id_verification.html` (Security Check)
+- The final onboarding hurdle.
+- **Data Stored:** (Future implementation) Will upload the ID image to a Supabase Storage Bucket. Currently simulates the upload. Updates `is_verified = true` in the `profiles` table.
+- **Routing Logic:** On success, redirects to the main `index.html` dashboard.
 
-### 1. Color Palette
-- **Background (`#f8f9ff`):** A clean, ultra-light slate driving the light mode aesthetic.
-- **Primary Accent (`#006e2f` / `#22c55e`):** Vibrant emerald greens used for CTA highlights, verification badges, and the primary UniThrift brand identity.
-- **Surface Containers (`#eff4ff` / `#ffffff`):** Layered whites and light blues to create depth and card hierarchies.
+## Main Application
+- **`index.html`**: The primary marketplace dashboard where users arrive after successfully authenticating and verifying their accounts. This is the next major focus for development (Marketplace Feed & Product Listings).
 
-### 2. Typography
-- **Primary Typeface:** `Geist` — a modern, geometric sans-serif used exclusively across the entire UI for headlines, body copy, and labels.
-- **Icons:** `Material Symbols Outlined` with precise weight and fill variations for dynamic interactions.
-
-### 3. Key Aesthetics
-- **Glassmorphism:** Navigation panels and sticky headers use semi-transparent backgrounds with backdrop blur (`backdrop-blur-md`, `.glass`).
-- **Signature Corners:** Container elements and main listing cards employ an organic `20px` border radius (`rounded-[20px]`).
-- **Shadow Depth:** Soft, diffused shadows (`shadow-[0_4px_20px_rgba(0,0,0,0.04)]`) provide elevation without harsh contrast.
-
----
-
-## ⚡ Feature Catalog
-
-### 1. Unified Navigation
-* **Desktop/Mobile Headers:** Frosted glass headers that dynamically update opacity. Include quick actions like Search and User Profile.
-* **Mobile Bottom Nav:** Standard fixed-bottom app navigation (`nav.fixed.bottom-0`) linking all primary HTML files (`index.html`, `marketplace.html`, `flatmates.html`, `pghostels.html`, `profile.html`).
-
-### 2. Dynamic Splash Screen (`splash.html`)
-* A pure visual intro screen featuring the green UniThrift logo and animated pulsing loading dots.
-* Automatically routes users to the Dashboard (`index.html`) after 3 seconds or upon any screen tap.
-
-### 3. Home Dashboard (`index.html`)
-* **Greeting & Search:** Personalized "Good morning" block and a floating search bar.
-* **Categories Row:** Horizontal scrolling action panel for Books, Lab Coats, Gadgets, Cycles, and PGs.
-* **Trending Offers:** A 2-column Bento grid of featured marketplace items.
-* **Near Campus Stays:** Horizontal scrolling cards for sponsored hostels.
-* **Looking for Roomies:** Quick view of potential flatmates.
-
-### 4. Marketplace (`marketplace.html`)
-* A comprehensive listing directory for campus essentials.
-* **Filter Pills:** Horizontal scrolling pill menu (All Items, Under $50, Textbooks, Electronics).
-* **Grid Layout:** Detailed product cards showing condition (e.g., "Like New"), original vs discounted pricing, and verified status badges.
-
-### 5. Swipeable Flatmates UI (`flatmates.html`)
-* An interactive Tinder-style swipe interface for finding roommates.
-* Features a fully functional Javascript drag-and-drop listener (`touchmove`, `touchend`) that applies dynamic rotation and opacity overlays (`LIKE` / `NOPE`).
-* Displays detailed roommate preferences (Budget, Preferred Area, Lifestyle tags like Night Owl/Non-Smoker).
-
-### 6. PGs & Hostels (`pghostels.html`)
-* A specialized directory for housing featuring large hero images of properties.
-* Displays walk-times to campus, star ratings, and rent per month.
-
-### 7. Item Details (`item.html`)
-* Deep-dive view of a specific product (e.g., a Leather Jacket).
-* Massive hero image taking up the top half of the screen.
-* Fixed bottom action bar offering "Make Offer" and "Buy Now" CTAs.
-
-### 8. User Profile (`profile.html`)
-* Trust & Verification center showing Student ID and Enrollment No. validation.
-* Statistical overview: Rating, Items Sold, and Transacts.
-* Account Activity links (Saved Items, Purchase History, Selling History).
+## Deprecated/Legacy Files
+- **`otp_verification.html`**: Originally used for Magic Link login, but deprecated due to Supabase sandbox rate limits on emails. Replaced entirely by the email/password flow in `login.html`.
+- **`pending_verification.html`**: A holding page for sellers awaiting manual approval. Currently bypassed by the automated `id_verification.html` flow, but kept for future manual admin review features.
