@@ -53,7 +53,9 @@
 </button>
 </div></div></div></div></button>
 </div>
-<div class="flex flex-col gap-stack-sm mt-auto pt-stack-lg px-container-padding-mobile pb-stack-lg w-full max-w-2xl mx-auto">
+</div>
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md px-container-padding-mobile pt-stack-sm pb-safe z-50 border-t border-outline-variant/20 shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
+<div class="flex flex-col gap-stack-sm w-full max-w-2xl mx-auto pb-stack-sm">
 <button onclick="window.location.href='index.html'" class="w-full bg-primary text-on-primary font-title-md text-title-md py-4 rounded-full flex items-center justify-center gap-2 transition-transform duration-200 active:scale-[0.98] opacity-50 pointer-events-none shadow-md" id="continue-btn">
         Upload & Continue
         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
@@ -62,6 +64,8 @@
         Need help?
       </button>
 </div>
+</div>
+<div class="h-32 w-full"></div> <!-- spacer for fixed footer -->
 </div>
 <script>
     const uploadArea = document.getElementById('upload-area');
