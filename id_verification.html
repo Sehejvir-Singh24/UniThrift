@@ -44,16 +44,16 @@
 </div>
 </div>
 <div class="absolute inset-0 w-full h-full bg-surface-container-lowest z-20 hidden flex-col items-center justify-center p-stack-sm" id="preview-container">
-<div class="w-full h-full relative rounded-lg overflow-hidden shadow-sm" data-alt="A modern, minimalist close up of a student ID card on a clean wooden desk, bright natural lighting, soft focus background, high resolution, soft warm tones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDJKIyAsm97s_PtMK3oVo2SZR1M5BGSon693YVriENoWZVm27ZhIJhWBg1n80-FqLa5QzsxEFbvNOGJ3Q3po4PXM-s97-njk7qaQG8iSdeDCgjOVmgTPIsmEUyTIaQ1JFX32w1m0fL-CyRtxi2hdloubVA7wI9ii6IBIOGp5lkzyuJMh1EHmOsNzke9TomW_I35e8dTgbTWZ_gWLVqb3ijDOqEJ_3mz50VlamfIo403i5dROPvwnG1cJIV_63OMHXNQBy8F_xvExrGM')">
+<div class="w-full h-full relative rounded-lg overflow-hidden shadow-sm bg-cover bg-center bg-no-repeat" data-alt="A modern, minimalist close up of a student ID card on a clean wooden desk, bright natural lighting, soft focus background, high resolution, soft warm tones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDJKIyAsm97s_PtMK3oVo2SZR1M5BGSon693YVriENoWZVm27ZhIJhWBg1n80-FqLa5QzsxEFbvNOGJ3Q3po4PXM-s97-njk7qaQG8iSdeDCgjOVmgTPIsmEUyTIaQ1JFX32w1m0fL-CyRtxi2hdloubVA7wI9ii6IBIOGp5lkzyuJMh1EHmOsNzke9TomW_I35e8dTgbTWZ_gWLVqb3ijDOqEJ_3mz50VlamfIo403i5dROPvwnG1cJIV_63OMHXNQBy8F_xvExrGM')">
 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex flex-col justify-end p-stack-md">
 <div class="flex items-center justify-between">
 <span class="font-body-sm text-body-sm text-on-primary font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check_circle</span> ID_Scan_Final.jpg</span>
-</div></div></div></div></button><button class="bg-surface/20 hover:bg-error backdrop-blur-md rounded-full p-2 text-on-primary transition-colors" id="remove-btn">
+<button class="bg-surface/20 hover:bg-error backdrop-blur-md rounded-full p-2 text-on-primary transition-colors" id="remove-btn">
 <span class="material-symbols-outlined text-[20px]">close</span>
 </button>
+</div></div></div></div></button>
 </div>
-</div>
-<div class="flex flex-col gap-stack-sm mt-auto pt-stack-lg">
+<div class="flex flex-col gap-stack-sm mt-auto pt-stack-lg px-container-padding-mobile pb-stack-lg w-full max-w-2xl mx-auto">
 <button onclick="window.location.href='index.html'" class="w-full bg-primary text-on-primary font-title-md text-title-md py-4 rounded-full flex items-center justify-center gap-2 transition-transform duration-200 active:scale-[0.98] opacity-50 pointer-events-none shadow-md" id="continue-btn">
         Upload & Continue
         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
@@ -61,6 +61,7 @@
 <button class="w-full bg-surface-container-lowest text-on-surface font-title-md text-title-md py-4 rounded-full flex items-center justify-center transition-transform duration-200 active:scale-[0.98] shadow-sm">
         Need help?
       </button>
+</div>
 </div>
 <script>
     const uploadArea = document.getElementById('upload-area');
