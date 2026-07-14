@@ -259,3 +259,116 @@ async function getSellingHistory(userId) {
   }
   return sold || [];
 }
+
+// Helper: Submit an Offer
+async function submitOffer(productId, sellerId, amount, message = '') {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('offers')
+    .insert({
+      product_id: productId,
+      buyer_id: session.user.id,
+      seller_id: sellerId,
+      offer_amount: amount,
+      message: message || null,
+      status: 'Pending'
+    });
+
+  if (error) {
+    console.error("Error submitting offer:", error);
+    throw error;
+  }
+}
+
+// Helper: Get Received Offers (for Sellers)
+async function getReceivedOffers() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data: offers, error } = await supabase
+    .from('offers')
+    .select('*, products(*), profiles!buyer_id(full_name, email)')
+    .eq('seller_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching received offers:", error);
+    return [];
+  }
+  return offers || [];
+}
+
+// Helper: Get Sent Offers (for Buyers)
+async function getSentOffers() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data: offers, error } = await supabase
+    .from('offers')
+    .select('*, products(*), profiles!seller_id(full_name)')
+    .eq('buyer_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching sent offers:", error);
+    return [];
+  }
+  return offers || [];
+}
+
+// Helper: Get Offer Details by ID
+async function getOfferById(offerId) {
+  const { data: offer, error } = await supabase
+    .from('offers')
+    .select('*, products(*), profiles!buyer_id(full_name, email)')
+    .eq('id', offerId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching offer by ID:", error);
+    return null;
+  }
+  return offer;
+}
+
+// Helper: Update Offer Status (and mark product sold if accepted)
+async function updateOfferStatus(offerId, status, counterAmount = null) {
+  const updates = { status };
+  if (status === 'Countered' && counterAmount) {
+    updates.offer_amount = counterAmount;
+  }
+
+  // Update offer
+  const { data: offer, error: updateError } = await supabase
+    .from('offers')
+    .update(updates)
+    .eq('id', offerId)
+    .select()
+    .single();
+
+  if (updateError) {
+    console.error("Error updating offer status:", updateError);
+    throw updateError;
+  }
+
+  // If accepted, update product status to 'Sold' and link buyer
+  if (status === 'Accepted') {
+    const { error: productError } = await supabase
+      .from('products')
+      .update({
+        status: 'Sold',
+        buyer_id: offer.buyer_id
+      })
+      .eq('id', offer.product_id);
+
+    if (productError) {
+      console.error("Error marking product as sold:", productError);
+      throw productError;
+    }
+  }
+
+  return offer;
+}
+
