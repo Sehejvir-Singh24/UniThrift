@@ -241,8 +241,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
-        requireAuth().then(isAuth => {
-            if(!isAuth) window.location.href = '/auth/login.html';
+        requireAuth().then(async isAuth => {
+            if(!isAuth) {
+                window.location.href = '/auth/login.html';
+                return;
+            }
+            const profile = await getProfile();
+            if (profile) {
+                if (profile.full_name && profile.phone_number) {
+                    if (profile.is_verified) {
+                        window.location.href = '/index.html';
+                    } else if (profile.id_url) {
+                        window.location.href = '/auth/pending_verification.html';
+                    } else {
+                        window.location.href = '/auth/id_verification.html';
+                    }
+                }
+            }
         });
     </script>
 </div></main></body></html>

@@ -372,3 +372,19 @@ async function updateOfferStatus(offerId, status, counterAmount = null) {
   return offer;
 }
 
+// Helper: Sign In with Google OAuth
+async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/auth/profile_setup.html'
+    }
+  });
+
+  if (error) {
+    console.error("Error signing in with Google:", error);
+    throw error;
+  }
+}
+
+
