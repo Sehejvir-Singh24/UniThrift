@@ -3,72 +3,53 @@
 This document chronicles what we have built so far and the roadmap for what we need to build next to bring the UniThrift Premium Campus Ecosystem to life.
 
 ## What We Did Today
-We made massive leaps forward today in building out the core onboarding and user authentication flow! Here is a recap of everything that was accomplished and integrated:
+We made massive progress today, expanding the app's features from simple static mockups into a fully connected, secure, and responsive campus marketplace! Here is a recap of everything that was accomplished and integrated:
 
-### 1. Authentication Strategy Pivot
-- Moved away from Magic Links and implemented **Email & Password Authentication** to bypass Supabase sandbox email rate limits.
-- Configured Supabase to handle the new login flow flawlessly.
+### 1. Mobile UI Responsiveness & Layout Fixes
+- Removed global `min-height` calculations which were causing layout shifting and "bouncing" scroll bugs on mobile devices.
+- Standardized vertical space offsets (`pb-[140px]`) across all 25+ layout templates to prevent floating navbar layouts from overlapping form inputs (like the Phone Number field during profile setup) and keyboard overlays.
 
-### 2. Dynamic Login & Sign Up Flow
-- Integrated the new premium Stitch design for the login page.
-- Branded the login page back to **UniThrift**.
-- Built a dynamic toggle between "Sign In" and "Create Account".
-- Successfully integrated the **Role Selector (Buy / Sell)** that only appears when a user is creating a brand new account.
+### 2. PostgREST Join Disambiguation Bugfix
+- Fixed a database join bug in `scripts/supabase.js` that occurred when introducing the `buyer_id` foreign key. Disambiguated all queries joining with the `profiles` table by explicitly using `profiles!seller_id(full_name)` instead of the ambiguous `profiles(full_name)`. This restored marketplace visibility for all posted items.
 
-### 3. Advanced Profile Setup
-- Added a brand new step to the onboarding flow (`profile_setup.html`).
-- Updated the Supabase `profiles` schema to track:
-  - `full_name`
-  - `phone_number`
-  - `enrollment_number`
-  - `year_of_study`
-- Wrote dynamic Javascript validation (e.g., making the Enrollment Number optional *only* for 1st Year students).
+### 3. Fully Working "Make an Offer" Feature
+- **Database Schema (`db/offers_migration.sql`):** Created the SQL schema defining the `offers` table and set up secure Row Level Security (RLS) policies allowing buyers to submit and sellers to review and manage offers.
+- **Offer Submission (`marketplace/item.html`):** Configured the make-an-offer modal to collect custom prices and messaging, executing an API call to save it to Supabase. Configured owner protection to prevent users from making offers on their own listings.
+- **Offers Dashboard (`core/offers.html`):** Designed and coded a central hub with tabbed sections for **Offers Received** and **Offers Sent**.
+- **Interactive Review Flow (`marketplace/offer_received.html`):** Made this screen dynamic, letting sellers Accept, Reject, or Counter offers. Accepting an offer updates the product's status to `Sold` and records the `buyer_id` in the products table.
 
-### 4. ID Verification Redesign
-- Completely replaced the old verification page with the new Stitch **ID Verification - Dynamic Upload** design (`id_verification.html`).
-- Fixed desktop overflow bugs and perfectly positioned the image remove button.
-- Tied the "Upload & Continue" button to Supabase so it officially marks the user's `is_verified` status as `true` in the database.
+### 4. Google OAuth Authentication Integration
+- **Google Sign-In Button (`auth/login.html`):** Added a beautiful, branded Google login button with smooth transitions and redirect loaders.
+- **Supabase Integration (`scripts/supabase.js`):** Programmed the `signInWithGoogle()` callback to route through Supabase's secure OAuth flow.
+- **Smart redirectional onboarding:** Configured `auth/profile_setup.html` so that returning users who log in via Google/Email instantly bypass the details forms and route straight to their current onboarding step (Home, ID Upload, or Pending Verification).
 
-### 5. Seamless Routing Architecture
-- Built smart, secure routing across the app.
-- If a user tries to access `index.html` without finishing their profile, they are bounced back to `profile_setup.html`.
-- If they finish their profile but haven't verified their ID, they are bounced to `id_verification.html`.
+### 5. Onboarding Cropper.js Integration & Global Avatar Sync
+- **Mandatory Registration Cropping (`auth/profile_setup.html`):** Integrated **Cropper.js** to allow users to select, crop, and preview their avatar right at registration. Enforced that an avatar must be cropped before registering.
+- **Global Header Avatar Sync:** Wrote a python script to inject `id="header-avatar"` onto all profile navigation elements across 20 files. Configured a central listener in `supabase.js` to automatically fetch and update the header icon's image source with the user's real avatar URL upon page load.
+
+### 6. Functional Logout
+- Implemented `logout()` helper in `supabase.js` to clear session cookies/cache and bounce the user back to the login page. Bound it to the Log Out button on the profile page.
 
 ---
 
 ## What We Need To Do Next (Future Roadmap)
-Now that the core onboarding and authentication flows are robust and fully integrated, here is what we need to tackle next:
+Now that onboarding, authentication, profile sync, and offer submissions are fully dynamic and functional, here is what we need to tackle next:
 
-### 1. Storage Bucket Implementation
-- **Goal:** Actually save the uploaded ID verification images instead of just running a UI simulation.
+### 1. In-App Notifications
+- **Goal:** Notify buyers/sellers when their offers are accepted, rejected, or countered.
 - **Tasks:**
-  - Create a private `id-verifications` storage bucket in the Supabase Dashboard.
-  - Implement the Supabase Javascript SDK upload logic in `id_verification.html` to convert the uploaded file and push it to the bucket.
-  - Secure the bucket so only authenticated admins can view the IDs.
+  - Create a `notifications` table in Supabase.
+  - Set up a dashboard notification bell in the header that queries this table.
+  - Trigger notification records when offers are sent, countered, or responded to.
 
-### 2. Marketplace Dashboard (`index.html`)
-- **Goal:** Build the main feed where users browse items.
+### 2. In-App Chat Integration
+- **Goal:** Enable direct negotiation and pickup coordination inside the app.
 - **Tasks:**
-  - Import the Stitch UI designs for the marketplace dashboard.
-  - Create an `items` table in Supabase to store product listings (title, description, price, seller_id, image_url, etc.).
-  - Write Javascript to fetch these items from Supabase and render them into the feed dynamically.
-  - Implement filtering or search functionality (e.g., search by category or price).
+  - Create a `messages` and `conversations` table in Supabase.
+  - Design a real-time messaging interface where buyers and sellers can talk after an offer is submitted.
 
-### 3. "Post an Item" Flow (Sellers Only)
-- **Goal:** Allow users who registered as "Sellers" to list new items.
+### 3. College Verification Enhancements (ID Verification Upload)
+- **Goal:** Set up secure, private image file storage for ID verification.
 - **Tasks:**
-  - Create a new `post_item.html` screen using Stitch UI designs.
-  - Set up a `product-images` storage bucket in Supabase for item photos.
-  - Write Javascript to handle image uploads and insert a new row into the `items` database table.
-
-### 4. Role-Based Access Control
-- **Goal:** Ensure buyers and sellers have distinct experiences.
-- **Tasks:**
-  - Add logic to the dashboard to show a "Post Item" floating action button *only* to verified sellers.
-  - Create a "My Listings" page for sellers to view and delete items they've posted.
-
-### 5. Messaging / Contact Seller
-- **Goal:** Allow buyers to express interest in an item.
-- **Tasks:**
-  - Build a chat interface or a simple "Email Seller" button on the item detail page.
-  - (Optional) Create a `messages` table in Supabase to handle in-app communication.
+  - Create an `id-cards` private storage bucket in Supabase.
+  - Implement image upload and OCR/Admin review panel to verify student cards.
