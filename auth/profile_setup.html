@@ -208,7 +208,7 @@
                 if(progressBar) progressBar.style.transform = 'scaleX(1)';
                 
                 setTimeout(() => {
-                    window.location.href = 'id_verification.html';
+                    window.location.href = '/auth/id_verification.html';
                 }, 800);
             } catch (err) {
                 alert("Error saving profile: " + err.message);
@@ -217,10 +217,10 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <script src="supabase.js"></script>
+    <script src="/scripts/supabase.js"></script>
     <script>
         requireAuth().then(isAuth => {
-            if(!isAuth) window.location.href = 'login.html';
+            if(!isAuth) window.location.href = '/auth/login.html';
         });
     </script>
 </div></main></body></html>

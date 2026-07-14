@@ -52,6 +52,7 @@
 <span class="material-symbols-outlined text-[20px] block">close</span>
 </button>
 </div></div></div></div></button>
+<input type="file" id="id-upload-input" accept="image/*" class="hidden">
 </div>
 </div>
 <div class="flex flex-col gap-stack-sm mt-auto pt-stack-lg pb-20">
@@ -65,17 +66,41 @@
 </div>
 <script>
     const uploadArea = document.getElementById('upload-area');
+    const uploadInput = document.getElementById('id-upload-input');
     const uploadContent = document.getElementById('upload-content');
     const previewContainer = document.getElementById('preview-container');
     const removeBtn = document.getElementById('remove-btn');
     const continueBtn = document.getElementById('continue-btn');
 
+    let selectedFile = null;
+
     uploadArea.addEventListener('click', (e) => {
         if(previewContainer.classList.contains('hidden') && !e.target.closest('#remove-btn')) {
-            // Simulate upload delay
+            uploadInput.click();
+        }
+    });
+
+    uploadInput.addEventListener('change', async (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            // Show loading state
             uploadContent.innerHTML = `<div class="w-12 h-12 rounded-full border-4 border-surface-container border-t-primary animate-spin"></div>`;
             
-            setTimeout(() => {
+            try {
+                // Basic compression using Canvas (Max 800px, 70% quality) to save Free Tier Storage
+                const compressedFile = await compressImage(file, 800, 0.7);
+                selectedFile = compressedFile;
+
+                // Show preview
+                const objectUrl = URL.createObjectURL(compressedFile);
+                const previewDiv = previewContainer.querySelector('div.bg-cover');
+                previewDiv.style.backgroundImage = `url('${objectUrl}')`;
+                
+                // Update filename text
+                const filenameSpan = previewContainer.querySelector('span.text-body-sm');
+                filenameSpan.innerHTML = `<span class="material-symbols-outlined text-[16px]">check_circle</span> ${file.name}`;
+                
                 previewContainer.classList.remove('hidden');
                 continueBtn.classList.remove('opacity-50', 'pointer-events-none');
                 
@@ -84,13 +109,17 @@
                 ripple.className = 'absolute inset-0 bg-primary/20 rounded-xl animate-[ping_0.5s_cubic-bezier(0,0,0.2,1)_forwards] pointer-events-none';
                 uploadArea.appendChild(ripple);
                 setTimeout(() => ripple.remove(), 500);
-
-            }, 800);
+            } catch (err) {
+                console.error("Compression error", err);
+                alert("Error processing image. Please try a different one.");
+                resetUploadArea();
+            }
         }
     });
 
-    removeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    function resetUploadArea() {
+        selectedFile = null;
+        uploadInput.value = '';
         previewContainer.classList.add('hidden');
         continueBtn.classList.add('opacity-50', 'pointer-events-none');
         uploadContent.innerHTML = `
@@ -102,26 +131,99 @@
              <span class="font-body-sm text-body-sm text-on-surface-variant">JPG, PNG, HEIC up to 5MB</span>
          </div>
         `;
+    }
+
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetUploadArea();
     });
 
     continueBtn.addEventListener('click', async () => {
-        continueBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Verifying...`;
+        if (!selectedFile) return;
+        
+        continueBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Uploading...`;
         continueBtn.classList.add('pointer-events-none');
         try {
-            await updateProfile({ is_verified: true });
-            window.location.href = 'index.html';
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) throw new Error("Not authenticated");
+            
+            const userId = session.user.id;
+            const fileExt = selectedFile.name.split('.').pop();
+            const filePath = `${userId}/id_card_${Date.now()}.${fileExt}`;
+            
+            // Upload to Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('id_cards')
+                .upload(filePath, selectedFile, { upsert: true });
+                
+            if (uploadError) throw uploadError;
+            
+            const { data: publicUrlData } = supabase.storage
+                .from('id_cards')
+                .getPublicUrl(filePath);
+                
+            const idUrl = publicUrlData.publicUrl;
+
+            // Update user's profile with the URL and mark as verified
+            await updateProfile({ is_verified: true, id_url: idUrl });
+            window.location.href = '/index.html';
         } catch(err) {
-            alert(err.message);
+            console.error("Upload error:", err);
+            alert("Upload failed: " + err.message);
             continueBtn.innerHTML = `Upload & Continue <span class="material-symbols-outlined text-[20px]">arrow_forward</span>`;
             continueBtn.classList.remove('pointer-events-none');
         }
     });
+
+    // Image compression helper function
+    function compressImage(file, maxSize, quality) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxSize) {
+                            height = Math.round(height *= maxSize / width);
+                            width = maxSize;
+                        }
+                    } else {
+                        if (height > maxSize) {
+                            width = Math.round(width *= maxSize / height);
+                            height = maxSize;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob(blob => {
+                        const newFile = new File([blob], file.name, {
+                            type: file.type || 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(newFile);
+                    }, file.type || 'image/jpeg', quality);
+                };
+                img.onerror = error => reject(error);
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
 <script>
     requireAuth().then(isAuth => {
-        if(!isAuth) window.location.href = 'login.html';
+        if(!isAuth) window.location.href = '/auth/login.html';
     });
 </script>
 </main></body></html>

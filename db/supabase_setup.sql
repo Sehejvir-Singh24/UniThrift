@@ -8,6 +8,7 @@ CREATE TABLE public.profiles (
   phone_number TEXT,
   enrollment_number TEXT,
   year_of_study TEXT,
+  id_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -34,7 +35,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, is_verified, full_name, phone_number, enrollment_number, year_of_study)
+  INSERT INTO public.profiles (id, email, role, is_verified, full_name, phone_number, enrollment_number, year_of_study, id_url)
   VALUES (
     new.id,
     new.email,
@@ -43,7 +44,8 @@ BEGIN
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    new.raw_user_meta_data->>'id_url'
   );
   RETURN new;
 END;
@@ -103,3 +105,20 @@ CREATE POLICY "Verified sellers can delete their own products."
       WHERE id = auth.uid() AND role = 'seller' AND is_verified = true
     )
   );
+
+-- 4. Setup Storage for ID Cards
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('id_cards', 'id_cards', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage Policies for 'id_cards' bucket
+CREATE POLICY "Anyone can view id_cards" 
+ON storage.objects FOR SELECT 
+USING (bucket_id = 'id_cards');
+
+CREATE POLICY "Authenticated users can upload id_cards" 
+ON storage.objects FOR INSERT 
+WITH CHECK (
+  bucket_id = 'id_cards' AND 
+  auth.role() = 'authenticated'
+);

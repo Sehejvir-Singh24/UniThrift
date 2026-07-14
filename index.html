@@ -6,14 +6,14 @@
     }
   </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <script src="supabase.js"></script>
+    <script src="/scripts/supabase.js"></script>
     <script>
       async function checkVerificationStatus() {
         const profile = await getProfile();
         if (profile && !profile.full_name) {
-          window.location.href = 'profile_setup.html';
+          window.location.href = '/auth/profile_setup.html';
         } else if (profile && !profile.is_verified) {
-          window.location.href = 'id_verification.html';
+          window.location.href = '/auth/id_verification.html';
         }
       }
 
@@ -39,7 +39,7 @@
 <script>
   async function logout() {
     await supabase.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href = '/auth/login.html';
   }
 </script>
 
@@ -102,7 +102,7 @@
 </div>
 <div class="grid grid-cols-2 gap-gutter">
 <!-- Product Card 1 -->
-<div onclick="window.location.href='item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
+<div onclick="window.location.href='/marketplace/item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
 <div class="relative w-full aspect-square bg-surface-container-low">
 <div class="bg-cover bg-center w-full h-full" data-alt="A softly lit photograph of a nearly new mechanical engineering textbook sitting on a clean wooden desk. A subtle green coffee mug is in the slightly blurred background, emphasizing a calm study environment. Minimalist and bright aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFfXGuC1fXSns6cUi7eh4ubu9ag3VJWAp92ndsa8ZWzDaEt1NKSqtU7eCjN3cExyiFQk12vDgRl3YSJH7xL3wEUBh8z-uputunsnwhdWNE0c59ZZTsVjSrOQqsGN_T5LttSqAN6T2-csDriACqqV8zcSR6X599l91cLFWrrjDTgRNgMDfV9r47i2x_cMlubiY-mpkdeEMVuP78yeIQM5nF6khvSHZEdbZg_aWoypv7aYKAZnocDyOP7HqXQ3RfBUTDQBJH5_XUXc8b')"></div>
 <div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
@@ -123,7 +123,7 @@
 </div>
 </div>
 <!-- Product Card 2 -->
-<div onclick="window.location.href='item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
+<div onclick="window.location.href='/marketplace/item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
 <div class="relative w-full aspect-square bg-surface-container-low">
 <div class="bg-cover bg-center w-full h-full" data-alt="A sleek black noise-canceling headphone resting on a white minimalist dorm room shelf. Natural sunlight casts soft shadows. A tiny vibrant green succulent sits next to it." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDDyAOvj7q60Ampac_9k_bza_iawy_fE5D_HP0u9Z-aRLyIB0dkH-wd9bP2CiJmP3fCVEgj2UyqWT_ltuh0S0LvzSzTrsx-ubeg9uRUCp3TMaVJ0SsXT57syMrfgaWaCCEKXI2X5f7bd0KGN8hLMuNwOvM8le6RcHyabsVu0BtlCw6t67Mw7gmTbn-xWpLocP58FdoPytz4EH6uc5BmYEGMPUU9igokgosDEMyQmECJoT3JrAz7Q_sXwtHWCP2i7vCYtPxzseAXyjBs')"></div>
 <div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
@@ -283,11 +283,11 @@
   });
 </script>
 <!-- Floating Action Button for Selling -->
-<button onclick="window.location.href='add_photos.html'" class="fixed bottom-24 right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
+<button onclick="window.location.href='/marketplace/add_photos.html'" class="fixed bottom-24 right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
     <span class="material-symbols-outlined text-[24px]">add</span>
     <span class="font-title-md text-[16px]">Sell</span>
 </button>
-</main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="account" href="profile.html"><span class="material-symbols-outlined">verified_user</span><span class="font-label-caps text-label-caps">Profile</span></a></div></nav></body></html>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="account" href="/core/profile.html"><span class="material-symbols-outlined">verified_user</span><span class="font-label-caps text-label-caps">Profile</span></a></div></nav></body></html>
 
 
 
