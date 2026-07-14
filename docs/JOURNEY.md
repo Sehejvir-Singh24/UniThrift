@@ -2,7 +2,7 @@
 
 This document chronicles what we have built so far and the roadmap for what we need to build next to bring the UniThrift Premium Campus Ecosystem to life.
 
-## What We Did Today
+## Session 2: Make an Offer, Google OAuth & Onboarding Cropper (Today)
 We made massive progress today, expanding the app's features from simple static mockups into a fully connected, secure, and responsive campus marketplace! Here is a recap of everything that was accomplished and integrated:
 
 ### 1. Mobile UI Responsiveness & Layout Fixes
@@ -29,6 +29,40 @@ We made massive progress today, expanding the app's features from simple static 
 
 ### 6. Functional Logout
 - Implemented `logout()` helper in `supabase.js` to clear session cookies/cache and bounce the user back to the login page. Bound it to the Log Out button on the profile page.
+
+---
+
+## Session 1: Core Onboarding & Authentication
+We built out the core onboarding and user authentication flow:
+
+### 1. Authentication Strategy Pivot
+- Moved away from Magic Links and implemented **Email & Password Authentication** to bypass Supabase sandbox email rate limits.
+- Configured Supabase to handle the new login flow flawlessly.
+
+### 2. Dynamic Login & Sign Up Flow
+- Integrated the new premium Stitch design for the login page.
+- Branded the login page back to **UniThrift**.
+- Built a dynamic toggle between "Sign In" and "Create Account".
+- Successfully integrated the **Role Selector (Buy / Sell)** that only appears when a user is creating a brand new account.
+
+### 3. Advanced Profile Setup
+- Added a brand new step to the onboarding flow (`profile_setup.html`).
+- Updated the Supabase `profiles` schema to track:
+  - `full_name`
+  - `phone_number`
+  - `enrollment_number`
+  - `year_of_study`
+- Wrote dynamic Javascript validation (e.g., making the Enrollment Number optional *only* for 1st Year students).
+
+### 4. ID Verification Redesign
+- Completely replaced the old verification page with the new Stitch **ID Verification - Dynamic Upload** design (`id_verification.html`).
+- Fixed desktop overflow bugs and perfectly positioned the image remove button.
+- Tied the "Upload & Continue" button to Supabase so it officially marks the user's `is_verified` status as `true` in the database.
+
+### 5. Seamless Routing Architecture
+- Built smart, secure routing across the app.
+- If a user tries to access `index.html` without finishing their profile, they are bounced back to `profile_setup.html`.
+- If they finish their profile but haven't verified their ID, they are bounced to `id_verification.html`.
 
 ---
 
