@@ -8,9 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
-      requireVerifiedSeller();
+      requireAuth();
     </script>
-  </head><body class="bg-background text-on-surface font-body-lg"><header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile flex items-center gap-stack-md"><button class="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-variant transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-primary">arrow_back</span></button><h1 class="font-title-md text-title-md">Sell Item</h1><div class="ml-auto flex items-center gap-stack-md"><img alt="UniThrift" class="h-6 w-auto opacity-50" src="https://lh3.googleusercontent.com/aida/AP1WRLtH4uYEmLByi1jW_bpwvfQ8lgafnrniPPxttkhpfAwQXnXw8NaT9mQkRksWXfo__XRM7d6Uvzm0Bwjn88BhIvEQONJqhM_exCVjyMuVo8JaM-QqfvxIedY9mpAB77aRx5NxpRDH4hHcAAK7XMuCqkpVLNDZbNaily1mDj9Sbn9wd4mk9nYQUiTqK5HOyLhdELnPMf9ECCHmvv5qA3vlmUb534EmdqX2-JyWeljbHwVMV0I03d9DZCZGd0vM"/><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvatbxVzqsSywC_1vHoSqI_wdlArM_evdqze8PEDCD-A2XFALYwvef1wSgnp5xF3MlRZrRJQKlKjsbmjk_vu-XyOCC_GpbCe2nbLWOxEfdhuZRav0Fi0gAet6qMx6U0G8O2kjfJ46p53GfneosMnR2eStPNUcL1QPBh78yyvfvmcw4p1oN0OQ4OJQNb3502Nj1Eh9lB0EcKXd3AxA6D1S0ILao1di_7DsVR-Ve0ptmRbkvPOwVR-IUakakA"/></div></div></header><main class="pt-16 bg-background min-h-screen"><div class="flex flex-col w-full h-full relative">
+  </head><body class="bg-background text-on-surface font-body-lg md:flex md:justify-center md:items-start md:p-8"><header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] md:max-w-2xl md:left-1/2 md:-translate-x-1/2 md:rounded-b-2xl md:top-8"><div class="h-16 px-container-padding-mobile flex items-center gap-stack-md"><button class="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-variant transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-primary">arrow_back</span></button><h1 class="font-title-md text-title-md">Sell Item</h1><div class="ml-auto flex items-center gap-stack-md"><img alt="UniThrift" class="h-6 w-auto opacity-50" src="https://lh3.googleusercontent.com/aida/AP1WRLtH4uYEmLByi1jW_bpwvfQ8lgafnrniPPxttkhpfAwQXnXw8NaT9mQkRksWXfo__XRM7d6Uvzm0Bwjn88BhIvEQONJqhM_exCVjyMuVo8JaM-QqfvxIedY9mpAB77aRx5NxpRDH4hHcAAK7XMuCqkpVLNDZbNaily1mDj9Sbn9wd4mk9nYQUiTqK5HOyLhdELnPMf9ECCHmvv5qA3vlmUb534EmdqX2-JyWeljbHwVMV0I03d9DZCZGd0vM"/><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvatbxVzqsSywC_1vHoSqI_wdlArM_evdqze8PEDCD-A2XFALYwvef1wSgnp5xF3MlRZrRJQKlKjsbmjk_vu-XyOCC_GpbCe2nbLWOxEfdhuZRav0Fi0gAet6qMx6U0G8O2kjfJ46p53GfneosMnR2eStPNUcL1QPBh78yyvfvmcw4p1oN0OQ4OJQNb3502Nj1Eh9lB0EcKXd3AxA6D1S0ILao1di_7DsVR-Ve0ptmRbkvPOwVR-IUakakA"/></div><a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 bg-background min-h-screen w-full md:max-w-2xl md:min-h-0 md:bg-surface-container-lowest md:shadow-xl md:rounded-3xl md:mt-24 md:pb-24"><div class="flex flex-col w-full h-full relative">
 <!-- Progress Indicator -->
 <div class="px-container-padding-mobile py-stack-md flex items-center gap-2">
 <div class="h-1 flex-1 bg-primary rounded-full"></div>
@@ -25,64 +25,165 @@
 <h2 class="font-headline-lg-mobile text-on-surface">Snap some pics</h2>
 <p class="font-body-lg text-on-surface-variant">Show off your item from a few different angles. Good lighting makes a huge difference!</p>
 </div>
+<!-- Hidden file input -->
+<input type="file" id="photo-input" accept="image/*" multiple class="hidden">
 <!-- Upload Area Grid -->
-<div class="grid grid-cols-2 gap-gutter">
-<!-- Main Upload Button (Empty State) -->
-<button class="relative w-full aspect-square bg-surface-container rounded-[20px] flex flex-col items-center justify-center gap-stack-sm active:scale-[0.98] transition-transform overflow-hidden shadow-sm">
-<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
-<span class="material-symbols-outlined">add_a_photo</span>
-</div>
-<span class="font-title-md text-on-surface">Add Photos</span>
-<span class="font-body-sm text-on-surface-variant">Up to 6 max</span>
-<!-- Subtle gradient overlay for depth -->
-<div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
+<div class="grid grid-cols-2 gap-gutter" id="photo-grid">
+<!-- Main Upload Button -->
+<button id="add-photo-btn" class="relative w-full aspect-square bg-surface-container rounded-[20px] flex flex-col items-center justify-center gap-stack-sm active:scale-[0.98] transition-transform overflow-hidden shadow-sm" type="button">
+  <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
+    <span class="material-symbols-outlined">add_a_photo</span>
+  </div>
+  <span class="font-title-md text-on-surface">Add Photos</span>
+  <span class="font-body-sm text-on-surface-variant" id="photo-count-label">Up to 6 max</span>
+  <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
 </button>
-<!-- Uploaded Photo 1 -->
-<div class="relative w-full aspect-square rounded-[20px] bg-surface-container overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] group">
-<img class="w-full h-full object-cover" data-alt="A high quality, softly lit photo of a neatly folded vintage university sweatshirt resting on a clean wooden desk. Natural sunlight streams from a nearby window, highlighting the texture of the fabric. Shot on a DSLR with shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLS3a9KY03FEr09sXXL-VmuxG0M24TTLTc4KPQ1iXiXfZuXF7MECBJnrCm1IA_UefmRidQYHEdZFVPN8RwzXR6tz1y3HZ87w0kAN1baZ_7ltammhw4XF3P6aQfnuO8YPlkOkVXoNtyCdsJA8mzn9QReQiJ35k2ZTKoUYbFxdEhrTA3eTcXSVHHz4RzEsUVfMb2Xnq-YDLEKxjIcDp2zZYih01fiEwmalckdxbhlvvrggFp4SFcvtZB2F1n9r-z_z--mB8o4gs-Mr5n"/>
-<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-highest/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-surface hover:bg-error hover:text-on-error transition-colors">
-<span class="material-symbols-outlined text-[20px]">close</span>
-</button>
-<!-- Primary Photo Badge -->
-<div class="absolute bottom-2 left-2 bg-primary/90 backdrop-blur-sm text-on-primary font-label-caps px-3 py-1 rounded-full">
-          COVER
-        </div>
-</div>
-<!-- Uploaded Photo 2 -->
-<div class="relative w-full aspect-square rounded-[20px] bg-surface-container overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-<img class="w-full h-full object-cover" data-alt="A close-up shot of the embroidered university logo on a vintage sweatshirt. The lighting is bright and clean, emphasizing the quality of the stitching against the faded fabric. Premium, modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCikWhEFOqAE75m6E_GWM3SvNgbpmhecnh_kMdN3iMozFKo4HISpXyYXjwoeIeBbRyqjPUCAgER5412LZ1dHv9b_gbQRtEDHPFwK0mVzOO9C3-pxG6MJsZTgNR6hEL_lvsLfEtBYNSvANblorTn5O2t9PjtO8yfkCo3mBJzfr6JLai9402GL4ZU7Unc7Cj877rPhXz2Qw6KVXltmb7we8WnJoStByG_f0rUl3JCZUE8Ijx2j194AGfjTWwP7uSFCdJIqS6FXntzag3L"/>
-<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-highest/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-surface hover:bg-error hover:text-on-error transition-colors">
-<span class="material-symbols-outlined text-[20px]">close</span>
-</button>
-</div>
-<!-- Uploaded Photo 3 -->
-<div class="relative w-full aspect-square rounded-[20px] bg-surface-container overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-<img class="w-full h-full object-cover" data-alt="A detail shot showing the original tag of a vintage university sweatshirt. The background is slightly blurred out to focus on the brand details. Well-lit, trustworthy product photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4t6FqFMA9tmg5vQ2X_yFdiX0zL-GqJ-4ae9_x5NPA1wfhTJZamgPgoRs4Nbyl_d2MX5381OuMYKgkShcfwfkCzIqIsEKFNTsrfDEBDFh8gQH4vyEE5lBrvexBoOP7MEYLe-m2CWXvljvu6aw_iYb68llPZgddClGo7tS-56iHRkkb78CNZ53BzrDt2VxOgNgSRT4gqS7TwJbDqZtuzlGrqSv-IT4z6mspCxDp6hxh260K6y0edvxjfwUPJS67jjY_Ukh77d_LRSIF"/>
-<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-highest/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-surface hover:bg-error hover:text-on-error transition-colors">
-<span class="material-symbols-outlined text-[20px]">close</span>
-</button>
-</div>
 </div>
 <!-- Photo Tips -->
 <div class="bg-surface-container-low rounded-xl p-4 flex gap-stack-md mt-4">
-<div class="w-8 h-8 bg-secondary-container rounded-full flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-on-secondary-container text-[20px]">tips_and_updates</span>
-</div>
-<div>
-<h4 class="font-title-md text-on-surface text-[16px]">Quick Tip</h4>
-<p class="font-body-sm text-on-surface-variant mt-1">Listings with 3 or more clear, well-lit photos sell 40% faster on average.</p>
-</div>
+  <div class="w-8 h-8 bg-secondary-container rounded-full flex items-center justify-center flex-shrink-0">
+    <span class="material-symbols-outlined text-on-secondary-container text-[20px]">tips_and_updates</span>
+  </div>
+  <div>
+    <h4 class="font-title-md text-on-surface text-[16px]">Quick Tip</h4>
+    <p class="font-body-sm text-on-surface-variant mt-1">Listings with 3 or more clear, well-lit photos sell 40% faster on average.</p>
+  </div>
 </div>
 </div>
 <!-- Fixed Bottom Bar -->
-<div class="fixed bottom-0 left-0 right-0 p-container-padding-mobile pb-safe bg-surface/80 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex justify-between items-center z-40">
-<button class="px-6 py-4 rounded-xl font-title-md text-on-surface-variant bg-surface-variant active:scale-[0.98] transition-transform">
-      Cancel
-    </button>
-<button onclick="window.location.href='/marketplace/sell_item_details.html'" class="px-8 py-4 rounded-xl font-title-md text-on-primary bg-primary flex items-center gap-2 active:scale-[0.98] transition-transform shadow-md">
-      Continue
-      <span class="material-symbols-outlined">arrow_forward</span>
-</button>
+<div class="fixed bottom-0 left-0 right-0 p-container-padding-mobile pb-safe bg-surface/80 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex justify-between items-center z-40 md:absolute md:rounded-b-3xl">
+  <button class="px-6 py-4 rounded-xl font-title-md text-on-surface-variant bg-surface-variant active:scale-[0.98] transition-transform" onclick="history.back()">
+    Cancel
+  </button>
+  <button id="continue-btn" onclick="goToDetails()" class="px-8 py-4 rounded-xl font-title-md text-on-primary bg-primary flex items-center gap-2 active:scale-[0.98] transition-transform shadow-md opacity-50 pointer-events-none" type="button">
+    Continue
+    <span class="material-symbols-outlined">arrow_forward</span>
+  </button>
 </div>
-</div></main></body></html>
+</div></main>
+<script>
+  const MAX_PHOTOS = 6;
+  let selectedFiles = []; // {file, objectUrl}
+
+  const photoInput = document.getElementById('photo-input');
+  const photoGrid = document.getElementById('photo-grid');
+  const addPhotoBtn = document.getElementById('add-photo-btn');
+  const continueBtn = document.getElementById('continue-btn');
+  const photoCountLabel = document.getElementById('photo-count-label');
+
+  addPhotoBtn.addEventListener('click', () => {
+    if (selectedFiles.length < MAX_PHOTOS) photoInput.click();
+  });
+
+  photoInput.addEventListener('change', async (e) => {
+    const newFiles = Array.from(e.target.files);
+    const slotsLeft = MAX_PHOTOS - selectedFiles.length;
+    const filesToProcess = newFiles.slice(0, slotsLeft);
+
+    for (const file of filesToProcess) {
+      const compressed = await compressImage(file, 1200, 0.8);
+      const objectUrl = URL.createObjectURL(compressed);
+      selectedFiles.push({ file: compressed, objectUrl, name: file.name });
+    }
+    photoInput.value = '';
+    renderGrid();
+  });
+
+  function renderGrid() {
+    // Remove all photo cards, keep only the add button
+    const existingCards = photoGrid.querySelectorAll('.photo-card');
+    existingCards.forEach(c => c.remove());
+
+    selectedFiles.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'photo-card relative w-full aspect-square rounded-[20px] bg-surface-container overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] group';
+      card.innerHTML = `
+        <img src="${item.objectUrl}" class="w-full h-full object-cover" />
+        <button onclick="removePhoto(${index})" class="absolute top-2 right-2 w-8 h-8 bg-surface-container-highest/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-surface hover:bg-error hover:text-on-error transition-colors" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        ${index === 0 ? '<div class="absolute bottom-2 left-2 bg-primary/90 backdrop-blur-sm text-on-primary font-label-caps px-3 py-1 rounded-full">COVER</div>' : ''}
+      `;
+      photoGrid.appendChild(card);
+    });
+
+    // Update label and continue button
+    const remaining = MAX_PHOTOS - selectedFiles.length;
+    photoCountLabel.textContent = remaining > 0 ? `${remaining} slot${remaining !== 1 ? 's' : ''} left` : 'Max reached';
+
+    if (selectedFiles.length >= MAX_PHOTOS) {
+      addPhotoBtn.classList.add('opacity-40', 'pointer-events-none');
+    } else {
+      addPhotoBtn.classList.remove('opacity-40', 'pointer-events-none');
+    }
+
+    if (selectedFiles.length > 0) {
+      continueBtn.classList.remove('opacity-50', 'pointer-events-none');
+    } else {
+      continueBtn.classList.add('opacity-50', 'pointer-events-none');
+    }
+  }
+
+  function removePhoto(index) {
+    URL.revokeObjectURL(selectedFiles[index].objectUrl);
+    selectedFiles.splice(index, 1);
+    renderGrid();
+  }
+
+  async function goToDetails() {
+    // Store file names and object URLs in sessionStorage to retrieve on next page
+    // We can't store File objects in sessionStorage, so we re-read them as base64
+    continueBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing...`;
+    continueBtn.classList.add('pointer-events-none');
+
+    try {
+      const filesData = [];
+      for (const item of selectedFiles) {
+        const base64 = await fileToBase64(item.file);
+        filesData.push({ name: item.name, type: item.file.type, base64 });
+      }
+      sessionStorage.setItem('pendingPhotos', JSON.stringify(filesData));
+      window.location.href = '/marketplace/sell_item_details.html';
+    } catch(err) {
+      alert('Error processing photos: ' + err.message);
+      continueBtn.innerHTML = `Continue <span class="material-symbols-outlined">arrow_forward</span>`;
+      continueBtn.classList.remove('pointer-events-none');
+    }
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  function compressImage(file, maxSize, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = event => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          if (width > height) {
+            if (width > maxSize) { height = Math.round(height * maxSize / width); width = maxSize; }
+          } else {
+            if (height > maxSize) { width = Math.round(width * maxSize / height); height = maxSize; }
+          }
+          canvas.width = width; canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          canvas.toBlob(blob => resolve(new File([blob], file.name, { type: file.type || 'image/jpeg', lastModified: Date.now() })), file.type || 'image/jpeg', quality);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  }
+</script>
+</body></html>
 

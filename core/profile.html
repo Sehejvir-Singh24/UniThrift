@@ -10,16 +10,28 @@
     <script>
       requireAuth();
     </script>
-  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Account</h1><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></div></header><main class="pt-16 pb-24 bg-background min-h-screen"><div class="flex flex-col w-full gap-stack-lg p-container-padding-mobile">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Account</h1>
+
+<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 pb-24 md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full md:max-w-2xl md:mx-auto gap-stack-lg p-container-padding-mobile">
 <!-- Profile Header -->
 <div class="flex flex-col items-center text-center">
 <div class="relative mb-stack-sm">
-<img class="w-24 h-24 rounded-full object-cover shadow-sm ring-4 ring-surface-bright" data-alt="A bright, high-quality portrait photo of a university student looking confident and friendly, smiling directly at the camera. The background is a slightly blurred campus setting on a sunny day. The lighting is natural and flattering. The student is wearing casual, stylish clothing suitable for an Indian university environment. Warm, inviting mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz"/>
+
+<div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()">
+  <img id="profile-avatar" class="w-24 h-24 rounded-full object-cover shadow-sm ring-4 ring-surface-bright transition-opacity group-hover:opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz" />
+  <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+    <span class="material-symbols-outlined text-on-primary drop-shadow-md">photo_camera</span>
+  </div>
+</div>
+<input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="handleAvatarChange(event)">
+
 <div class="absolute bottom-0 right-0 bg-primary-container text-on-primary rounded-full p-1 shadow-sm flex items-center justify-center ring-2 ring-surface-bright">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
 </div>
-<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-unit">Priya Sharma</h2>
+<h2 id="profile-name" class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-unit">...</h2>
 <div class="flex items-center gap-1 bg-surface-container-high px-3 py-1 rounded-full">
 <span class="material-symbols-outlined text-[14px] text-primary">school</span>
 <span class="font-label-caps text-label-caps text-on-surface-variant">GGSIPU Verified Student</span>
@@ -66,17 +78,80 @@
 </div>
 <div class="flex-1">
 <p class="font-body-lg text-body-lg text-on-surface leading-tight">Enrollment No.</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant">01416403220</p>
+<p id="profile-enrollment" class="font-body-sm text-body-sm text-on-surface-variant">...</p>
+      <div class="flex items-center gap-1 mt-1 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px]">school</span>
+        <p id="profile-college" class="font-body-sm text-body-sm">Not Selected</p>
+      </div>
+
 </div>
 <span class="material-symbols-outlined text-primary-container">check_circle</span>
 </div>
 </div>
 </div>
+
+<!-- My Listings (Seller Dashboard) -->
+<div class="flex flex-col mb-stack-md" id="seller-dashboard-section" style="display: none;">
+  <div class="flex items-center justify-between px-2 mb-stack-sm">
+    <h3 class="font-title-md text-title-md text-on-surface">My Listings</h3>
+    <span class="bg-primary-container text-on-primary-container font-label-caps text-label-caps px-2 py-1 rounded-full shadow-sm" id="listing-count">0 Active</span>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-gutter" id="my-listings-grid">
+    <!-- Listing Cards Inject Here -->
+  </div>
+</div>
+
+<!-- Edit Listing Modal -->
+<div id="edit-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-surface-container-lowest w-11/12 md:max-w-md rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.2)] p-stack-md flex flex-col gap-4 transform scale-95 transition-transform duration-300" id="edit-modal-content">
+    <div class="flex justify-between items-center">
+      <h3 class="font-title-md text-title-md text-on-surface">Edit Listing</h3>
+      <button onclick="closeEditModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container text-on-surface-variant hover:text-error transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    
+    <input type="hidden" id="edit-item-id">
+    
+    <div class="flex flex-col gap-1">
+      <label class="font-label-caps text-label-caps text-on-surface-variant">Item Title</label>
+      <input type="text" id="edit-item-title" class="w-full bg-surface-container-high text-on-surface font-body-lg px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary-container transition-shadow">
+    </div>
+    
+    <div class="flex flex-col gap-1">
+      <label class="font-label-caps text-label-caps text-on-surface-variant">Price ($)</label>
+      <input type="number" id="edit-item-price" class="w-full bg-surface-container-high text-on-surface font-body-lg px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary-container transition-shadow">
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="font-label-caps text-label-caps text-on-surface-variant">Item Image</label>
+      <div class="flex gap-4 items-center">
+        <div id="edit-item-img-preview" class="w-16 h-16 bg-surface-container rounded-lg bg-cover bg-center border border-outline-variant"></div>
+        <div class="flex flex-col gap-2">
+          <input type="file" id="edit-item-img-upload" accept="image/*" class="hidden" onchange="handleEditImageSelect(event)">
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('edit-item-img-upload').click()" class="font-label-caps bg-surface-container-high text-on-surface-variant px-3 py-1.5 rounded-md hover:bg-surface-variant transition-colors">Change</button>
+            <button onclick="removeEditImage()" class="font-label-caps bg-error-container/20 text-error px-3 py-1.5 rounded-md hover:bg-error-container/50 transition-colors">Remove</button>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="edit-item-img-url">
+      <input type="hidden" id="edit-item-img-removed" value="false">
+    </div>
+
+    
+    <div class="flex gap-stack-sm mt-2">
+      <button onclick="saveEdit()" class="flex-1 bg-primary text-on-primary font-title-md py-3 rounded-xl active:scale-95 transition-transform shadow-sm">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Quick Links -->
 <div class="flex flex-col">
 <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-sm px-2">Account Activity</h3>
 <div class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
-<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="javascript:void(0)">
+<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="/core/saved_items.html">
 <div class="flex items-center gap-stack-md">
 <div class="w-10 h-10 rounded-full bg-secondary-container/30 text-on-secondary-container flex items-center justify-center group-hover:bg-primary-container/20 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">favorite</span>
@@ -86,7 +161,7 @@
 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
 </a>
 <div class="h-px bg-surface-container mx-stack-md"></div>
-<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="javascript:void(0)">
+<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="/core/purchase_history.html">
 <div class="flex items-center gap-stack-md">
 <div class="w-10 h-10 rounded-full bg-secondary-container/30 text-on-secondary-container flex items-center justify-center group-hover:bg-primary-container/20 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">shopping_bag</span>
@@ -96,7 +171,7 @@
 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
 </a>
 <div class="h-px bg-surface-container mx-stack-md"></div>
-<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="javascript:void(0)">
+<a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="/core/selling_history.html">
 <div class="flex items-center gap-stack-md">
 <div class="w-10 h-10 rounded-full bg-secondary-container/30 text-on-secondary-container flex items-center justify-center group-hover:bg-primary-container/20 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">storefront</span>
@@ -122,5 +197,284 @@
 <span class="material-symbols-outlined">logout</span>
     Log Out
   </button>
-</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="account" href="/core/profile.html"><span class="material-symbols-outlined">verified_user</span><span class="font-label-caps text-label-caps">Profile</span></a></div></nav></body></html>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a></div></nav>
+
+<!-- Crop Modal -->
+<div id="crop-modal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-surface-container-lowest w-11/12 md:max-w-md rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.4)] flex flex-col transform scale-95 transition-transform duration-300" id="crop-modal-content">
+    <div class="p-4 flex justify-between items-center border-b border-surface-container">
+      <h3 class="font-title-md text-title-md text-on-surface">Adjust Profile Photo</h3>
+    </div>
+    <div class="w-full bg-black flex items-center justify-center p-4 relative" style="height: 60vh; max-height: 400px;">
+      <img id="crop-image" class="max-w-full max-h-full block">
+    </div>
+    <div class="p-4 flex gap-stack-sm">
+      <button onclick="cancelCrop()" class="flex-1 py-3 font-title-md text-on-surface-variant bg-surface-container rounded-xl hover:bg-surface-variant transition-colors">Cancel</button>
+      <button onclick="confirmCrop()" class="flex-1 py-3 font-title-md text-on-primary bg-primary rounded-xl hover:bg-primary-container transition-colors shadow-sm" id="confirm-crop-btn">Upload</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    
+    
+  
+  let cropper = null;
+
+  function handleAvatarChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Reset input so selecting the same file works again
+    event.target.value = '';
+
+    const url = URL.createObjectURL(file);
+    const image = document.getElementById('crop-image');
+    image.src = url;
+
+    // Show modal
+    const modal = document.getElementById('crop-modal');
+    const content = document.getElementById('crop-modal-content');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.remove('opacity-0');
+      content.classList.remove('scale-95');
+    }, 10);
+
+    // Initialize Cropper
+    if (cropper) {
+      cropper.destroy();
+    }
+    cropper = new Cropper(image, {
+      aspectRatio: 1, // Square
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 0.9,
+      restore: false,
+      guides: false,
+      center: false,
+      highlight: false,
+      cropBoxMovable: true,
+      cropBoxResizable: true,
+      toggleDragModeOnDblclick: false,
+    });
+  }
+
+  function cancelCrop() {
+    const modal = document.getElementById('crop-modal');
+    const content = document.getElementById('crop-modal-content');
+    modal.classList.add('opacity-0');
+    content.classList.add('scale-95');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }, 300);
+  }
+
+  async function confirmCrop() {
+    if (!cropper) return;
+
+    const btn = document.getElementById('confirm-crop-btn');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px] align-middle">progress_activity</span>`;
+    btn.disabled = true;
+
+    try {
+      const profile = await getProfile();
+      if (!profile) throw new Error("Not logged in");
+
+      // Get cropped image as Blob
+      const blob = await new Promise(resolve => {
+        cropper.getCroppedCanvas({
+          width: 500,
+          height: 500,
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high',
+        }).toBlob(resolve, 'image/jpeg', 0.9);
+      });
+
+      // We need to create a File object from the blob for uploadAvatar
+      const file = new File([blob], `avatar_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+      // Visual loading state on the profile avatar
+      const img = document.getElementById('profile-avatar');
+      img.style.opacity = '0.5';
+
+      const publicUrl = await uploadAvatar(profile.id, file);
+      await updateProfile({ avatar_url: publicUrl });
+      
+      img.src = publicUrl;
+      img.style.opacity = '1';
+
+      cancelCrop();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to upload photo: " + e.message);
+    } finally {
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+    }
+  }
+
+
+  let myProducts = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const profile = await getProfile();
+    if (!profile) return;// Populate Profile Info
+    document.getElementById('profile-name').textContent = profile.full_name || 'Anonymous User';
+    document.getElementById('profile-enrollment').textContent = profile.enrollment_number || 'Not Provided';
+    if (profile.college) document.getElementById('profile-college').textContent = profile.college;
+
+    if (profile.avatar_url) {
+      document.getElementById('profile-avatar').src = profile.avatar_url;
+    }
+
+    
+    // Always show seller dashboard so user knows they can sell items
+    document.getElementById('seller-dashboard-section').style.display = 'flex';
+    await loadMyListings(profile.id);
+  });
+
+  async function loadMyListings(userId) {
+    myProducts = await getUserProducts(userId);
+    const grid = document.getElementById('my-listings-grid');
+    const countBadge = document.getElementById('listing-count');
+    
+    countBadge.textContent = `${myProducts.length} Active`;
+    grid.innerHTML = '';
+    
+    if (myProducts.length === 0) {
+      grid.innerHTML = `
+        <div class="col-span-2 md:col-span-3 flex flex-col items-center justify-center py-8 text-center gap-3 bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant">
+          <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-[24px]">storefront</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">You don't have any active listings yet.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    myProducts.forEach(p => {
+      const imageStyle = p.image_url ? `background-image: url('${p.image_url}')` : 'background-color: var(--color-surface-container)';
+      const card = `
+        <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+          <div class="w-full aspect-square bg-cover bg-center" style="${imageStyle}"></div>
+          <div class="p-3 flex flex-col gap-2">
+            <h4 class="font-body-sm text-on-surface font-semibold truncate">${p.title}</h4>
+            <span class="font-title-md text-primary-container">$${p.price}</span>
+            <div class="flex gap-2 mt-1">
+              <button onclick="openEditModal('${p.id}')" class="flex-1 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-caps hover:bg-surface-container-high transition-colors">Edit</button>
+              <button onclick="confirmDelete('${p.id}')" class="flex-1 py-1.5 rounded-lg bg-error-container/20 text-error font-label-caps hover:bg-error-container/50 transition-colors">Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+      grid.insertAdjacentHTML('beforeend', card);
+    });
+  }
+
+  function openEditModal(id) {
+    const p = myProducts.find(x => x.id === id);
+    if (!p) return;
+    
+    document.getElementById('edit-item-id').value = p.id;
+    document.getElementById('edit-item-title').value = p.title;
+    document.getElementById('edit-item-price').value = p.price;
+    document.getElementById('edit-item-img-url').value = p.image_url || '';
+    document.getElementById('edit-item-img-removed').value = "false";
+    
+    if (p.image_url) {
+      document.getElementById('edit-item-img-preview').style.backgroundImage = `url('${p.image_url}')`;
+    } else {
+      document.getElementById('edit-item-img-preview').style.backgroundImage = 'none';
+    }
+    selectedEditFile = null;
+
+    
+    const modal = document.getElementById('edit-modal');
+    const content = document.getElementById('edit-modal-content');
+    modal.classList.remove('hidden');
+    // slight delay for transition
+    setTimeout(() => {
+      modal.classList.remove('opacity-0');
+      content.classList.remove('scale-95');
+    }, 10);
+  }
+
+  function closeEditModal() {
+    const modal = document.getElementById('edit-modal');
+    const content = document.getElementById('edit-modal-content');
+    modal.classList.add('opacity-0');
+    content.classList.add('scale-95');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 300);
+  }
+
+  async function saveEdit() {
+    const btn = document.querySelector('#edit-modal-content button[onclick="saveEdit()"]');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = 'Saving...';
+    btn.disabled = true;
+
+    const id = document.getElementById('edit-item-id').value;
+    const title = document.getElementById('edit-item-title').value;
+    const price = document.getElementById('edit-item-price').value;
+    let imageUrl = document.getElementById('edit-item-img-url').value;
+    const isRemoved = document.getElementById('edit-item-img-removed').value === 'true';
+    
+    try {
+      if (isRemoved) {
+        imageUrl = null;
+      } else if (selectedEditFile) {
+        const profile = await getProfile();
+        const ext = selectedEditFile.name.split('.').pop();
+        const filePath = `${profile.id}/${Date.now()}_edit.${ext}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('product_images')
+          .upload(filePath, selectedEditFile, { upsert: true });
+          
+        if (uploadError) throw uploadError;
+        
+        const { data: urlData } = supabase.storage
+          .from('product_images')
+          .getPublicUrl(filePath);
+          
+        imageUrl = urlData.publicUrl;
+      }
+    
+      await updateProduct(id, { title, price: parseFloat(price), image_url: imageUrl });
+      closeEditModal();
+      const profile = await getProfile();
+      await loadMyListings(profile.id);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to update listing: " + e.message);
+    } finally {
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+    }
+  }
+
+  async function confirmDelete(id) {
+    if (confirm("Are you sure you want to delete this listing?")) {
+      try {
+        await deleteProduct(id);
+        const profile = await getProfile();
+        await loadMyListings(profile.id);
+      } catch (e) {
+        alert("Failed to delete listing.");
+      }
+    }
+  }
+</script>
+
+</body></html>
 

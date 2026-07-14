@@ -8,12 +8,43 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
+      function getGreeting() {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good morning';
+        if (hour < 17) return 'Good afternoon';
+        return 'Good evening';
+      }
+
       async function checkVerificationStatus() {
         const profile = await getProfile();
         if (profile && !profile.full_name) {
           window.location.href = '/auth/profile_setup.html';
         } else if (profile && !profile.is_verified) {
           window.location.href = '/auth/id_verification.html';
+        } else if (profile) {
+          // Personalize greeting
+          const firstName = profile.full_name ? profile.full_name.split(' ')[0] : '';
+          document.getElementById('greeting-text').textContent = `${getGreeting()}, ${firstName} 👋`;
+
+          // Load live products
+          const products = await getLatestProducts(4);
+          const grid = document.getElementById('trending-grid');
+          const placeholder = document.getElementById('trending-placeholder');
+
+          if (products.length === 0) {
+            placeholder.innerHTML = `
+              <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[32px]">storefront</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">No items listed yet.</p>
+              <p class="font-label-caps text-label-caps text-primary-container">Be the first to sell!</p>
+            `;
+          } else {
+            placeholder.remove();
+            products.forEach(p => {
+              grid.insertAdjacentHTML('beforeend', renderProductCard(p));
+            });
+          }
         }
       }
 
@@ -27,12 +58,14 @@
         }
       });
     </script>
-  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Dashboard</h1>
+  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Dashboard</h1>
+
 <div class="flex items-center gap-3">
   <button onclick="logout()" class="text-on-surface-variant hover:text-error transition-colors flex items-center justify-center bg-surface-container rounded-full p-2 shadow-sm">
     <span class="material-symbols-outlined text-[20px]">logout</span>
   </button>
-  <img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+  
+  <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a>
 </div>
 </div></header>
 
@@ -43,14 +76,14 @@
   }
 </script>
 
-<main class="pt-16 pb-24 bg-background min-h-screen"><div class="flex flex-col w-full gap-stack-lg pb-stack-lg">
+<main class="pt-16 pb-24 md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full gap-stack-lg pb-stack-lg md:max-w-7xl md:mx-auto">
 <!-- Header & Search -->
-<div class="px-container-padding-mobile flex flex-col gap-stack-md mt-stack-md">
+<div class="px-container-padding-mobile md:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-stack-md mt-stack-md">
 <div>
-<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Good morning, Alex 👋</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background" id="greeting-text">Good morning 👋</h2>
 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Ready to find a steal today?</p>
 </div>
-<div class="relative flex items-center w-full bg-surface-container-highest rounded-full shadow-sm px-4 py-3 transition-transform duration-200 focus-within:scale-[1.02] focus-within:shadow-md">
+<div class="relative flex items-center w-full md:max-w-md bg-surface-container-highest rounded-full shadow-sm px-4 py-3 transition-transform duration-200 focus-within:scale-[1.02] focus-within:shadow-md">
 <span class="material-symbols-outlined text-on-surface-variant mr-3">search</span>
 <input class="bg-transparent w-full font-body-lg text-body-lg text-on-background outline-none placeholder:text-on-surface-variant/60" placeholder="Search campus essentials..." type="text"/>
 <button class="bg-primary-container text-on-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm hover:scale-95 transition-transform">
@@ -59,7 +92,7 @@
 </div>
 </div>
 <!-- Categories -->
-<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4">
+<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile md:pl-6 pr-4">
 <div class="flex gap-stack-md pb-2">
 <!-- Category Item -->
 <button class="flex flex-col items-center gap-2 group min-w-[72px]">
@@ -95,59 +128,24 @@
 </div>
 </div>
 <!-- Trending Items -->
-<div class="px-container-padding-mobile flex flex-col gap-stack-md">
+<div class="px-container-padding-mobile md:px-6 flex flex-col gap-stack-md">
 <div class="flex justify-between items-center">
 <h3 class="font-title-md text-title-md text-on-background">Trending Offers ⚡</h3>
 <button class="font-label-caps text-label-caps text-primary-container">See All</button>
 </div>
-<div class="grid grid-cols-2 gap-gutter">
-<!-- Product Card 1 -->
-<div onclick="window.location.href='/marketplace/item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
-<div class="relative w-full aspect-square bg-surface-container-low">
-<div class="bg-cover bg-center w-full h-full" data-alt="A softly lit photograph of a nearly new mechanical engineering textbook sitting on a clean wooden desk. A subtle green coffee mug is in the slightly blurred background, emphasizing a calm study environment. Minimalist and bright aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFfXGuC1fXSns6cUi7eh4ubu9ag3VJWAp92ndsa8ZWzDaEt1NKSqtU7eCjN3cExyiFQk12vDgRl3YSJH7xL3wEUBh8z-uputunsnwhdWNE0c59ZZTsVjSrOQqsGN_T5LttSqAN6T2-csDriACqqV8zcSR6X599l91cLFWrrjDTgRNgMDfV9r47i2x_cMlubiY-mpkdeEMVuP78yeIQM5nF6khvSHZEdbZg_aWoypv7aYKAZnocDyOP7HqXQ3RfBUTDQBJH5_XUXc8b')"></div>
-<div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-<span class="material-symbols-outlined text-[12px] text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
-<span class="font-label-caps text-[10px] text-on-surface">Verified</span>
-</div>
-<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-lowest/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm text-on-surface-variant hover:text-error transition-colors">
-<span class="material-symbols-outlined text-[18px]">favorite</span>
-</button>
-</div>
-<div class="p-4 flex flex-col gap-1">
-<h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">Engineering Math V4</h4>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Like New</p>
-<div class="flex items-center justify-between mt-1">
-<span class="font-title-md text-[18px] text-primary-container">$45</span>
-<span class="font-label-caps text-[10px] text-on-surface-variant line-through">$80</span>
-</div>
-</div>
-</div>
-<!-- Product Card 2 -->
-<div onclick="window.location.href='/marketplace/item.html'" class="cursor-pointer bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
-<div class="relative w-full aspect-square bg-surface-container-low">
-<div class="bg-cover bg-center w-full h-full" data-alt="A sleek black noise-canceling headphone resting on a white minimalist dorm room shelf. Natural sunlight casts soft shadows. A tiny vibrant green succulent sits next to it." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDDyAOvj7q60Ampac_9k_bza_iawy_fE5D_HP0u9Z-aRLyIB0dkH-wd9bP2CiJmP3fCVEgj2UyqWT_ltuh0S0LvzSzTrsx-ubeg9uRUCp3TMaVJ0SsXT57syMrfgaWaCCEKXI2X5f7bd0KGN8hLMuNwOvM8le6RcHyabsVu0BtlCw6t67Mw7gmTbn-xWpLocP58FdoPytz4EH6uc5BmYEGMPUU9igokgosDEMyQmECJoT3JrAz7Q_sXwtHWCP2i7vCYtPxzseAXyjBs')"></div>
-<div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-<span class="material-symbols-outlined text-[12px] text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
-<span class="font-label-caps text-[10px] text-on-surface">Verified</span>
-</div>
-<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-lowest/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm text-on-surface-variant hover:text-error transition-colors">
-<span class="material-symbols-outlined text-[18px]">favorite</span>
-</button>
-</div>
-<div class="p-4 flex flex-col gap-1">
-<h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">Sony WH-1000XM4</h4>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Good</p>
-<div class="flex items-center justify-between mt-1">
-<span class="font-title-md text-[18px] text-primary-container">$120</span>
-<span class="font-label-caps text-[10px] text-on-surface-variant line-through">$350</span>
-</div>
-</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter" id="trending-grid">
+<!-- Product cards will be injected here by JavaScript -->
+<div class="col-span-2 md:col-span-4 lg:col-span-5 flex flex-col items-center justify-center py-12 text-center gap-3" id="trending-placeholder">
+  <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">Loading items...</p>
 </div>
 </div>
 </div>
 <!-- Sponsored PGs -->
 <div class="flex flex-col gap-stack-md mt-4">
-<div class="px-container-padding-mobile flex justify-between items-end">
+<div class="px-container-padding-mobile md:px-6 flex justify-between items-end">
 <div>
 <h3 class="font-title-md text-title-md text-on-background">Near Campus Stays</h3>
 <p class="font-body-sm text-[12px] text-on-surface-variant">Sponsored PGs & Hostels</p>
@@ -156,7 +154,7 @@
         Map <span class="material-symbols-outlined text-[16px]">explore</span>
 </button>
 </div>
-<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4 pb-4 snap-x snap-mandatory">
+<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile md:pl-6 pr-4 pb-4 snap-x snap-mandatory">
 <div class="flex gap-gutter w-max">
 <!-- PG Card -->
 <div class="w-[280px] bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col snap-start">
@@ -206,7 +204,7 @@
 </div>
 </div>
 <!-- Recommended Flatmates -->
-<div class="px-container-padding-mobile flex flex-col gap-stack-md mt-2">
+<div class="px-container-padding-mobile md:px-6 flex flex-col gap-stack-md mt-2">
 <div class="flex justify-between items-center">
 <h3 class="font-title-md text-title-md text-on-background">Looking for Roomies</h3>
 </div>
@@ -283,11 +281,12 @@
   });
 </script>
 <!-- Floating Action Button for Selling -->
+<!-- Floating Action Button for Selling -->
 <button onclick="window.location.href='/marketplace/add_photos.html'" class="fixed bottom-24 right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
     <span class="material-symbols-outlined text-[24px]">add</span>
     <span class="font-title-md text-[16px]">Sell</span>
 </button>
-</main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="account" href="/core/profile.html"><span class="material-symbols-outlined">verified_user</span><span class="font-label-caps text-label-caps">Profile</span></a></div></nav></body></html>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a></div></nav></body></html>
 
 
 

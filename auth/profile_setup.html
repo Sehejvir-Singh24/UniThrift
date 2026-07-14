@@ -69,6 +69,29 @@
 <div class="absolute right-4 px-2 py-0.5 bg-surface-container-highest rounded-full text-[10px] font-label-caps text-on-surface-variant/60">Optional</div></div>
 <p class="font-body-sm text-error hidden text-xs ml-2 mt-1" id="enrollment-error">Must be exactly 11 digits</p>
 </div>
+
+<div class="flex flex-col gap-2 group mb-4">
+    <label class="font-label-caps text-on-surface-variant ml-2 transition-colors group-focus-within:text-primary">College</label>
+    <div class="relative flex items-center bg-surface-container-low rounded-xl focus-within:bg-surface-container transition-colors duration-200">
+        <span class="material-symbols-outlined absolute left-4 text-on-surface-variant opacity-60">school</span>
+        <select id="college" class="w-full bg-transparent font-body-lg text-on-surface py-4 pl-12 pr-4 outline-none appearance-none cursor-pointer" onchange="checkFormCompleteness()">
+            <option value="" disabled selected>Select your GGSIPU College</option>
+            <option value="USICT">USICT (University School of Info, Comm and Tech)</option>
+            <option value="MAIT">MAIT (Maharaja Agrasen Institute of Technology)</option>
+            <option value="MSIT">MSIT (Maharaja Surajmal Institute of Technology)</option>
+            <option value="BPIT">BPIT (Bhagwan Parshuram Institute of Technology)</option>
+            <option value="BVCOE">BVCOE (Bharati Vidyapeeth's College of Engineering)</option>
+            <option value="GTBIT">GTBIT (Guru Tegh Bahadur Institute of Technology)</option>
+            <option value="GTB4CEC">GTB4CEC (Guru Tegh Bahadur 4th Centenary Engineering College)</option>
+            <option value="ADGITM">ADGITM (Akhilesh Das Gupta Institute of Tech & Mgmt)</option>
+            <option value="VIPS-TC">VIPS-TC (Vivekananda Institute of Professional Studies)</option>
+            <option value="HMRITM">HMRITM (HMR Institute of Technology and Management)</option>
+            <option value="JIMS">JIMS Engineering Management Technical Campus</option>
+            <option value="DTC">DTC (Delhi Technical Campus)</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-4 pointer-events-none text-on-surface-variant opacity-60 group-hover:text-primary transition-colors">expand_more</span>
+    </div>
+</div>
 <!-- Input Group: Full Name -->
 <div class="flex flex-col gap-2 group">
 <label class="font-label-caps text-on-surface-variant ml-2 transition-colors group-focus-within:text-primary" for="fullname">Full Name</label>
@@ -136,11 +159,12 @@
         function checkFormCompleteness() {
             const enrollment = document.getElementById('enrollment').value;
             const fullname = document.getElementById('fullname').value;
+            const college = document.getElementById('college').value;
             const phone = document.getElementById('phone').value;
             const btn = document.getElementById('next-btn');
 
             const isEnrollmentValid = (selectedYear === '1st Year' && enrollment.length === 0) || enrollment.length === 11;
-            const isValid = isEnrollmentValid && fullname.length > 2 && phone.length === 10;
+            const isValid = isEnrollmentValid && fullname.length > 2 && phone.length === 10 && college;
 
             if (isValid) {
                 btn.removeAttribute('disabled');
@@ -187,6 +211,7 @@
             
             const enrollment = document.getElementById('enrollment').value;
             const fullname = document.getElementById('fullname').value;
+            const college = document.getElementById('college').value;
             const phone = document.getElementById('phone').value;
 
             // Button loading state
@@ -197,7 +222,8 @@
                     full_name: fullname,
                     phone_number: phone,
                     enrollment_number: enrollment,
-                    year_of_study: selectedYear
+                    year_of_study: selectedYear,
+                    college: college
                 });
 
                 // Success state
