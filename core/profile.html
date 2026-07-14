@@ -10,7 +10,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Account</h1>
 
-<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full md:max-w-2xl md:mx-auto gap-stack-lg p-container-padding-mobile">
+<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full md:max-w-2xl md:mx-auto gap-stack-lg p-container-padding-mobile">
 <!-- Profile Header -->
 <div class="flex flex-col items-center text-center">
 <div class="relative mb-stack-sm">
@@ -199,7 +199,7 @@
 </div>
 </div>
 <!-- Logout Button -->
-<button class="mt-stack-md w-full bg-error-container text-on-error-container font-title-md text-title-md py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<button onclick="logout()" class="mt-stack-md w-full bg-error-container text-on-error-container font-title-md text-title-md py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined">logout</span>
     Log Out
   </button>

@@ -387,4 +387,33 @@ async function signInWithGoogle() {
   }
 }
 
+// Helper: Sign Out
+async function logout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Error signing out:", error);
+    throw error;
+  }
+  window.location.href = '/auth/login.html';
+}
+
+// Auto-sync header profile photo across all pages
+document.addEventListener('DOMContentLoaded', async () => {
+  const headerAvatars = document.querySelectorAll('#header-avatar');
+  if (headerAvatars.length > 0) {
+    try {
+      const profile = await getProfile();
+      if (profile && profile.avatar_url) {
+        headerAvatars.forEach(img => {
+          img.src = profile.avatar_url;
+        });
+      }
+    } catch (e) {
+      console.warn("Auto-sync profile picture skipped:", e);
+    }
+  }
+});
+
+
+
 
