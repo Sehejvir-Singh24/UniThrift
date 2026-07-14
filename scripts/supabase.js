@@ -79,7 +79,7 @@ async function updateProfile(updates) {
 async function getLatestProducts(limit = 6) {
   const { data: products, error } = await supabase
     .from('products')
-    .select('*, profiles(full_name)')
+    .select('*, profiles!seller_id(full_name)')
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -94,7 +94,7 @@ async function getLatestProducts(limit = 6) {
 async function getProductById(id) {
   const { data: product, error } = await supabase
     .from('products')
-    .select('*, profiles(full_name, is_verified)')
+    .select('*, profiles!seller_id(full_name, is_verified)')
     .eq('id', id)
     .single();
 
@@ -110,7 +110,7 @@ async function getProductById(id) {
 async function getAllProducts() {
   const { data: products, error } = await supabase
     .from('products')
-    .select('*, profiles(full_name)')
+    .select('*, profiles!seller_id(full_name)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -159,7 +159,7 @@ function renderProductCard(product) {
 async function getUserProducts(userId) {
   const { data: products, error } = await supabase
     .from('products')
-    .select('*, profiles(full_name)')
+    .select('*, profiles!seller_id(full_name)')
     .eq('seller_id', userId)
     .order('created_at', { ascending: false });
 
