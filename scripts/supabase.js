@@ -59,6 +59,7 @@ async function requireVerifiedSeller() {
 
   // Non-verified users cannot sell
   if (!profile.is_verified) {
+    alert("Your Student ID has not been verified yet. You can perform this action once your ID has been verified by the admin.");
     if (profile.verification_status === 'pending') {
       window.location.href = '/auth/pending_verification.html';
     } else {
@@ -67,6 +68,30 @@ async function requireVerifiedSeller() {
     return false;
   }
   return true;
+}
+
+// Helper: Verify Action
+// Intercepts user action if not verified, shows alert, and redirects.
+async function verifyAction(actionCallback) {
+  const profile = await getProfile();
+  if (!profile) {
+    window.location.href = '/auth/login.html';
+    return false;
+  }
+
+  if (profile.is_verified || profile.role === 'admin') {
+    if (actionCallback) actionCallback();
+    return true;
+  }
+
+  alert("Your Student ID has not been verified yet. You can perform this action once your ID has been verified by the admin.");
+  
+  if (profile.verification_status === 'pending') {
+    window.location.href = '/auth/pending_verification.html';
+  } else {
+    window.location.href = '/auth/id_verification.html';
+  }
+  return false;
 }
 
 // Helper: Update Profile
