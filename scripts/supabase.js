@@ -446,6 +446,19 @@ async function getPendingVerifications() {
   return data || [];
 }
 
+// Helper: Get All Users (for Admins)
+async function getAllUsers() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error("Error fetching all users:", error);
+    return [];
+  }
+  return data || [];
+}
+
 // Helper: Approve Verification (for Admins)
 async function approveVerification(userId) {
   const { error } = await supabase
