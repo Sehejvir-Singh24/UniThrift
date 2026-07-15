@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS public.offers (
   offer_amount DECIMAL NOT NULL,
   message TEXT,
   status TEXT CHECK (status IN ('Pending', 'Accepted', 'Rejected', 'Countered')) DEFAULT 'Pending' NOT NULL,
+  seller_notified BOOLEAN DEFAULT false NOT NULL,
+  buyer_notified BOOLEAN DEFAULT false NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

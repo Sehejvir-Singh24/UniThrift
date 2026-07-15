@@ -606,7 +606,7 @@ async function requireAdmin() {
   return true;
 }
 
-// Auto-sync header profile photo across all pages
+// Auto-sync header profile photo across all pages and check notifications
 document.addEventListener('DOMContentLoaded', async () => {
   const headerAvatars = document.querySelectorAll('#header-avatar');
   if (headerAvatars.length > 0) {
@@ -621,7 +621,191 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.warn("Auto-sync profile picture skipped:", e);
     }
   }
+
+  // Trigger notification check shortly after load
+  setTimeout(checkForNotifications, 1000);
 });
+
+// Helper: Get Unseen Offers for Seller
+async function getUnseenOffersForSeller() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data, error } = await supabase
+    .from('offers')
+    .select('*, products(title), profiles!buyer_id(full_name)')
+    .eq('seller_id', session.user.id)
+    .eq('status', 'Pending')
+    .eq('seller_notified', false);
+
+  if (error) {
+    console.error("Error fetching unseen offers for seller:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Get Unseen Offers for Buyer
+async function getUnseenOffersForBuyer() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data, error } = await supabase
+    .from('offers')
+    .select('*, products(title)')
+    .eq('buyer_id', session.user.id)
+    .in('status', ['Accepted', 'Rejected'])
+    .eq('buyer_notified', false);
+
+  if (error) {
+    console.error("Error fetching unseen offers for buyer:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Mark Offer Seller Notified
+async function markOfferSellerNotified(offerId) {
+  const { error } = await supabase
+    .from('offers')
+    .update({ seller_notified: true })
+    .eq('id', offerId);
+  if (error) {
+    console.error("Error marking offer seller notified:", error);
+    throw error;
+  }
+}
+
+// Helper: Mark Offer Buyer Notified
+async function markOfferBuyerNotified(offerId) {
+  const { error } = await supabase
+    .from('offers')
+    .update({ buyer_notified: true })
+    .eq('id', offerId);
+  if (error) {
+    console.error("Error marking offer buyer notified:", error);
+    throw error;
+  }
+}
+
+// Helper: Show Premium Glassmorphic Notification
+function showPremiumNotification(title, message, iconName, redirectUrl, onAcknowledge) {
+  let container = document.getElementById('notification-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notification-toast-container';
+    container.className = 'fixed bottom-6 right-6 z-[100] flex flex-col gap-3 max-w-sm w-[calc(100vw-3rem)] pointer-events-none';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'pointer-events-auto border border-outline-variant/30 rounded-2xl p-4 shadow-xl flex gap-3 transform translate-y-12 opacity-0 transition-all duration-500 hover:shadow-2xl';
+  toast.style.background = 'rgba(255, 255, 255, 0.9)';
+  toast.style.backdropFilter = 'blur(12px)';
+  toast.style.webkitBackdropFilter = 'blur(12px)';
+
+  let iconColor = 'text-primary bg-primary/10';
+  if (iconName === 'check_circle') iconColor = 'text-primary bg-primary/10';
+  if (iconName === 'cancel') iconColor = 'text-error bg-error-container/20';
+
+  toast.innerHTML = `
+    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconColor}">
+      <span class="material-symbols-outlined text-[20px]">${iconName}</span>
+    </div>
+    <div class="flex-grow flex flex-col gap-0.5 cursor-pointer">
+      <h4 class="font-title-md text-[14px] text-on-surface font-semibold">${title}</h4>
+      <p class="font-body-sm text-[12px] text-secondary leading-relaxed">${message}</p>
+    </div>
+    <button class="w-8 h-8 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container transition-colors select-none">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.remove('translate-y-12', 'opacity-0');
+  }, 50);
+
+  let acknowledged = false;
+  async function ack() {
+    if (acknowledged) return;
+    acknowledged = true;
+    try {
+      await onAcknowledge();
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  toast.querySelector('.cursor-pointer').addEventListener('click', async () => {
+    await ack();
+    window.location.href = redirectUrl;
+  });
+
+  toast.querySelector('button').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await ack();
+    dismissToast();
+  });
+
+  const autoDismissTimeout = setTimeout(async () => {
+    await ack();
+    dismissToast();
+  }, 10000);
+
+  function dismissToast() {
+    clearTimeout(autoDismissTimeout);
+    toast.classList.add('translate-y-12', 'opacity-0');
+    setTimeout(() => {
+      toast.remove();
+    }, 500);
+  }
+}
+
+// Helper: Check for Offer Notifications
+async function checkForNotifications() {
+  if (window.location.pathname.includes('/auth/')) {
+    return;
+  }
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const now = Date.now();
+  const lastCheck = sessionStorage.getItem('last_notification_check');
+  if (lastCheck && now - parseInt(lastCheck) < 15000) {
+    return;
+  }
+  sessionStorage.setItem('last_notification_check', now);
+
+  try {
+    const unseenReceived = await getUnseenOffersForSeller();
+    unseenReceived.forEach(offer => {
+      showPremiumNotification(
+        "New Offer Received",
+        `You got an offer of ₹${offer.offer_amount} for "${offer.products?.title || 'your product'}" from ${offer.profiles?.full_name || 'a student'}.`,
+        "local_offer",
+        "/core/offers.html",
+        () => markOfferSellerNotified(offer.id)
+      );
+    });
+
+    const unseenSent = await getUnseenOffersForBuyer();
+    unseenSent.forEach(offer => {
+      const isAccepted = offer.status === 'Accepted';
+      showPremiumNotification(
+        isAccepted ? "Offer Accepted!" : "Offer Rejected",
+        `Your offer of ₹${offer.offer_amount} for "${offer.products?.title || 'the product'}" was ${offer.status.toLowerCase()} by the seller.`,
+        isAccepted ? "check_circle" : "cancel",
+        "/core/offers.html",
+        () => markOfferBuyerNotified(offer.id)
+      );
+    });
+  } catch(e) {
+    console.error("Error in notification checker:", e);
+  }
+}
 
 
 
