@@ -86,7 +86,7 @@
   <button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-4 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-surface-variant">
     Make Offer
   </button>
-  <button onclick="verifyAction(() => alert('Purchase flow initiated! This feature is coming soon.'))" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
+  <button onclick="verifyAction(() => buyNowRequest())" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
     Buy Now
   </button>
 </div>
@@ -102,7 +102,7 @@
 <button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-3.5 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98]">
         Make Offer
 </button>
-<button onclick="verifyAction(() => alert('Purchase flow initiated! This feature is coming soon.'))" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
+<button onclick="verifyAction(() => buyNowRequest())" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
         Buy Now
 </button>
 </div>
@@ -274,6 +274,23 @@
         </div>
       `;
     }
+
+    // If the item is already sold
+    if (product.status === 'Sold') {
+      const soldHTML = `
+        <button disabled class="flex-1 bg-surface-container/50 text-on-surface/40 py-4 rounded-xl text-center font-title-md text-title-md cursor-not-allowed">
+          This item has been sold
+        </button>
+      `;
+      document.getElementById('action-buttons-desktop').innerHTML = soldHTML;
+      document.getElementById('action-buttons-mobile').innerHTML = `
+        <div class="flex gap-3 max-w-lg mx-auto pb-4">
+          <button disabled class="flex-1 bg-surface-container/50 text-on-surface/40 py-3.5 rounded-xl text-center font-title-md text-title-md cursor-not-allowed">
+            This item has been sold
+          </button>
+        </div>
+      `;
+    }
   }
 
   async function submitUserOffer() {
@@ -300,6 +317,19 @@
     } finally {
       offerBtn.disabled = false;
       offerBtn.innerHTML = `<span>Send Offer</span><span class="material-symbols-outlined text-[20px]">send</span>`;
+    }
+  }
+
+  async function buyNowRequest() {
+    if (!currentProduct) return;
+    if (!confirm(`Are you sure you want to buy "${currentProduct.title}" directly for ₹${currentProduct.price}?`)) return;
+
+    try {
+      await buyProductDirectly(currentProduct.id);
+      alert("Purchase successful! You have bought the item. The seller will contact you.");
+      window.location.href = '/core/purchase_history.html';
+    } catch (e) {
+      alert("Purchase failed: " + e.message);
     }
   }
 

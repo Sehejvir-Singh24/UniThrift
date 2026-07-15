@@ -112,7 +112,9 @@
       // Card action
       const cardAction = activeTab === 0 
         ? `onclick="window.location.href='/marketplace/offer_received.html?id=${offer.id}'"`
-        : `onclick="window.location.href='/marketplace/item.html?id=${product.id}'"`;
+        : (offer.status === 'Countered'
+            ? `onclick="window.location.href='/marketplace/counter_offer.html?id=${offer.id}'"`
+            : `onclick="window.location.href='/marketplace/item.html?id=${product.id}'"`);
 
       const cardHtml = `
         <div ${cardAction} class="cursor-pointer bg-surface-container-lowest rounded-2xl p-4 flex gap-4 shadow-sm hover:shadow-md transition-shadow active:scale-[0.99] transition-transform">

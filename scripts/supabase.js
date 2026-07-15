@@ -115,6 +115,7 @@ async function getLatestProducts(limit = 6) {
   const { data: products, error } = await supabase
     .from('products')
     .select('*, profiles!seller_id(full_name)')
+    .eq('status', 'Available')
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -146,6 +147,7 @@ async function getAllProducts() {
   const { data: products, error } = await supabase
     .from('products')
     .select('*, profiles!seller_id(full_name)')
+    .eq('status', 'Available')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -153,6 +155,25 @@ async function getAllProducts() {
     return [];
   }
   return products || [];
+}
+
+// Helper: Buy Product Directly
+async function buyProductDirectly(productId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('products')
+    .update({
+      status: 'Sold',
+      buyer_id: session.user.id
+    })
+    .eq('id', productId);
+
+  if (error) {
+    console.error("Error buying product directly:", error);
+    throw error;
+  }
 }
 
 function renderProductCard(product) {
