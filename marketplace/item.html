@@ -86,8 +86,8 @@
   <button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-4 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-surface-variant">
     Make Offer
   </button>
-  <button onclick="verifyAction(() => buyNowRequest())" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
-    Buy Now
+  <button onclick="verifyAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
+    Reserve Item
   </button>
 </div>
 
@@ -102,8 +102,8 @@
 <button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-3.5 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98]">
         Make Offer
 </button>
-<button onclick="verifyAction(() => buyNowRequest())" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
-        Buy Now
+<button onclick="verifyAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
+        Reserve Item
 </button>
 </div>
 </div>
@@ -145,6 +145,48 @@
 </div>
 </div>
 </div>
+
+<!-- Reserve Modal Overlay -->
+<div class="fixed inset-0 z-50 hidden flex-col justify-end md:justify-center items-center" id="reserve-modal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-background/30 backdrop-blur-sm transition-opacity" onclick="document.getElementById('reserve-modal').classList.add('hidden')"></div>
+<!-- Sheet -->
+<div class="relative w-full md:w-full md:max-w-md md:rounded-[32px] md:mx-auto bg-surface rounded-t-[32px] px-6 pt-2 md:pt-6 pb-safe shadow-[0_-8px_40px_rgba(0,0,0,0.12)] transform transition-transform animate-[slideUp_0.3s_ease-out]">
+<!-- Drag handle -->
+<div class="w-12 h-1.5 bg-surface-variant rounded-full mx-auto my-4 md:hidden"></div>
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Reserve Item</h3>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-on-surface" onclick="document.getElementById('reserve-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-surface-container rounded-2xl p-6">
+  <div class="flex justify-between items-center mb-4">
+    <span class="font-body-lg text-body-lg text-on-surface-variant" id="reserve-price-label">Listing Price</span>
+    <span class="font-title-md text-title-md text-on-background" id="reserve-full-price">₹--</span>
+  </div>
+  <div class="h-px w-full bg-outline-variant/30 mb-4"></div>
+  <div class="flex justify-between items-center">
+    <div class="flex flex-col">
+      <span class="font-body-lg text-body-lg text-on-background font-medium">Security Deposit (10%)</span>
+      <span class="font-label-caps text-label-caps text-primary mt-1">Refundable • Secure</span>
+    </div>
+    <span class="font-display-lg text-display-lg text-primary" id="reserve-deposit-amount">₹--</span>
+  </div>
+</div>
+<div class="flex gap-3 bg-secondary-container/50 p-4 rounded-xl items-start">
+  <span class="material-symbols-outlined text-secondary mt-0.5">lock</span>
+  <p class="font-body-sm text-body-sm text-on-secondary-container">Your deposit unlocks a private chat to safely coordinate a campus meetup. Pay the remaining <span id="reserve-remaining-amount" class="font-semibold">₹--</span> in person.</p>
+</div>
+<button id="confirm-reserve-btn" onclick="submitReservation()" class="w-full bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] mb-6 mt-2 flex items-center justify-center gap-2">
+  <span>Pay Deposit & Reserve</span>
+  <span class="material-symbols-outlined text-[20px]">lock_open</span>
+</button>
+</div>
+</div>
+</div>
+</div>
 <style>
   @keyframes slideUp {
     from { transform: translateY(100%); }
@@ -164,6 +206,7 @@
 <script>
     let currentProduct = null;
   let currentUserId = null;
+  let currentReservationPrice = null;
 
   // Save button micro-interaction
   const saveBtn = document.getElementById('save-btn');
@@ -275,18 +318,55 @@
       `;
     }
 
-    // If the item is already sold
-    if (product.status === 'Sold') {
+    // Update Reserve Modal prices
+    let finalPrice = product.price;
+    let priceLabel = 'Listing Price';
+    
+    // Check if the current user has an accepted offer for this item
+    if (currentUserId && product.seller_id !== currentUserId) {
+      const { data: acceptedOffer } = await supabase
+        .from('offers')
+        .select('offer_amount')
+        .eq('product_id', product.id)
+        .eq('buyer_id', currentUserId)
+        .eq('status', 'Accepted')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+        
+      if (acceptedOffer) {
+        finalPrice = acceptedOffer.offer_amount;
+        priceLabel = 'Accepted Offer Price';
+        
+        // Disable or hide Make Offer button since they have an accepted offer
+        const offerBtnDesktop = document.querySelector('#action-buttons-desktop button:first-child');
+        const offerBtnMobile = document.querySelector('#action-buttons-mobile button:first-child');
+        if (offerBtnDesktop) offerBtnDesktop.classList.add('hidden');
+        if (offerBtnMobile) offerBtnMobile.classList.add('hidden');
+      }
+    }
+
+    currentReservationPrice = finalPrice;
+    const deposit = (finalPrice * 0.1).toFixed(2);
+    const remaining = (finalPrice * 0.9).toFixed(2);
+    
+    document.getElementById('reserve-price-label').textContent = priceLabel;
+    document.getElementById('reserve-full-price').textContent = `₹${finalPrice}`;
+    document.getElementById('reserve-deposit-amount').textContent = `₹${deposit}`;
+    document.getElementById('reserve-remaining-amount').textContent = `₹${remaining}`;
+
+    // If the item is already sold or reserved
+    if (product.status === 'Sold' || product.status === 'Reserved') {
       const soldHTML = `
         <button disabled class="flex-1 bg-surface-container/50 text-on-surface/40 py-4 rounded-xl text-center font-title-md text-title-md cursor-not-allowed">
-          This item has been sold
+          This item is ${product.status.toLowerCase()}
         </button>
       `;
       document.getElementById('action-buttons-desktop').innerHTML = soldHTML;
       document.getElementById('action-buttons-mobile').innerHTML = `
         <div class="flex gap-3 max-w-lg mx-auto pb-4">
           <button disabled class="flex-1 bg-surface-container/50 text-on-surface/40 py-3.5 rounded-xl text-center font-title-md text-title-md cursor-not-allowed">
-            This item has been sold
+            This item is ${product.status.toLowerCase()}
           </button>
         </div>
       `;
@@ -320,16 +400,21 @@
     }
   }
 
-  async function buyNowRequest() {
+  async function submitReservation() {
     if (!currentProduct) return;
-    if (!confirm(`Are you sure you want to buy "${currentProduct.title}" directly for ₹${currentProduct.price}?`)) return;
+    const btn = document.getElementById('confirm-reserve-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Processing...`;
 
     try {
-      await buyProductDirectly(currentProduct.id);
-      alert("Purchase successful! You have bought the item. The seller will contact you.");
-      window.location.href = '/core/purchase_history.html';
+      await createReservation(currentProduct.id, currentProduct.seller_id, currentReservationPrice);
+      alert("Reservation successful! Your private chat is now unlocked.");
+      window.location.href = '/core/dashboard.html';
     } catch (e) {
-      alert("Purchase failed: " + e.message);
+      alert("Reservation failed: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<span>Pay Deposit & Reserve</span><span class="material-symbols-outlined text-[20px]">lock_open</span>`;
     }
   }
 

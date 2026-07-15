@@ -409,21 +409,8 @@ async function updateOfferStatus(offerId, status, counterAmount = null) {
     throw updateError;
   }
 
-  // If accepted, update product status to 'Sold' and link buyer
-  if (status === 'Accepted') {
-    const { error: productError } = await supabase
-      .from('products')
-      .update({
-        status: 'Sold',
-        buyer_id: offer.buyer_id
-      })
-      .eq('id', offer.product_id);
-
-    if (productError) {
-      console.error("Error marking product as sold:", productError);
-      throw productError;
-    }
-  }
+  // If accepted, we do NOT automatically mark the product as Sold anymore.
+  // The buyer must now go to the item page and pay the 10% deposit to Reserve it.
 
   return offer;
 }
@@ -831,3 +818,253 @@ async function checkForNotifications() {
 
 
 
+// ==========================================
+// RESERVATION & IN-PLATFORM MESSAGING SYSTEM
+// ==========================================
+
+// Helper: Create a Reservation (10% Deposit)
+async function createReservation(productId, sellerId, productPrice) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const depositAmount = (productPrice * 0.1).toFixed(2);
+  const remainingAmount = (productPrice * 0.9).toFixed(2);
+
+  const { data: reservation, error: resError } = await supabase
+    .from('reservations')
+    .insert({
+      product_id: productId,
+      buyer_id: session.user.id,
+      seller_id: sellerId,
+      deposit_amount: depositAmount,
+      remaining_amount: remainingAmount,
+      status: 'Reserved'
+    })
+    .select()
+    .single();
+
+  if (resError) {
+    console.error("Error creating reservation:", resError);
+    throw resError;
+  }
+
+  // Update product status to 'Reserved' and link buyer
+  const { error: prodError } = await supabase
+    .from('products')
+    .update({
+      status: 'Reserved',
+      buyer_id: session.user.id
+    })
+    .eq('id', productId);
+
+  if (prodError) {
+    console.error("Error updating product to Reserved:", prodError);
+    throw prodError;
+  }
+
+  return reservation;
+}
+
+// Helper: Get Reservations as Buyer
+async function getReservationsAsBuyer() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data, error } = await supabase
+    .from('reservations')
+    .select('*, products(*), profiles!seller_id(full_name, avatar_url)')
+    .eq('buyer_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching buyer reservations:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Get Reservations as Seller
+async function getReservationsAsSeller() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  const { data, error } = await supabase
+    .from('reservations')
+    .select('*, products(*), profiles!buyer_id(full_name, avatar_url)')
+    .eq('seller_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching seller reservations:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Get Reservation by ID
+async function getReservationById(id) {
+  const { data, error } = await supabase
+    .from('reservations')
+    .select('*, products(*), buyer:profiles!buyer_id(full_name, avatar_url), seller:profiles!seller_id(full_name, avatar_url)')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching reservation:", error);
+    return null;
+  }
+  return data;
+}
+
+// Helper: Send Chat Message
+async function sendMessage(reservationId, text, imageUrl = null) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('messages')
+    .insert({
+      reservation_id: reservationId,
+      sender_id: session.user.id,
+      text: text,
+      image_url: imageUrl
+    });
+
+  if (error) {
+    console.error("Error sending message:", error);
+    throw error;
+  }
+}
+
+// Helper: Get Chat Messages
+async function getChatMessages(reservationId) {
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*, profiles!sender_id(full_name, avatar_url)')
+    .eq('reservation_id', reservationId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error("Error fetching messages:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Propose Meetup
+async function proposeMeetup(reservationId, location, meetTime) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  // Check if meetup exists
+  const { data: existing, error: checkError } = await supabase
+    .from('meetups')
+    .select('id')
+    .eq('reservation_id', reservationId)
+    .single();
+
+  if (existing) {
+    const { error } = await supabase
+      .from('meetups')
+      .update({
+        location: location,
+        meet_time: meetTime,
+        status: 'Proposed',
+        proposed_by: session.user.id
+      })
+      .eq('reservation_id', reservationId);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from('meetups')
+      .insert({
+        reservation_id: reservationId,
+        location: location,
+        meet_time: meetTime,
+        status: 'Proposed',
+        proposed_by: session.user.id
+      });
+    if (error) throw error;
+  }
+}
+
+// Helper: Get Meetup for Reservation
+async function getMeetupForReservation(reservationId) {
+  const { data, error } = await supabase
+    .from('meetups')
+    .select('*, profiles!proposed_by(full_name)')
+    .eq('reservation_id', reservationId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows found"
+    console.error("Error fetching meetup:", error);
+    return null;
+  }
+  return data || null;
+}
+
+// Helper: Confirm Meetup
+async function confirmMeetup(reservationId) {
+  const { error } = await supabase
+    .from('meetups')
+    .update({ status: 'Confirmed' })
+    .eq('reservation_id', reservationId);
+
+  if (error) {
+    console.error("Error confirming meetup:", error);
+    throw error;
+  }
+}
+
+// Helper: Confirm Transaction Completion
+async function confirmTransaction(reservationId, role) {
+  const updates = {};
+  if (role === 'buyer') updates.buyer_confirmed = true;
+  else if (role === 'seller') updates.seller_confirmed = true;
+
+  const { data: reservation, error } = await supabase
+    .from('reservations')
+    .update(updates)
+    .eq('id', reservationId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error confirming transaction:", error);
+    throw error;
+  }
+
+  // If both confirmed, mark reservation as Completed and Product as Sold
+  if (reservation.buyer_confirmed && reservation.seller_confirmed) {
+    await supabase
+      .from('reservations')
+      .update({ status: 'Completed' })
+      .eq('id', reservationId);
+      
+    await supabase
+      .from('products')
+      .update({ status: 'Sold' })
+      .eq('id', reservation.product_id);
+  }
+}
+
+// Helper: Submit Review
+async function submitReview(reservationId, revieweeId, rating, comment) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('reviews')
+    .insert({
+      reservation_id: reservationId,
+      reviewer_id: session.user.id,
+      reviewee_id: revieweeId,
+      rating: rating,
+      comment: comment
+    });
+
+  if (error) {
+    console.error("Error submitting review:", error);
+    throw error;
+  }
+}
