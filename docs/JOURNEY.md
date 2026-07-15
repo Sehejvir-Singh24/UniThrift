@@ -32,6 +32,14 @@ We made massive progress today, expanding the app's features from simple static 
 
 ---
 
+## Session 3: Security Deposit, Meetup Negotiation & Contact Reveal (Latest)
+- **Security Deposit Checkout:** Implemented a new checkout model where buyers only pay a 10% security deposit to reserve an item, leaving the remaining 90% for in-person settlement.
+- **Meetup Negotiation Flow:** Instead of free-form chat, introduced a structured meetup planner. Buyers propose a campus location and time, and sellers can accept or send a counter-offer.
+- **Phone Number Reveal System:** Replaced the planned in-app messaging system with a more secure and efficient Phone Number Reveal. Once a meetup is confirmed, both parties' phone numbers are revealed with one-tap Call and WhatsApp action buttons.
+- **Database Schema Updates:** Added `reservations` and `meetups` tables to handle the deposit status and negotiation states securely.
+
+---
+
 ## Session 1: Core Onboarding & Authentication
 We built out the core onboarding and user authentication flow:
 
@@ -76,14 +84,11 @@ Now that onboarding, authentication, profile sync, and offer submissions are ful
   - Set up a dashboard notification bell in the header that queries this table.
   - Trigger notification records when offers are sent, countered, or responded to.
 
-### 2. In-App Chat Integration
-- **Goal:** Enable direct negotiation and pickup coordination inside the app.
-- **Tasks:**
-  - Create a `messages` and `conversations` table in Supabase.
-  - Design a real-time messaging interface where buyers and sellers can talk after an offer is submitted.
-
-### 3. College Verification Enhancements (ID Verification Upload)
+### 2. College Verification Enhancements (ID Verification Upload)
 - **Goal:** Set up secure, private image file storage for ID verification.
 - **Tasks:**
   - Create an `id-cards` private storage bucket in Supabase.
   - Implement image upload and OCR/Admin review panel to verify student cards.
+
+### 3. Redesign Chat UI for Mobile (Stitch)
+- **Goal:** Improve the layout of the mobile meetup view with the Stitch design system.

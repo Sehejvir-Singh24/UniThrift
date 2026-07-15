@@ -9,7 +9,7 @@ This document serves as a guide to the current structure of the UniThrift codeba
 - **`/marketplace`**: Core buying and selling flows, offer review pages, and item listings.
 - **`/roommates`**: Flatmate finding features.
 - **`/pghostels`**: PG and Hostel discovery features.
-- **`/core`**: General user pages like pricing, offers dashboard, and user profiles.
+- **`/core`**: General user pages like pricing, offers dashboard, and user profiles. Includes `/core/chat.html` for Meetup Negotiation and Phone Number Reveal.
 - **`/scripts`**: JavaScript logic files.
 - **`/docs`**: Documentation and specs (including this file).
 - **`/db`**: Database configuration, schema scripts, and SQL migrations.
@@ -24,6 +24,7 @@ This document serves as a guide to the current structure of the UniThrift codeba
 
 - **`/db/supabase_setup.sql`**: The master SQL script containing all core table definitions (e.g., the `profiles`, `products` schemas) and Row Level Security (RLS) policies.
 - **`/db/offers_migration.sql`**: Schema configuration and RLS security policies for the `offers` table.
+- **`/db/reservation_chat_setup.sql`**: Schema configuration and RLS for the `reservations` and `meetups` tables handling the transaction lifecycle.
 
 ## The Onboarding Journey (Routing Flow)
 
@@ -55,6 +56,7 @@ The app employs a strict, linear onboarding flow to ensure data integrity:
 - **`/index.html`**: The primary marketplace dashboard where users arrive after successfully authenticating and verifying their accounts. Shows the marketplace product feed.
 - **`/core/offers.html`**: The Central Offers Dashboard containing tabbed panels for **Offers Received** (Seller view) and **Offers Sent** (Buyer view).
 - **`/marketplace/offer_received.html`**: Dedicated seller processing screen for a received offer, enabling accepting, rejecting, or countering.
+- **`/core/chat.html`**: The Meetup Status dashboard where users negotiate the meetup location/time and eventually view the revealed phone number.
 
 ## Deprecated/Legacy Files
 - **`/auth/otp_verification.html`**: Originally used for Magic Link login, but deprecated due to Supabase sandbox rate limits on emails. Replaced entirely by the email/password and Google OAuth flows.
