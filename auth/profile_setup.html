@@ -227,26 +227,28 @@
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span><span class="ml-2">Saving...</span>`;
             
             try {
-                if (!croppedBlob) {
-                    alert("Please select and crop a profile photo.");
-                    btn.innerHTML = `<span>Continue</span><span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1" id="next-icon">arrow_forward</span>`;
-                    return;
-                }
-
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) throw new Error("No active session");
 
-                const file = new File([croppedBlob], `avatar_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                const publicUrl = await uploadAvatar(session.user.id, file);
+                let publicUrl = null;
+                if (croppedBlob) {
+                    const file = new File([croppedBlob], `avatar_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                    publicUrl = await uploadAvatar(session.user.id, file);
+                }
 
-                await updateProfile({
+                const profileUpdates = {
                     full_name: fullname,
                     phone_number: phone,
                     enrollment_number: enrollment,
                     year_of_study: selectedYear,
-                    college: college,
-                    avatar_url: publicUrl
-                });
+                    college: college
+                };
+
+                if (publicUrl) {
+                    profileUpdates.avatar_url = publicUrl;
+                }
+
+                await updateProfile(profileUpdates);
 
                 // Success state
                 btn.classList.replace('bg-primary-container', 'bg-primary');
