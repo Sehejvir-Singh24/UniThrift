@@ -4,7 +4,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
-      requireVerifiedSeller();
+      requireAdmin();
     </script>
   </head><body class="bg-surface font-body-lg text-on-surface"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 flex items-center px-container-padding-mobile gap-stack-md"><button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all" onclick="history.back()"><span class="material-symbols-outlined text-on-surface">arrow_back</span></button><span class="font-title-md text-title-md text-on-surface truncate">Create Listing</span><a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full pb-[100px] gap-stack-lg">
 <!-- Progress Indicator -->
@@ -64,8 +64,8 @@
 <!-- Fixed Bottom Action Bar -->
 <div class="fixed bottom-0 left-0 w-full bg-surface/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom,20px)] pt-stack-md px-container-padding-mobile shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
 <div class="flex gap-gutter">
-<button class="w-1/3 bg-surface-container text-on-surface font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all">Back</button>
-<button onclick="window.location.href='/pghostels/pg_review_publish.html'" class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all shadow-sm">Continue</button>
+<button onclick="history.back()" class="w-1/3 bg-surface-container text-on-surface font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all">Back</button>
+<button onclick="saveMediaAmenitiesAndContinue()" class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-3 rounded-full active:scale-95 transition-all shadow-sm">Continue</button>
 </div>
 </div>
 </div>
@@ -84,6 +84,7 @@
   ];
 
   const container = document.getElementById('amenities-container');
+  const selectedAmenities = [];
   
   amenities.forEach(item => {
     const chip = document.createElement('button');
@@ -101,15 +102,36 @@
         chip.classList.remove('bg-surface-container', 'text-on-surface');
         chip.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
         chip.querySelector('.material-symbols-outlined').classList.remove('opacity-70');
+        selectedAmenities.push(item.label);
       } else {
         chip.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
         chip.classList.add('bg-surface-container', 'text-on-surface');
         chip.querySelector('.material-symbols-outlined').classList.add('opacity-70');
+        const idx = selectedAmenities.indexOf(item.label);
+        if (idx > -1) selectedAmenities.splice(idx, 1);
       }
     });
 
     container.appendChild(chip);
   });
+
+  function saveMediaAmenitiesAndContinue() {
+      const description = document.querySelector('textarea').value.trim();
+      const draftStr = sessionStorage.getItem('pg_draft');
+      if (!draftStr) {
+          alert("Session expired. Please restart the listing flow.");
+          window.location.href = '/pghostels/pg_property_basics.html';
+          return;
+      }
+      
+      const pgDraft = JSON.parse(draftStr);
+      pgDraft.description = description || "Beautiful student hostel / PG accommodating all student needs. Located near campus.";
+      pgDraft.amenities = selectedAmenities;
+      pgDraft.image_url = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBxUPriTWu6eA9GhUJJM-c0bMTSrTdNLAtPpySrsIQLEIXfY93j78IYsNePK7g3zZM3Ao_hdnv0CAxTX_-1JFL2s0DTB829cwNMlTtjuCQlvXLMojwrswnbb4ySyhtQWQWUCSl9WkRLMXGqwJLK6p5-PiBlvbxMTSLPoxJdP4ETs0ZCh_FSqMK7veviZieEA8GR9mQ398E2X8q831G3KVDXYebGyW0rjgEwAe8O0ELjwXPUc2pfinLhsXtZapSwOjP8KicXTsaEje4M';
+      
+      sessionStorage.setItem('pg_draft', JSON.stringify(pgDraft));
+      window.location.href = '/pghostels/pg_review_publish.html';
+  }
 </script></main></body></html>
 
 

@@ -4,7 +4,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
-      requireVerifiedSeller();
+      requireAdmin();
     </script>
   </head><body class="bg-surface font-body-lg text-on-surface"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 flex items-center px-container-padding-mobile gap-stack-md"><button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all" onclick="history.back()"><span class="material-symbols-outlined text-on-surface">arrow_back</span></button><span class="font-title-md text-title-md text-on-surface truncate">Create Listing</span><a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full pb-24">
 <!-- Progress Bar -->
@@ -100,10 +100,56 @@
 </div>
 <!-- Bottom Navigation Action -->
 <div class="fixed bottom-0 left-0 w-full p-container-padding-mobile bg-surface/80 backdrop-blur-xl z-50">
-<button onclick="window.location.href='/pghostels/pg_media_amenities.html'" class="w-full bg-primary-container text-on-primary font-title-md text-title-md py-4 rounded-full active:scale-[0.98] transition-transform shadow-[0_8px_24px_rgba(34,197,94,0.3)]">
+<button onclick="saveBasicsAndContinue()" class="w-full bg-primary-container text-on-primary font-title-md text-title-md py-4 rounded-full active:scale-[0.98] transition-transform shadow-[0_8px_24px_rgba(34,197,94,0.3)]">
       Next: Amenities & Photos
     </button>
 </div>
+
+<script>
+  let selectedGender = 'Girls Only';
+
+  const genderButtons = document.querySelectorAll('.grid.grid-cols-3 > button');
+  genderButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+          genderButtons.forEach(b => {
+              b.className = 'relative bg-surface-container-lowest rounded-[20px] py-4 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center gap-2 active:scale-95 transition-all text-on-surface-variant';
+              const indicator = b.querySelector('.absolute');
+              if (indicator) indicator.remove();
+          });
+          
+          btn.className = 'relative bg-primary-container rounded-[20px] py-4 shadow-[0_12px_30px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center gap-2 active:scale-95 transition-all text-on-primary font-medium';
+          
+          const indicator = document.createElement('div');
+          indicator.className = 'absolute -top-1 -right-1 bg-surface-container-lowest rounded-full p-0.5';
+          indicator.innerHTML = '<span class="material-symbols-outlined text-primary-container text-[16px]" style="font-variation-settings: \'FILL\' 1;">check_circle</span>';
+          btn.appendChild(indicator);
+          
+          selectedGender = btn.innerText.includes('Boys') ? 'Boys Only' : (btn.innerText.includes('Girls') ? 'Girls Only' : 'Co-Ed');
+      });
+  });
+
+  function saveBasicsAndContinue() {
+      const name = document.getElementById('pg-name').value.trim();
+      const rent = document.getElementById('pg-rent').value.trim();
+      const distance = document.getElementById('distance-value').innerText;
+      
+      if (!name || !rent) {
+          alert("Please fill in PG Name and Monthly Rent.");
+          return;
+      }
+      
+      const pgDraft = {
+          title: name,
+          price: parseFloat(rent),
+          distance_to_campus: distance,
+          type: selectedGender,
+          address: 'GTBIT Campus Area, Janakpuri, New Delhi'
+      };
+      
+      sessionStorage.setItem('pg_draft', JSON.stringify(pgDraft));
+      window.location.href = '/pghostels/pg_media_amenities.html';
+  }
+</script>
 </div></main></body></html>
 
 

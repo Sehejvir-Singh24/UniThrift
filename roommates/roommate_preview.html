@@ -9,56 +9,125 @@
 <div class="relative bg-surface-container-lowest rounded-xl p-stack-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col gap-stack-md">
 <!-- User Info Header -->
 <div class="flex items-center gap-stack-sm">
-<img alt="Alex Morgan Profile Picture" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvatbxVzqsSywC_1vHoSqI_wdlArM_evdqze8PEDCD-A2XFALYwvef1wSgnp5xF3MlRZrRJQKlKjsbmjk_vu-XyOCC_GpbCe2nbLWOxEfdhuZRav0Fi0gAet6qMx6U0G8O2kjfJ46p53GfneosMnR2eStPNUcL1QPBh78yyvfvmcw4p1oN0OQ4OJQNb3502Nj1Eh9lB0EcKXd3AxA6D1S0ILao1di_7DsVR-Ve0ptmRbkvPOwVR-IUakakA"/>
+<img id="user-avatar" alt="Profile Avatar" class="w-12 h-12 rounded-full object-cover border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz"/>
 <div class="flex flex-col flex-1 min-w-0">
 <div class="flex items-center gap-unit">
-<span class="font-title-md text-title-md text-on-surface truncate">Alex Morgan</span>
+<span id="user-name" class="font-title-md text-title-md text-on-surface truncate">Student</span>
 <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Verified Student • GTBIT</span>
+<span id="user-college" class="font-body-sm text-body-sm text-on-surface-variant">Verified Student • GGSIPU</span>
 </div>
 </div>
 <!-- Main Title -->
-<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Looking for a cozy room in North Campus</h3>
+<h3 id="preview-title" class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Looking for Roommate</h3>
 <!-- Key Stats Bento Grid -->
 <div class="grid grid-cols-2 gap-stack-sm">
 <div class="bg-surface-container-low rounded-lg p-stack-sm flex flex-col gap-unit">
 <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Budget</span>
-<span class="font-title-md text-title-md text-on-surface">₹12k/mo</span>
+<span id="preview-budget" class="font-title-md text-title-md text-on-surface">₹15,000/mo</span>
 </div>
 <div class="bg-surface-container-low rounded-lg p-stack-sm flex flex-col gap-unit">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Move-in</span>
-<span class="font-title-md text-title-md text-on-surface">Aug 1st</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Preferred Area</span>
+<span id="preview-area" class="font-title-md text-title-md text-on-surface truncate">North Campus</span>
 </div>
 </div>
 <!-- Bio -->
-<p class="font-body-lg text-body-lg text-on-surface-variant line-clamp-3">
-        Hi! I'm a final year CS student at GTBIT. Looking for a quiet place with chill roommates. I love coding and weekend hikes.
+<p id="preview-bio" class="font-body-lg text-body-lg text-on-surface-variant line-clamp-3">
+        Hi! I'm looking for a quiet place with chill roommates.
       </p>
 <!-- Tags -->
-<div class="flex flex-wrap gap-stack-sm">
-<span class="bg-primary/10 text-primary font-body-sm text-body-sm px-3 py-1 rounded-full">Non-Smoker</span>
-<span class="bg-primary/10 text-primary font-body-sm text-body-sm px-3 py-1 rounded-full">Early Bird</span>
-<span class="bg-primary/10 text-primary font-body-sm text-body-sm px-3 py-1 rounded-full">Pet Friendly</span>
+<div id="preview-tags" class="flex flex-wrap gap-stack-sm">
+  <!-- Dynamic tags -->
 </div>
 <!-- Mock Action Button -->
 <button class="w-full bg-secondary-fixed-dim text-on-secondary-container font-title-md text-title-md py-3 rounded-lg flex items-center justify-center gap-stack-sm mt-stack-sm" disabled="">
 <span class="material-symbols-outlined">chat_bubble</span>
-        Message Alex
+        Message
       </button>
 </div>
 </div>
 <!-- Sticky Bottom Actions -->
 <div class="px-container-padding-mobile py-stack-md bg-surface/80 backdrop-blur-xl flex flex-col gap-stack-sm sticky bottom-0">
-<button onclick="this.innerHTML='<span class=material-symbols-outlined>check_circle</span>&nbsp;Posted!'; this.classList.replace('bg-primary','bg-surface-tint'); setTimeout(function(){window.location.href='/roommates/flatmates.html'},1500)" class="w-full bg-primary text-on-primary font-title-md text-title-md py-4 rounded-xl shadow-[0_4px_12px_rgba(0,110,47,0.2)] active:scale-[0.98] transition-transform flex items-center justify-center gap-stack-sm">
+<button onclick="publishRoommateRequest(this)" class="w-full bg-primary text-on-primary font-title-md text-title-md py-4 rounded-xl shadow-[0_4px_12px_rgba(0,110,47,0.2)] active:scale-[0.98] transition-transform flex items-center justify-center gap-stack-sm">
 <span class="material-symbols-outlined">publish</span>
       Looks good! Publish Now
     </button>
-<button class="w-full bg-surface-container text-on-surface font-title-md text-title-md py-4 rounded-xl active:scale-[0.98] transition-transform flex items-center justify-center gap-stack-sm">
+<button onclick="history.back()" class="w-full bg-surface-container text-on-surface font-title-md text-title-md py-4 rounded-xl active:scale-[0.98] transition-transform flex items-center justify-center gap-stack-sm">
 <span class="material-symbols-outlined">edit</span>
       Edit Details
     </button>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  let draftData = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+      // Auth Guard
+      const isAuth = await requireAuth();
+      if (!isAuth) {
+          window.location.href = '/auth/login.html';
+          return;
+      }
+      
+      const draftStr = sessionStorage.getItem('roommate_draft');
+      if (!draftStr) {
+          alert("No draft found. Redirecting to start...");
+          window.location.href = '/roommates/roommate_need_flat.html';
+          return;
+      }
+      draftData = JSON.parse(draftStr);
+
+      // Fetch active user profile
+      const profile = await getProfile();
+      if (profile) {
+          document.getElementById('user-name').innerText = profile.full_name || 'Anonymous Student';
+          document.getElementById('user-college').innerText = `Verified Student • ${profile.college || 'GGSIPU'}`;
+          if (profile.avatar_url) {
+              document.getElementById('user-avatar').src = profile.avatar_url;
+          }
+      }
+
+      // Render Draft Details
+      document.getElementById('preview-title').innerText = draftData.title;
+      document.getElementById('preview-budget').innerText = `₹${draftData.budget}/mo`;
+      document.getElementById('preview-area').innerText = draftData.preferred_area;
+      document.getElementById('preview-bio').innerText = draftData.bio;
+
+      const tagsContainer = document.getElementById('preview-tags');
+      tagsContainer.innerHTML = '';
+      if (draftData.tags && draftData.tags.length > 0) {
+          draftData.tags.forEach(tag => {
+              const span = document.createElement('span');
+              span.className = 'bg-primary/10 text-primary font-body-sm text-body-sm px-3 py-1 rounded-full';
+              span.innerText = tag;
+              tagsContainer.appendChild(span);
+          });
+      }
+  });
+
+  async function publishRoommateRequest(btn) {
+      if (!draftData) return;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Posting...`;
+      
+      try {
+          await createRoommateListing(draftData);
+          btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Published!`;
+          btn.className = btn.className.replace('bg-primary', 'bg-surface-tint');
+          sessionStorage.removeItem('roommate_draft');
+          
+          setTimeout(() => {
+              window.location.href = '/roommates/flatmates.html';
+          }, 1500);
+      } catch(e) {
+          btn.disabled = false;
+          btn.innerHTML = `<span class="material-symbols-outlined">publish</span> Looks good! Publish Now`;
+          alert("Posting failed: " + e.message);
+      }
+  }
+</script>
 </div></main></body></html>
 
 

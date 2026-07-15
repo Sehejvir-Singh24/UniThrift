@@ -146,7 +146,7 @@
 <!-- Quick Links -->
 <div class="flex flex-col">
 <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-sm px-2">Account Activity</h3>
-<div class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden" id="account-activity-links">
 <a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="/core/saved_items.html">
 <div class="flex items-center gap-stack-md">
 <div class="w-10 h-10 rounded-full bg-secondary-container/30 text-on-secondary-container flex items-center justify-center group-hover:bg-primary-container/20 group-hover:text-primary transition-colors">
@@ -340,7 +340,25 @@
       document.getElementById('profile-avatar').src = profile.avatar_url;
     }
 
-    
+    if (profile.role === 'admin') {
+      const container = document.getElementById('account-activity-links');
+      if (container) {
+        const adminLinkHTML = `
+          <a class="flex items-center justify-between p-stack-md bg-surface-container-lowest active:bg-surface-container-low transition-colors group" href="/admin/dashboard.html">
+            <div class="flex items-center gap-stack-md">
+              <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-colors animate-pulse">
+                <span class="material-symbols-outlined">security</span>
+              </div>
+              <span class="font-body-lg text-body-lg text-on-surface font-semibold">Admin Panel</span>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+          </a>
+          <div class="h-px bg-surface-container mx-stack-md"></div>
+        `;
+        container.insertAdjacentHTML('afterbegin', adminLinkHTML);
+      }
+    }
+
     // Always show seller dashboard so user knows they can sell items
     document.getElementById('seller-dashboard-section').style.display = 'flex';
     await loadMyListings(profile.id);

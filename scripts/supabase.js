@@ -397,6 +397,167 @@ async function logout() {
   window.location.href = '/auth/login.html';
 }
 
+// Helper: Get Pending Verifications (for Admins)
+async function getPendingVerifications() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('verification_status', 'pending')
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error("Error fetching pending verifications:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Approve Verification (for Admins)
+async function approveVerification(userId) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      is_verified: true,
+      verification_status: 'verified',
+      verification_feedback: null
+    })
+    .eq('id', userId);
+  if (error) {
+    console.error("Error approving verification:", error);
+    throw error;
+  }
+}
+
+// Helper: Reject Verification (for Admins)
+async function rejectVerification(userId, feedback) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      is_verified: false,
+      verification_status: 'rejected',
+      verification_feedback: feedback
+    })
+    .eq('id', userId);
+  if (error) {
+    console.error("Error rejecting verification:", error);
+    throw error;
+  }
+}
+
+// Helper: Get All Products (for Admin Moderation)
+async function getAdminProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, profiles!seller_id(full_name)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error("Error fetching admin products:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Delete Product as Admin
+async function deleteProductAdmin(productId) {
+  const { error } = await supabase
+    .from('products')
+    .delete()
+    .eq('id', productId);
+  if (error) {
+    console.error("Error deleting product as admin:", error);
+    throw error;
+  }
+}
+
+// Helper: Create Roommate Listing
+async function createRoommateListing(listing) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+  const { error } = await supabase
+    .from('roommate_listings')
+    .insert({
+      ...listing,
+      user_id: session.user.id
+    });
+  if (error) {
+    console.error("Error creating roommate listing:", error);
+    throw error;
+  }
+}
+
+// Helper: Get Roommate Listings
+async function getRoommateListings() {
+  const { data, error } = await supabase
+    .from('roommate_listings')
+    .select('*, profiles!user_id(full_name, avatar_url, college, year_of_study)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error("Error fetching roommate listings:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Delete Roommate Listing as Admin
+async function deleteRoommateListingAdmin(id) {
+  const { error } = await supabase
+    .from('roommate_listings')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    console.error("Error deleting roommate listing as admin:", error);
+    throw error;
+  }
+}
+
+// Helper: Create PG Listing
+async function createPGListing(pgData) {
+  const { error } = await supabase
+    .from('pg_listings')
+    .insert(pgData);
+  if (error) {
+    console.error("Error creating PG listing:", error);
+    throw error;
+  }
+}
+
+// Helper: Get PG Listings
+async function getPGListings() {
+  const { data, error } = await supabase
+    .from('pg_listings')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error("Error fetching PG listings:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Helper: Delete PG Listing as Admin
+async function deletePGListingAdmin(id) {
+  const { error } = await supabase
+    .from('pg_listings')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    console.error("Error deleting PG listing as admin:", error);
+    throw error;
+  }
+}
+
+// Helper: Require Admin Role
+async function requireAdmin() {
+  const isAuth = await requireAuth();
+  if (!isAuth) return false;
+  
+  const profile = await getProfile();
+  if (!profile || profile.role !== 'admin') {
+    window.location.href = '/pghostels/pghostels.html';
+    return false;
+  }
+  return true;
+}
+
 // Auto-sync header profile photo across all pages
 document.addEventListener('DOMContentLoaded', async () => {
   const headerAvatars = document.querySelectorAll('#header-avatar');

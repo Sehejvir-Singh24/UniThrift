@@ -117,10 +117,8 @@
     }
 </style>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     const card = document.getElementById('active-card');
-    const nopeOverlay = document.getElementById('nope-overlay');
-    const likeOverlay = document.getElementById('like-overlay');
     const btnNope = document.getElementById('btn-nope');
     const btnLike = document.getElementById('btn-like');
     
@@ -131,19 +129,131 @@
     
     const threshold = 100; // pixels to trigger swipe
 
+    // Dynamic Swiper State
+    let postings = [];
+    let currentIndex = 0;
+
+    try {
+        postings = await getRoommateListings();
+    } catch(e) {
+        console.error("Error loading roommate postings:", e);
+    }
+
+    function renderActiveCard() {
+        if (currentIndex >= postings.length) {
+            // Show all caught up card
+            card.innerHTML = `
+              <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-surface-container-lowest">
+                <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 animate-bounce">
+                  <span class="material-symbols-outlined text-[40px]">check_circle</span>
+                </div>
+                <h3 class="font-headline-lg-mobile text-on-surface mb-2">All Caught Up!</h3>
+                <p class="font-body-sm text-on-surface-variant max-w-xs">There are no more roommate listings in your campus area right now. Check back later!</p>
+              </div>
+            `;
+            // Hide control buttons
+            btnNope.style.display = 'none';
+            btnLike.style.display = 'none';
+            return;
+        }
+
+        const post = postings[currentIndex];
+        const profile = post.profiles || {};
+        const name = profile.full_name || 'Anonymous Student';
+        const college = profile.college || 'GGSIPU';
+        const year = profile.year_of_study || 'N/A';
+        const avatar = profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
+        
+        let tagsHTML = '';
+        if(post.tags && post.tags.length > 0) {
+            tagsHTML = post.tags.map(t => `
+              <span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">${getTagIcon(t)}</span> ${t}
+              </span>
+            `).join('');
+        }
+
+        card.innerHTML = `
+          <div class="relative w-full h-[55%] bg-surface-variant">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
+            <img class="w-full h-full object-cover" src="${avatar}" alt="${name}"/>
+            <div class="absolute top-4 left-4 z-20 flex gap-2">
+              <span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px] text-primary">verified</span> Verified
+              </span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10">
+              <div class="flex items-baseline gap-2 text-white">
+                <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
+              </div>
+              <p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">school</span> ${year} • ${college}
+              </p>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
+            <div class="flex flex-col gap-2">
+              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Looking For</h4>
+              <div class="flex items-center gap-3">
+                <div class="flex flex-col">
+                  <span class="font-title-md text-title-md text-primary-container">₹${post.budget}/mo</span>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">Budget</span>
+                </div>
+                <div class="w-px h-8 bg-surface-variant"></div>
+                <div class="flex flex-col">
+                  <span class="font-title-md text-title-md text-on-surface truncate max-w-[150px]">${post.preferred_area || 'Flexible'}</span>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">Preferred Area</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Lifestyle</h4>
+              <div class="flex flex-wrap gap-2">${tagsHTML || '<span class="text-on-surface-variant font-body-sm">Flexible preferences</span>'}</div>
+            </div>
+            <div class="flex flex-col gap-2 mt-2">
+              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">About me</h4>
+              <p class="font-body-sm text-body-sm text-on-surface leading-relaxed">${post.bio || 'No description provided.'}</p>
+            </div>
+          </div>
+          <div class="absolute inset-0 bg-error/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="nope-overlay">
+            <div class="border-4 border-error text-error font-headline-lg text-headline-lg rounded-lg px-6 py-2 -rotate-12 opacity-80">NOPE</div>
+          </div>
+          <div class="absolute inset-0 bg-primary-container/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="like-overlay">
+            <div class="border-4 border-primary-container text-primary-container font-headline-lg text-headline-lg rounded-lg px-6 py-2 rotate-12 opacity-80">LIKE</div>
+          </div>
+        `;
+    }
+
+    function getTagIcon(tag) {
+        tag = tag.toLowerCase();
+        if (tag.includes('owl') || tag.includes('night')) return 'bedtime';
+        if (tag.includes('veg')) return 'eco';
+        if (tag.includes('smoke')) return 'smoke_free';
+        if (tag.includes('pet')) return 'pets';
+        if (tag.includes('clean')) return 'cleaning_services';
+        if (tag.includes('study')) return 'menu_book';
+        return 'star';
+    }
+
+    // Initialize first card
+    renderActiveCard();
+
     function updateCardTransform() {
       card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
       
-      // Update overlays based on direction
+      const nopeOver = document.getElementById('nope-overlay');
+      const likeOver = document.getElementById('like-overlay');
+      if (!nopeOver || !likeOver) return;
+
       if (currentX > 0) {
-          likeOverlay.style.opacity = Math.min(currentX / threshold, 1);
-          nopeOverlay.style.opacity = 0;
+          likeOver.style.opacity = Math.min(currentX / threshold, 1);
+          nopeOver.style.opacity = 0;
       } else if (currentX < 0) {
-          nopeOverlay.style.opacity = Math.min(Math.abs(currentX) / threshold, 1);
-          likeOverlay.style.opacity = 0;
+          nopeOver.style.opacity = Math.min(Math.abs(currentX) / threshold, 1);
+          likeOver.style.opacity = 0;
       } else {
-          likeOverlay.style.opacity = 0;
-          nopeOverlay.style.opacity = 0;
+          likeOver.style.opacity = 0;
+          nopeOver.style.opacity = 0;
       }
     }
 
@@ -154,13 +264,16 @@
         card.style.transform = `translateX(${endX}px) rotate(${endRotation}deg)`;
         card.style.opacity = 0;
         
+        const nopeOver = document.getElementById('nope-overlay');
+        const likeOver = document.getElementById('like-overlay');
         if(direction > 0) {
-             likeOverlay.style.opacity = 1;
+             if (likeOver) likeOver.style.opacity = 1;
         } else {
-             nopeOverlay.style.opacity = 1;
+             if (nopeOver) nopeOver.style.opacity = 1;
         }
 
         setTimeout(() => {
+            currentIndex++;
             resetCard();
         }, 400);
     }
@@ -171,8 +284,9 @@
         rotation = 0;
         card.style.transform = '';
         card.style.opacity = 1;
-        likeOverlay.style.opacity = 0;
-        nopeOverlay.style.opacity = 0;
+        
+        // Re-render card content
+        renderActiveCard();
         
         // Minor visual feedback
         card.classList.add('scale-95');
@@ -184,16 +298,17 @@
 
     // Touch Events
     card.addEventListener('touchstart', (e) => {
+      if (currentIndex >= postings.length) return;
       isDragging = true;
       startX = e.touches[0].clientX;
-      card.style.transition = 'none'; // Remove transition while dragging
+      card.style.transition = 'none';
     });
 
     card.addEventListener('touchmove', (e) => {
       if (!isDragging) return;
       const x = e.touches[0].clientX;
       currentX = x - startX;
-      rotation = currentX * 0.1; // Slight rotation
+      rotation = currentX * 0.1;
       updateCardTransform();
     });
 
@@ -207,7 +322,6 @@
       } else if (currentX < -threshold) {
         animateCardOut(-1); // Nope
       } else {
-        // Snap back
         currentX = 0;
         rotation = 0;
         updateCardTransform();
@@ -215,8 +329,12 @@
     });
     
     // Button Clicks
-    btnLike.addEventListener('click', () => animateCardOut(1));
-    btnNope.addEventListener('click', () => animateCardOut(-1));
+    btnLike.addEventListener('click', () => {
+        if (currentIndex < postings.length) animateCardOut(1);
+    });
+    btnNope.addEventListener('click', () => {
+        if (currentIndex < postings.length) animateCardOut(-1);
+    });
   });
 </script>
 <!-- FAB: Post a Roommate Requirement -->
@@ -224,7 +342,6 @@
     <span class="material-symbols-outlined text-[24px]">group_add</span>
     <span class="font-title-md text-[16px]">Need Flat</span>
 </button>
-</main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a></div></nav></body></html>
 
 
 

@@ -106,7 +106,7 @@
 </div>
 <!-- Footer -->
 <div class="sticky bottom-0 w-full p-container-padding-mobile bg-surface/90 backdrop-blur-[12px] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] pb-safe">
-<button onclick="window.location.href='/roommates/roommate_preview.html'" class="w-full bg-primary text-on-primary py-4 rounded-[20px] font-title-md text-title-md shadow-[0_8px_24px_rgba(34,197,94,0.25)] hover:scale-[0.98] transition-transform active:scale-95 flex items-center justify-center gap-2">
+<button onclick="saveRoommateRequirementsAndContinue()" class="w-full bg-primary text-on-primary py-4 rounded-[20px] font-title-md text-title-md shadow-[0_8px_24px_rgba(34,197,94,0.25)] hover:scale-[0.98] transition-transform active:scale-95 flex items-center justify-center gap-2">
 <span class="material-symbols-outlined">campaign</span>
       Post Requirement
     </button>
@@ -195,6 +195,47 @@
       btn.classList.remove('text-on-surface-variant');
     });
   });
+
+  function saveRoommateRequirementsAndContinue() {
+      const budget = parseFloat(slider.value);
+      
+      const areas = [];
+      document.querySelectorAll('.area-chip.bg-primary').forEach(chip => {
+          areas.push(chip.textContent.trim());
+      });
+      
+      const roomType = document.querySelector('select').value;
+      const bio = document.querySelector('textarea').value.trim();
+      
+      const tags = [];
+      document.querySelectorAll('.lifestyle-chip.bg-primary').forEach(chip => {
+          // Keep only alphanumeric and standard characters
+          const txt = chip.textContent.replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ').trim();
+          tags.push(txt);
+      });
+      
+      if (areas.length === 0) {
+          alert("Please select at least one preferred area.");
+          return;
+      }
+      if (!bio) {
+          alert("Please write something about yourself.");
+          return;
+      }
+      
+      const title = `Need ${roomType} in ${areas[0]}`;
+      
+      const roommateDraft = {
+          title,
+          budget,
+          preferred_area: areas.join(', '),
+          bio,
+          tags
+      };
+      
+      sessionStorage.setItem('roommate_draft', JSON.stringify(roommateDraft));
+      window.location.href = '/roommates/roommate_preview.html';
+  }
 </script></main></body></html>
 
 

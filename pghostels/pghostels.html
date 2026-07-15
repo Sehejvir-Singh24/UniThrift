@@ -54,7 +54,7 @@
 </div>
 </section>
 <!-- Listing Feed -->
-<section class="flex flex-col gap-6 px-container-padding-mobile pb-8">
+<section id="pg-feed-container" class="flex flex-col gap-6 px-container-padding-mobile pb-8">
 <!-- Sponsored Listing -->
 <article class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 transform hover:scale-[1.01] cursor-pointer group">
 <div class="relative h-56 w-full">
@@ -153,11 +153,77 @@
     scrollbar-width: none;
   }
 </style>
-<!-- FAB: List Your PG (for property owners) -->
-<button onclick="window.location.href='/pghostels/pg_property_basics.html'" class="md:hidden fixed bottom-[120px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
-    <span class="material-symbols-outlined text-[24px]">apartment</span>
-    <span class="font-title-md text-[16px]">List PG</span>
-</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const feedContainer = document.getElementById('pg-feed-container');
+    try {
+      const pgs = await getPGListings();
+      if (pgs && pgs.length > 0) {
+        feedContainer.innerHTML = ''; // Clear mock items
+        pgs.forEach(pg => {
+          const card = document.createElement('article');
+          card.className = 'bg-surface-container-lowest rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 transform hover:scale-[1.01] cursor-pointer group';
+          
+          const imageSrc = pg.image_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBxUPriTWu6eA9GhUJJM-c0bMTSrTdNLAtPpySrsIQLEIXfY93j78IYsNePK7g3zZM3Ao_hdnv0CAxTX_-1JFL2s0DTB829cwNMlTtjuCQlvXLMojwrswnbb4ySyhtQWQWUCSl9WkRLMXGqwJLK6p5-PiBlvbxMTSLPoxJdP4ETs0ZCh_FSqMK7veviZieEA8GR9mQ398E2X8q831G3KVDXYebGyW0rjgEwAe8O0ELjwXPUc2pfinLhsXtZapSwOjP8KicXTsaEje4M';
+          
+          let amenitiesHTML = '';
+          if (pg.amenities && pg.amenities.length > 0) {
+            amenitiesHTML = pg.amenities.map(a => `
+              <div class="flex items-center gap-1.5" title="${a}">
+                <span class="material-symbols-outlined text-[18px]">${getAmenityIcon(a)}</span>
+                <span class="font-label-caps-mobile">${a}</span>
+              </div>
+            `).join('');
+          }
+
+          card.innerHTML = `
+            <div class="relative h-56 w-full">
+              <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${imageSrc}')"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+              <div class="absolute top-4 left-4 bg-primary text-on-primary font-label-caps-mobile px-3 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-md bg-opacity-90">
+                <span class="material-symbols-outlined text-[14px]">apartment</span> ${pg.type || 'Co-Ed'}
+              </div>
+              <button class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container-lowest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error transition-colors shadow-sm z-10">
+                <span class="material-symbols-outlined text-[20px]">favorite_border</span>
+              </button>
+              <div class="absolute bottom-4 left-4 flex gap-2 z-10">
+                <span class="bg-surface-container-lowest/90 backdrop-blur-sm text-on-surface font-label-caps-mobile px-2 py-1 rounded-md shadow-sm">${pg.rating || '5.0'} ★</span>
+                <span class="bg-surface-container-lowest/90 backdrop-blur-sm text-on-surface font-label-caps-mobile px-2 py-1 rounded-md shadow-sm">${pg.distance_to_campus || 'Near Campus'}</span>
+              </div>
+            </div>
+            <div class="p-5 flex flex-col gap-3">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h3 class="font-title-md text-on-surface line-clamp-1 group-hover:text-primary transition-colors">${pg.title}</h3>
+                  <p class="font-body-sm-mobile text-on-surface-variant mt-0.5">${pg.address || 'GGSIPU Area'}</p>
+                </div>
+                <div class="text-right ml-4 shrink-0">
+                  <p class="font-title-md text-on-surface">₹${pg.price}<span class="font-body-sm-mobile text-on-surface-variant font-normal">/mo</span></p>
+                </div>
+              </div>
+              <div class="flex gap-4 text-on-surface-variant pt-2 border-t border-outline-variant/30">
+                ${amenitiesHTML}
+              </div>
+            </div>
+          `;
+          feedContainer.appendChild(card);
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load dynamic PGs, keeping fallbacks", err);
+    }
+  });
+
+  function getAmenityIcon(amenity) {
+    amenity = amenity.toLowerCase();
+    if (amenity.includes('wifi')) return 'wifi';
+    if (amenity.includes('ac') || amenity.includes('air conditioning')) return 'ac_unit';
+    if (amenity.includes('meal') || amenity.includes('food') || amenity.includes('restaurant')) return 'restaurant';
+    if (amenity.includes('security')) return 'security';
+    return 'check_circle';
+  }
+</script>
 </main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a></div></nav></body></html>
 
 
