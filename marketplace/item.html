@@ -175,9 +175,28 @@
     <span class="font-display-lg text-display-lg text-primary" id="reserve-deposit-amount">₹--</span>
   </div>
 </div>
+<!-- NEW LOCATION & TIME INPUTS -->
+<div class="bg-surface-container rounded-2xl p-4 flex flex-col gap-3">
+  <div>
+    <label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">Propose Meetup Location</label>
+    <select id="meetup-location" class="w-full bg-surface-container-highest rounded-xl p-3 font-body-lg text-body-lg text-on-background outline-none">
+      <option value="Canteen">Canteen</option>
+      <option value="Nescafe">Nescafe</option>
+      <option value="Mother Dairy">Mother Dairy</option>
+      <option value="Ground">Ground</option>
+      <option value="Stage">Stage</option>
+      <option value="Fountain">Fountain</option>
+      <option value="Under the bridge">Under the bridge</option>
+    </select>
+  </div>
+  <div>
+    <label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">Propose Meetup Time</label>
+    <input type="datetime-local" id="meetup-time" class="w-full bg-surface-container-highest rounded-xl p-3 font-body-lg text-body-lg text-on-background outline-none" />
+  </div>
+</div>
 <div class="flex gap-3 bg-secondary-container/50 p-4 rounded-xl items-start">
   <span class="material-symbols-outlined text-secondary mt-0.5">lock</span>
-  <p class="font-body-sm text-body-sm text-on-secondary-container">Your deposit unlocks a private chat to safely coordinate a campus meetup. Pay the remaining <span id="reserve-remaining-amount" class="font-semibold">₹--</span> in person.</p>
+  <p class="font-body-sm text-body-sm text-on-secondary-container">Your deposit unlocks a private chat. The seller must accept your proposed meetup to unlock chat.</p>
 </div>
 <button id="confirm-reserve-btn" onclick="submitReservation()" class="w-full bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] mb-6 mt-2 flex items-center justify-center gap-2">
   <span>Pay Deposit & Reserve</span>
@@ -403,12 +422,22 @@
   async function submitReservation() {
     if (!currentProduct) return;
     const btn = document.getElementById('confirm-reserve-btn');
+    const location = document.getElementById('meetup-location').value;
+    const time = document.getElementById('meetup-time').value;
+
+    if (!time) {
+      alert("Please select a meetup time.");
+      return;
+    }
+
+    const meetTimeISO = new Date(time).toISOString();
+
     btn.disabled = true;
     btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Processing...`;
 
     try {
-      await createReservation(currentProduct.id, currentProduct.seller_id, currentReservationPrice);
-      alert("Reservation successful! Your private chat is now unlocked.");
+      await createReservation(currentProduct.id, currentProduct.seller_id, currentReservationPrice, location, meetTimeISO);
+      alert("Reservation successful! Meetup proposed.");
       window.location.href = '/core/dashboard.html';
     } catch (e) {
       alert("Reservation failed: " + e.message);

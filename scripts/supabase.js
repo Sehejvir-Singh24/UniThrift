@@ -823,7 +823,7 @@ async function checkForNotifications() {
 // ==========================================
 
 // Helper: Create a Reservation (10% Deposit)
-async function createReservation(productId, sellerId, productPrice) {
+async function createReservation(productId, sellerId, productPrice, location, meetTime) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Not authenticated");
 
@@ -846,6 +846,23 @@ async function createReservation(productId, sellerId, productPrice) {
   if (resError) {
     console.error("Error creating reservation:", resError);
     throw resError;
+  }
+
+  // Automatically propose the meetup
+  if (location && meetTime) {
+    const { error: meetupError } = await supabase
+      .from('meetups')
+      .insert({
+        reservation_id: reservation.id,
+        location: location,
+        meet_time: meetTime,
+        status: 'Proposed',
+        proposed_by: session.user.id
+      });
+      
+    if (meetupError) {
+      console.error("Error creating initial meetup:", meetupError);
+    }
   }
 
   // Update product status to 'Reserved' and link buyer
@@ -905,7 +922,7 @@ async function getReservationsAsSeller() {
 async function getReservationById(id) {
   const { data, error } = await supabase
     .from('reservations')
-    .select('*, products(*), buyer:profiles!buyer_id(full_name, avatar_url), seller:profiles!seller_id(full_name, avatar_url)')
+    .select('*, products(*), buyer:profiles!buyer_id(full_name, avatar_url, phone_number), seller:profiles!seller_id(full_name, avatar_url, phone_number)')
     .eq('id', id)
     .single();
 

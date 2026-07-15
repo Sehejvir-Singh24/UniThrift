@@ -48,104 +48,63 @@
           </div>
         </div>
       </div>
-      <button onclick="togglePlanner()" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-surface-container text-on-surface ml-2">
-        <span class="material-symbols-outlined">calendar_month</span>
-      </button>
     </div>
   </header>
 
-  <!-- Main Layout -->
-  <div class="flex-1 flex pt-[calc(env(safe-area-inset-top)+64px)] h-full">
-    
-    <!-- Chat Area -->
-    <main class="flex-1 flex flex-col relative h-full bg-surface-container-lowest">
-      <!-- Messages List -->
-      <div id="messages-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 pb-20">
-        <!-- Messages will be injected here -->
-        <div class="flex justify-center my-4">
-          <div class="bg-surface-container px-3 py-1 rounded-full text-[12px] font-label-caps text-on-surface-variant">Loading messages...</div>
-        </div>
-      </div>
-
-      <!-- Input Area -->
-      <div class="absolute bottom-0 left-0 right-0 glass pb-safe border-t border-outline-variant/30">
-        <div class="flex items-center p-3 gap-2 max-w-5xl mx-auto">
-          <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors shrink-0">
-            <span class="material-symbols-outlined">add_photo_alternate</span>
-          </button>
-          <input type="text" id="message-input" class="flex-1 bg-surface-container/50 border border-outline-variant/50 rounded-full px-4 py-2.5 outline-none font-body-lg text-on-background placeholder:text-on-surface-variant focus:bg-surface-container-lowest transition-colors" placeholder="Type a message...">
-          <button id="send-btn" onclick="handleSendMessage()" class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary shadow-sm hover:scale-105 transition-transform shrink-0">
-            <span class="material-symbols-outlined text-[20px]" style="margin-left:2px">send</span>
-          </button>
-        </div>
-      </div>
-    </main>
-
-    <!-- Sidebar / Meetup Planner -->
-    <aside id="planner-sidebar" class="w-full md:w-80 lg:w-96 bg-background border-l border-outline-variant/30 flex flex-col absolute inset-0 z-40 transform translate-x-full md:translate-x-0 md:relative transition-transform duration-300">
+  <!-- Meetup Status Main View -->
+  <main class="flex-1 flex flex-col items-center bg-background pt-[calc(env(safe-area-inset-top)+64px)] pb-safe overflow-y-auto px-4">
+    <div class="w-full max-w-lg flex flex-col gap-6 py-6">
       
-      <!-- Planner Mobile Header -->
-      <div class="md:hidden h-16 border-b border-outline-variant/30 flex items-center px-4 pt-safe glass sticky top-0 z-10">
-        <button onclick="togglePlanner()" class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-        <h2 class="font-title-md text-[18px] text-on-surface flex-1">Meetup Planner</h2>
+      <!-- Transaction Summary -->
+      <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Transaction Summary</h3>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 rounded-lg bg-surface-container overflow-hidden shrink-0">
+            <img id="planner-img" src="" class="w-full h-full object-cover hidden">
+          </div>
+          <div class="flex flex-col">
+            <span id="planner-title" class="font-title-md text-[14px] text-on-background line-clamp-2">--</span>
+            <span id="planner-price" class="font-title-md text-[14px] text-primary mt-0.5">₹--</span>
+          </div>
+        </div>
+        <div class="h-px w-full bg-outline-variant/30 mb-3"></div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Deposit Paid</span>
+          <span id="planner-deposit" class="font-body-sm text-body-sm text-on-background font-medium">₹--</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-body-lg text-[14px] text-on-surface-variant">Remaining at Meetup</span>
+          <span id="planner-remaining" class="font-title-md text-[18px] text-primary">₹--</span>
+        </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-5 pb-safe flex flex-col gap-6">
+      <!-- Meetup Status Module -->
+      <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary">pin_drop</span>
+          <h3 class="font-title-md text-[16px] text-on-background">Meetup Details</h3>
+        </div>
         
-        <!-- Transaction Summary -->
-        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
-          <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Transaction Summary</h3>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-lg bg-surface-container overflow-hidden shrink-0">
-              <img id="planner-img" src="" class="w-full h-full object-cover hidden">
-            </div>
-            <div class="flex flex-col">
-              <span id="planner-title" class="font-title-md text-[14px] text-on-background line-clamp-2">--</span>
-              <span id="planner-price" class="font-title-md text-[14px] text-primary mt-0.5">₹--</span>
-            </div>
-          </div>
-          <div class="h-px w-full bg-outline-variant/30 mb-3"></div>
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-body-sm text-body-sm text-on-surface-variant">Deposit Paid</span>
-            <span id="planner-deposit" class="font-body-sm text-body-sm text-on-background font-medium">₹--</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="font-body-lg text-[14px] text-on-surface-variant">Remaining at Meetup</span>
-            <span id="planner-remaining" class="font-title-md text-[18px] text-primary">₹--</span>
-          </div>
+        <div id="meetup-state-container" class="flex flex-col gap-4">
+          <!-- Dynamic State Injected Here -->
+          <div class="animate-pulse bg-surface-container h-32 rounded-xl"></div>
         </div>
-
-        <!-- Meetup Status Module -->
-        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-symbols-outlined text-primary">pin_drop</span>
-            <h3 class="font-title-md text-[16px] text-on-background">Meetup Details</h3>
-          </div>
-          
-          <div id="meetup-state-container" class="flex flex-col gap-4">
-            <!-- Dynamic State Injected Here -->
-            <div class="animate-pulse bg-surface-container h-32 rounded-xl"></div>
-          </div>
-        </div>
-
-        <!-- Review Module (Hidden until complete) -->
-        <div id="review-container" class="hidden bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex-col gap-3">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-            <h3 class="font-title-md text-[16px] text-on-background">Rate Experience</h3>
-          </div>
-          <p class="font-body-sm text-[12px] text-on-surface-variant">The transaction is complete. How was your experience?</p>
-          <button onclick="openReviewModal()" class="w-full bg-surface-container text-on-surface-variant font-title-md text-[14px] py-3 rounded-xl hover:bg-surface-variant transition-colors mt-2">
-            Leave a Review
-          </button>
-        </div>
-
       </div>
-    </aside>
 
-  </div>
+      <!-- Review Module (Hidden until complete) -->
+      <div id="review-container" class="hidden bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex-col gap-3">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+          <h3 class="font-title-md text-[16px] text-on-background">Rate Experience</h3>
+        </div>
+        <p class="font-body-sm text-[12px] text-on-surface-variant">The transaction is complete. How was your experience?</p>
+        <button onclick="openReviewModal()" class="w-full bg-surface-container text-on-surface-variant font-title-md text-[14px] py-3 rounded-xl hover:bg-surface-variant transition-colors mt-2">
+          Leave a Review
+        </button>
+      </div>
+
+    </div>
+  </main>
 
   <!-- Review Modal Overlay -->
   <div class="fixed inset-0 z-50 hidden flex-col justify-end md:justify-center items-center" id="review-modal">
@@ -179,16 +138,6 @@
     let currentUserRole = null; // 'buyer' or 'seller'
     let currentUserId = null;
     let selectedRating = 0;
-    let chatInterval = null;
-
-    function togglePlanner() {
-      const planner = document.getElementById('planner-sidebar');
-      if (planner.classList.contains('translate-x-full')) {
-        planner.classList.remove('translate-x-full');
-      } else {
-        planner.classList.add('translate-x-full');
-      }
-    }
 
     // Handle Star Selection
     document.querySelectorAll('#star-rating span').forEach(star => {
@@ -239,26 +188,6 @@
       }
     }
 
-    async function handleSendMessage() {
-      const input = document.getElementById('message-input');
-      const text = input.value.trim();
-      if (!text || !currentReservation) return;
-
-      input.value = '';
-      try {
-        await sendMessage(currentReservation.id, text);
-        loadMessages(); // reload immediately
-      } catch(e) {
-        console.error(e);
-        alert("Failed to send message");
-      }
-    }
-
-    // Send on Enter
-    document.getElementById('message-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleSendMessage();
-    });
-
     async function handleProposeMeetup() {
       const location = document.getElementById('meetup-location').value;
       const time = document.getElementById('meetup-time').value;
@@ -271,8 +200,6 @@
       btn.disabled = true;
       
       try {
-        // Format time properly to ISO for postgres
-        // Using local time assumption for simplicity in demo
         const isoTime = new Date(time).toISOString();
         await proposeMeetup(currentReservation.id, location, isoTime);
         loadMeetupState();
@@ -302,46 +229,36 @@
       }
     }
 
-    function renderMessages(messages) {
-      const container = document.getElementById('messages-container');
-      const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
-      
-      container.innerHTML = '';
-      if (messages.length === 0) {
-        container.innerHTML = `
-          <div class="flex flex-col items-center justify-center my-auto opacity-50">
-            <span class="material-symbols-outlined text-[48px] mb-2">forum</span>
-            <span class="font-body-sm">No messages yet. Say hi!</span>
+    function showCounterOfferForm() {
+      const container = document.getElementById('meetup-state-container');
+      container.innerHTML = `
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="font-label-caps text-[10px] text-on-surface-variant mb-1 ml-1 block">Counter Meetup Location</label>
+            <select id="meetup-location" class="w-full bg-surface-container rounded-xl p-3 outline-none font-body-sm text-on-background">
+              <option value="Canteen">Canteen</option>
+              <option value="Nescafe">Nescafe</option>
+              <option value="Mother Dairy">Mother Dairy</option>
+              <option value="Ground">Ground</option>
+              <option value="Stage">Stage</option>
+              <option value="Fountain">Fountain</option>
+              <option value="Under the bridge">Under the bridge</option>
+            </select>
           </div>
-        `;
-        return;
-      }
-
-      messages.forEach(m => {
-        const isMine = m.sender_id === currentUserId;
-        const timeStr = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        const div = document.createElement('div');
-        div.className = `flex flex-col max-w-[75%] ${isMine ? 'self-end items-end' : 'self-start items-start'} mb-1`;
-        
-        div.innerHTML = `
-          <div class="px-4 py-2.5 rounded-2xl ${isMine ? 'bg-primary text-on-primary rounded-tr-sm' : 'bg-surface-container text-on-surface rounded-tl-sm'} font-body-lg text-[14px]">
-            ${m.text}
+          <div>
+            <label class="font-label-caps text-[10px] text-on-surface-variant mb-1 ml-1 block">Date & Time</label>
+            <input type="datetime-local" id="meetup-time" class="w-full bg-surface-container rounded-xl p-3 outline-none font-body-sm text-on-background">
           </div>
-          <span class="font-body-sm text-[10px] text-on-surface-variant/70 mt-1 mx-1">${timeStr}</span>
-        `;
-        container.appendChild(div);
-      });
-
-      if (isAtBottom) {
-        container.scrollTop = container.scrollHeight;
-      }
-    }
-
-    async function loadMessages() {
-      if (!currentReservation) return;
-      const msgs = await getChatMessages(currentReservation.id);
-      renderMessages(msgs);
+          <div class="flex gap-2 mt-1">
+            <button onclick="loadMeetupState()" class="flex-1 bg-surface-container text-on-surface font-title-md text-[14px] py-3 rounded-xl hover:bg-surface-variant transition-colors">
+              Cancel
+            </button>
+            <button id="propose-btn" onclick="handleProposeMeetup()" class="flex-1 bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity">
+              Propose
+            </button>
+          </div>
+        </div>
+      `;
     }
 
     async function loadMeetupState() {
@@ -358,7 +275,7 @@
         `;
         document.getElementById('review-container').classList.remove('hidden');
         document.getElementById('review-container').classList.add('flex');
-        return;
+        return meetup;
       }
 
       if (!meetup) {
@@ -368,11 +285,13 @@
             <div>
               <label class="font-label-caps text-[10px] text-on-surface-variant mb-1 ml-1 block">Campus Location</label>
               <select id="meetup-location" class="w-full bg-surface-container rounded-xl p-3 outline-none font-body-sm text-on-background">
-                <option value="Main Library">Main Library</option>
-                <option value="Student Cafeteria">Student Cafeteria</option>
-                <option value="Main Gate">Main Gate</option>
-                <option value="Hostel Block A">Hostel Block A</option>
-                <option value="Sports Complex">Sports Complex</option>
+                <option value="Canteen">Canteen</option>
+                <option value="Nescafe">Nescafe</option>
+                <option value="Mother Dairy">Mother Dairy</option>
+                <option value="Ground">Ground</option>
+                <option value="Stage">Stage</option>
+                <option value="Fountain">Fountain</option>
+                <option value="Under the bridge">Under the bridge</option>
               </select>
             </div>
             <div>
@@ -384,7 +303,7 @@
             </button>
           </div>
         `;
-        return;
+        return meetup;
       }
 
       // Meetup exists
@@ -423,14 +342,26 @@
                 <span class="font-body-sm text-on-background font-medium">${timeStr}</span>
               </div>
             </div>
-            <button onclick="handleConfirmMeetup()" class="w-full bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 shadow-sm">
-              Accept Meetup
-            </button>
+            <div class="flex gap-2 mt-2">
+              <button onclick="showCounterOfferForm()" class="flex-1 bg-surface-container text-on-surface font-title-md text-[14px] py-3 rounded-xl hover:bg-surface-variant transition-colors shadow-sm">
+                Counter
+              </button>
+              <button onclick="handleConfirmMeetup()" class="flex-1 bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity shadow-sm">
+                Accept
+              </button>
+            </div>
           `;
         }
       } else if (meetup.status === 'Confirmed') {
         const myConfirmed = currentUserRole === 'buyer' ? currentReservation.buyer_confirmed : currentReservation.seller_confirmed;
-        const otherConfirmed = currentUserRole === 'buyer' ? currentReservation.seller_confirmed : currentReservation.buyer_confirmed;
+        const otherUser = currentUserRole === 'buyer' ? currentReservation.seller : currentReservation.buyer;
+        const phone = otherUser.phone_number || "";
+        
+        // Format the phone if it's 10 digits
+        let displayPhone = phone;
+        if (phone.length === 10) {
+          displayPhone = phone.slice(0, 5) + " " + phone.slice(5);
+        }
 
         let completionUI = '';
         if (myConfirmed) {
@@ -442,7 +373,7 @@
           `;
         } else {
           completionUI = `
-            <button onclick="handleCompleteTransaction()" class="w-full bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 shadow-sm flex items-center justify-center gap-2">
+            <button onclick="handleCompleteTransaction()" class="w-full bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity mt-4 shadow-sm flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-[18px]">done_all</span>
               <span>Mark Completed</span>
             </button>
@@ -465,9 +396,26 @@
               <span class="font-body-sm text-on-background font-semibold">${timeStr}</span>
             </div>
           </div>
+          
+          <div class="bg-surface-container rounded-xl p-5 mt-2 flex flex-col items-center">
+            <span class="font-label-caps text-[10px] text-on-surface-variant mb-2 uppercase">Contact ${otherUser.full_name.split(' ')[0]}</span>
+            <span class="font-display-lg text-[28px] text-on-background tracking-wider mb-4 font-bold">+91 ${displayPhone}</span>
+            
+            <div class="flex gap-3 w-full">
+              <a href="tel:${phone}" class="flex-1 bg-surface-container-highest text-on-background flex items-center justify-center gap-2 py-3 rounded-xl font-title-md text-[14px] hover:bg-surface-variant transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">call</span>
+                Call
+              </a>
+              <a href="https://wa.me/91${phone}" target="_blank" class="flex-1 bg-[#25D366] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-title-md text-[14px] hover:opacity-90 transition-opacity shadow-sm">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">chat</span>
+                WhatsApp
+              </a>
+            </div>
+          </div>
           ${completionUI}
         `;
       }
+      return meetup;
     }
 
     async function init() {
@@ -520,22 +468,7 @@
         document.getElementById('planner-img').classList.remove('hidden');
       }
 
-      // Disable inputs if completed
-      if (currentReservation.status === 'Completed') {
-        const input = document.getElementById('message-input');
-        input.disabled = true;
-        input.placeholder = "Transaction completed. Chat closed.";
-        document.getElementById('send-btn').disabled = true;
-        document.getElementById('send-btn').classList.replace('bg-primary', 'bg-surface-variant');
-      }
-
       await loadMeetupState();
-      await loadMessages();
-
-      if (chatInterval) clearInterval(chatInterval);
-      if (currentReservation.status !== 'Completed') {
-        chatInterval = setInterval(loadMessages, 3000);
-      }
     }
 
     document.addEventListener('DOMContentLoaded', init);
