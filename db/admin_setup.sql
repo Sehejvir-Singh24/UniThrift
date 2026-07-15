@@ -16,6 +16,10 @@ END $$;
 
 ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check CHECK (role IN ('customer', 'seller', 'admin'));
 
+-- Add columns for verification status and feedback reason
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verification_status TEXT CHECK (verification_status IN ('pending', 'verified', 'rejected')) DEFAULT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verification_feedback TEXT DEFAULT NULL;
+
 -- 2. Create recursion-safe is_admin() helper function
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
