@@ -41,19 +41,29 @@ async function requireAuth() {
 }
 
 // Helper: Require Verified Seller
-// Redirects to pending-verification if seller is not verified.
+// Redirects to pending_verification or id_verification if user is not verified.
 async function requireVerifiedSeller() {
   const isAuth = await requireAuth();
   if (!isAuth) return false;
 
   const profile = await getProfile();
   if (!profile) {
-    window.location.href = 'login.html';
+    window.location.href = '/auth/login.html';
     return false;
   }
 
-  if (profile.role === 'seller' && !profile.is_verified) {
-    window.location.href = 'pending_verification.html';
+  // Admins can always sell
+  if (profile.role === 'admin') {
+    return true;
+  }
+
+  // Non-verified users cannot sell
+  if (!profile.is_verified) {
+    if (profile.verification_status === 'pending') {
+      window.location.href = '/auth/pending_verification.html';
+    } else {
+      window.location.href = '/auth/id_verification.html';
+    }
     return false;
   }
   return true;

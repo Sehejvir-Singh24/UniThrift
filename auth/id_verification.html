@@ -160,8 +160,13 @@
                 
             const idUrl = publicUrlData.publicUrl;
 
-            // Update user's profile with the URL and mark as verified
-            await updateProfile({ is_verified: true, id_url: idUrl });
+            // Update user's profile with the URL and set status to pending review
+            await updateProfile({ 
+                is_verified: false, 
+                id_url: idUrl,
+                verification_status: 'pending',
+                verification_feedback: null
+            });
             window.location.href = '/index.html';
         } catch(err) {
             console.error("Upload error:", err);

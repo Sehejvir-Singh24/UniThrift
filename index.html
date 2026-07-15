@@ -15,7 +15,7 @@
         const profile = await getProfile();
         if (profile && !profile.full_name) {
           window.location.href = '/auth/profile_setup.html';
-        } else if (profile && !profile.is_verified) {
+        } else if (profile && !profile.is_verified && profile.verification_status !== 'pending') {
           window.location.href = '/auth/id_verification.html';
         } else if (profile) {
           // Personalize greeting

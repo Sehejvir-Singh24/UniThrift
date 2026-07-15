@@ -190,7 +190,7 @@
                 const profile = await getProfile();
                 
                 setTimeout(() => { 
-                    if(profile && profile.role === 'seller' && !profile.is_verified) {
+                    if(profile && profile.role === 'seller' && !profile.is_verified && profile.verification_status !== 'pending') {
                         window.location.href = '/auth/id_verification.html';
                     } else {
                         window.location.href = '/index.html'; 
