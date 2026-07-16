@@ -33,7 +33,7 @@ We made massive progress today, expanding the app's features from simple static 
 ---
 
 ## Session 3: Security Deposit, Meetup Negotiation & Contact Reveal (Latest)
-- **Security Deposit Checkout:** Implemented a new checkout model where buyers only pay a 10% security deposit to reserve an item, leaving the remaining 90% for in-person settlement.
+- **Security Deposit Checkout:** Implemented a new checkout model where buyers only pay a 25% security deposit to reserve an item, leaving the remaining 75% for in-person settlement.
 - **Meetup Negotiation Flow:** Instead of free-form chat, introduced a structured meetup planner. Buyers propose a campus location and time, and sellers can accept or send a counter-offer.
 - **Phone Number Reveal System:** Replaced the planned in-app messaging system with a more secure and efficient Phone Number Reveal. Once a meetup is confirmed, both parties' phone numbers are revealed with one-tap Call and WhatsApp action buttons.
 - **Database Schema Updates:** Added `reservations` and `meetups` tables to handle the deposit status and negotiation states securely.

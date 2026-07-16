@@ -410,7 +410,7 @@ async function updateOfferStatus(offerId, status, counterAmount = null) {
   }
 
   // If accepted, we do NOT automatically mark the product as Sold anymore.
-  // The buyer must now go to the item page and pay the 10% deposit to Reserve it.
+  // The buyer must now go to the item page and pay the 25% deposit to Reserve it.
 
   return offer;
 }
@@ -822,13 +822,13 @@ async function checkForNotifications() {
 // RESERVATION & IN-PLATFORM MESSAGING SYSTEM
 // ==========================================
 
-// Helper: Create a Reservation (10% Deposit)
+// Helper: Create a Reservation (25% Deposit)
 async function createReservation(productId, sellerId, productPrice, location, meetTime) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Not authenticated");
 
-  const depositAmount = (productPrice * 0.1).toFixed(2);
-  const remainingAmount = (productPrice * 0.9).toFixed(2);
+  const depositAmount = (productPrice * 0.25).toFixed(2);
+  const remainingAmount = (productPrice * 0.75).toFixed(2);
 
   const { data: reservation, error: resError } = await supabase
     .from('reservations')

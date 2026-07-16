@@ -9,10 +9,10 @@ The platform is designed to be mobile-first with a high-end, dynamic UI (featuri
 
 ### 1. The Security Deposit & Meetup Model
 The platform does NOT handle full payments, selling of products directly, or shipping. Instead, it facilitates safe physical meetups on campus through a Security Deposit model.
-- **Reserving an Item:** Instead of paying full price online, buyers pay a 10% Security Deposit to reserve an item.
+- **Reserving an Item:** Instead of paying full price online, buyers pay a 25% Security Deposit to reserve an item.
 - **Meetup Negotiation:** Upon reservation, the buyer proposes a time and on-campus location (e.g., Canteen, Library, Nescafe, Ground, Stage). The seller can either accept or counter-offer.
 - **Phone Number Reveal:** Once both parties agree on the meetup details, the system officially marks it as "Confirmed". At this moment, it securely reveals their phone numbers via large Call and WhatsApp buttons so they can coordinate the physical exchange.
-- **Final Settlement:** The remaining 90% of the item price is paid directly to the seller in-person during the meetup.
+- **Final Settlement:** The remaining 75% of the item price is paid directly to the seller in-person during the meetup.
 - **Completion & Reviews:** After the meetup is successfully completed and the balance settled, the transaction is marked as completed in the app, and both parties can leave a 5-star review for each other.
 
 ### 2. Trust and Safety (Student Only)
