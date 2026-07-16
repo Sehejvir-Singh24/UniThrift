@@ -262,7 +262,11 @@
         const btnIcon = document.getElementById('btn-icon');
 
         function showError(msg) {
-            errorDiv.innerText = msg;
+            if (typeof msg === 'object') {
+                errorDiv.innerText = JSON.stringify(msg);
+            } else {
+                errorDiv.innerText = msg;
+            }
             errorDiv.classList.remove('hidden');
         }
 
@@ -317,12 +321,15 @@
                 
                 // If success, onAuthStateChange takes over
             } catch (err) {
-                if (err.message.includes('already registered')) {
+                console.error("Auth error occurred:", err);
+                const errMsg = err.message || (typeof err === 'string' ? err : JSON.stringify(err));
+                
+                if (errMsg.includes('already registered') || errMsg.includes('already exists')) {
                     showError('Email is already registered. Please Sign In.');
-                } else if (err.message.includes('Invalid login')) {
+                } else if (errMsg.includes('Invalid login')) {
                     showError('Invalid email or password.');
                 } else {
-                    showError(err.message || 'Something went wrong. Please try again.');
+                    showError(errMsg || 'Something went wrong. Please try again.');
                 }
                 
                 // Revert button
@@ -333,6 +340,7 @@
             }
         });
     });
+
 
     async function verifyOtpClick() {
         const codeInput = document.getElementById('otp-code');
