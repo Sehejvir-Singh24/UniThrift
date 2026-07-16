@@ -783,11 +783,18 @@ async function checkForNotifications() {
   const now = Date.now();
   const lastCheck = sessionStorage.getItem('last_notification_check');
   if (lastCheck && now - parseInt(lastCheck) < 15000) {
+    // If we checked recently, we still want to render the badge if it was stored
+    renderNotificationBadge(parseInt(sessionStorage.getItem('last_unread_count') || '0'));
     return;
   }
   sessionStorage.setItem('last_notification_check', now);
 
   try {
+    const unreadCount = await getUnreadNotificationCount();
+    sessionStorage.setItem('last_unread_count', unreadCount);
+    renderNotificationBadge(unreadCount);
+
+    // Keep the old toast notification logic for offers so users still get the toast popup
     const unseenReceived = await getUnseenOffersForSeller();
     unseenReceived.forEach(offer => {
       showPremiumNotification(
@@ -813,6 +820,27 @@ async function checkForNotifications() {
   } catch(e) {
     console.error("Error in notification checker:", e);
   }
+}
+
+function renderNotificationBadge(count) {
+  // Find the Activity nav items
+  const activityNavs = document.querySelectorAll('a[href="/core/activity.html"]');
+  activityNavs.forEach(nav => {
+    // Remove existing badge if any
+    const existingBadge = nav.querySelector('.nav-badge');
+    if (existingBadge) existingBadge.remove();
+
+    if (count > 0) {
+      // Add relatively positioned wrapper if icon doesn't have it
+      const iconSpan = nav.querySelector('.material-symbols-outlined');
+      if (iconSpan) {
+        iconSpan.style.position = 'relative';
+        const badge = document.createElement('div');
+        badge.className = 'nav-badge absolute top-0 right-0 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface-container-lowest animate-pulse';
+        iconSpan.appendChild(badge);
+      }
+    }
+  });
 }
 
 
@@ -1083,5 +1111,47 @@ async function submitReview(reservationId, revieweeId, rating, comment) {
   if (error) {
     console.error("Error submitting review:", error);
     throw error;
+  }
+}
+
+// ==========================================
+// NOTIFICATIONS SYSTEM
+// ==========================================
+
+async function getUnreadNotificationCount() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return 0;
+
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', session.user.id)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error("Error fetching notification count:", error);
+    return 0;
+  }
+  return count || 0;
+}
+
+async function markNotificationsAsRead() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('user_id', session.user.id)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error("Error marking notifications read:", error);
+  }
+  
+  // Clear the badge immediately on the frontend
+  sessionStorage.setItem('last_unread_count', '0');
+  if (typeof renderNotificationBadge === 'function') {
+    renderNotificationBadge(0);
   }
 }

@@ -144,6 +144,10 @@
       }
       
       await loadActivityFeed();
+      // Mark notifications as read when the user views the Activity Hub
+      if (typeof markNotificationsAsRead === 'function') {
+        await markNotificationsAsRead();
+      }
     });
 
     async function loadActivityFeed() {
