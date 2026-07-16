@@ -255,16 +255,18 @@
 
           // Upload photos from sessionStorage
           let imageUrl = null;
+          let imageUrls = [];
           const pendingPhotosRaw = sessionStorage.getItem('pendingPhotos');
           if (pendingPhotosRaw) {
             const pendingPhotos = JSON.parse(pendingPhotosRaw);
-            if (pendingPhotos.length > 0) {
-              const photo = pendingPhotos[0]; // cover photo
+            
+            for (let i = 0; i < pendingPhotos.length; i++) {
+              const photo = pendingPhotos[i];
               // Convert base64 back to File
               const res = await fetch(photo.base64);
               const blob = await res.blob();
               const ext = photo.name.split('.').pop();
-              const filePath = `${userId}/${Date.now()}_cover.${ext}`;
+              const filePath = `${userId}/${Date.now()}_${i}.${ext}`;
 
               const { error: uploadError } = await supabase.storage
                 .from('product_images')
@@ -275,7 +277,12 @@
               const { data: urlData } = supabase.storage
                 .from('product_images')
                 .getPublicUrl(filePath);
-              imageUrl = urlData.publicUrl;
+              
+              imageUrls.push(urlData.publicUrl);
+              
+              if (i === 0) {
+                imageUrl = urlData.publicUrl; // Keep first image for fallback
+              }
             }
           }
 
@@ -290,7 +297,8 @@
             original_price: originalPrice,
             category,
             condition: selectedCondition,
-            image_url: imageUrl
+            image_url: imageUrl,
+            image_urls: imageUrls
           });
 
           if (insertError) throw insertError;

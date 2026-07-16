@@ -320,8 +320,20 @@
     const imagesContainer = document.getElementById('product-images');
     imagesContainer.innerHTML = ''; // clear loading state
     
-    if (product.image_url) {
-      // Just one image for now, but we use the same styling as the carousel
+    if (product.image_urls && product.image_urls.length > 0) {
+      const total = product.image_urls.length;
+      product.image_urls.forEach((url, idx) => {
+        imagesContainer.innerHTML += `
+          <div class="w-[88vw] md:w-full shrink-0 snap-center rounded-2xl bg-surface-container overflow-hidden shadow-sm relative aspect-[4/5] md:aspect-[3/4]">
+            <div class="bg-cover bg-center w-full h-full absolute inset-0" style="background-image: url('${url}')"></div>
+            <div class="absolute bottom-4 right-4 bg-on-background/60 backdrop-blur-md text-on-primary font-label-caps text-label-caps px-3 py-1.5 rounded-full">
+              ${idx + 1} / ${total}
+            </div>
+          </div>
+        `;
+      });
+    } else if (product.image_url) {
+      // Fallback for older products with only one image_url
       imagesContainer.innerHTML = `
         <div class="w-[88vw] md:w-full shrink-0 snap-center rounded-2xl bg-surface-container overflow-hidden shadow-sm relative aspect-[4/5] md:aspect-[3/4]">
           <div class="bg-cover bg-center w-full h-full absolute inset-0" style="background-image: url('${product.image_url}')"></div>
