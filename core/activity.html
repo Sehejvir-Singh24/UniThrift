@@ -177,10 +177,10 @@
           type: 'offer_sent',
           data: offer,
           date: new Date(offer.created_at), 
-          title: \`Offer \${offer.status}\`,
-          description: \`Your offer of ₹\${offer.offer_amount} for \${offer.products?.title} is \${offer.status}\`,
+          title: `Offer ${offer.status}`,
+          description: `Your offer of ₹${offer.offer_amount} for ${offer.products?.title} is ${offer.status}`,
           icon: offer.status === 'Accepted' ? 'check_circle' : (offer.status === 'Rejected' ? 'cancel' : 'schedule'),
-          url: offer.status === 'Countered' ? \`/marketplace/counter_offer.html?id=\${offer.id}\` : \`/marketplace/item.html?id=\${offer.product_id}\`,
+          url: offer.status === 'Countered' ? `/marketplace/counter_offer.html?id=${offer.id}` : `/marketplace/item.html?id=${offer.product_id}`,
           isActionable: offer.status === 'Countered'
         });
       });
@@ -192,9 +192,9 @@
           data: res,
           date: new Date(res.created_at),
           title: 'Deposit Paid & Reserved',
-          description: \`You paid ₹\${res.deposit_amount} deposit for \${res.products?.title}. Let's chat!\`,
+          description: `You paid ₹${res.deposit_amount} deposit for ${res.products?.title}. Let's chat!`,
           icon: 'handshake',
-          url: \`/core/chat.html?id=\${res.id}\`,
+          url: `/core/chat.html?id=${res.id}`,
           isActionable: res.status !== 'Completed' && res.status !== 'Cancelled'
         });
       });
@@ -205,9 +205,9 @@
           data: res,
           date: new Date(res.created_at),
           title: 'Item Reserved!',
-          description: \`A buyer paid a ₹\${res.deposit_amount} deposit for \${res.products?.title}.\`,
+          description: `A buyer paid a ₹${res.deposit_amount} deposit for ${res.products?.title}.`,
           icon: 'chat_bubble',
-          url: \`/core/chat.html?id=\${res.id}\`,
+          url: `/core/chat.html?id=${res.id}`,
           isActionable: res.status !== 'Completed' && res.status !== 'Cancelled'
         });
       });
@@ -251,16 +251,16 @@
       }
 
       if (displayActivity.length === 0) {
-        container.innerHTML = \`
+        container.innerHTML = `
           <div class="flex flex-col items-center justify-center py-16 text-center gap-3">
             <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-              <span class="material-symbols-outlined text-[32px]">\${activeTab === 1 ? 'chat_bubble' : 'notifications'}</span>
+              <span class="material-symbols-outlined text-[32px]">${activeTab === 1 ? 'chat_bubble' : 'notifications'}</span>
             </div>
             <p class="font-body-sm text-body-sm text-on-surface-variant">
-              \${activeTab === 1 ? "You have no active meetup chats." : "You have no recent activity."}
+              ${activeTab === 1 ? "You have no active meetup chats." : "You have no recent activity."}
             </p>
           </div>
-        \`;
+        `;
         return;
       }
 
@@ -270,29 +270,30 @@
         // Status Badge Logic
         let actionRequiredHTML = '';
         if (activity.isActionable && activity.type === 'offer_received') {
-          actionRequiredHTML = \`<div class="w-2 h-2 rounded-full bg-error absolute top-4 right-4 shadow-sm animate-pulse"></div>\`;
+          actionRequiredHTML = `<div class="w-2 h-2 rounded-full bg-error absolute top-4 right-4 shadow-sm animate-pulse"></div>`;
         } else if (activity.isActionable && activity.type.startsWith('reservation')) {
-           actionRequiredHTML = \`<div class="font-label-caps text-[10px] text-primary-container bg-primary-container/10 px-2 py-0.5 rounded-full absolute top-3 right-3">Active Chat</div>\`;
+           actionRequiredHTML = `<div class="font-label-caps text-[10px] text-primary-container bg-primary-container/10 px-2 py-0.5 rounded-full absolute top-3 right-3">Active Chat</div>`;
         }
 
         const dateStr = activity.date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
 
-        const cardHtml = \`
-          <div onclick="window.location.href='\${activity.url}'" class="relative cursor-pointer bg-surface-container-lowest rounded-2xl p-4 flex gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:shadow-md transition-all active:scale-[0.99]">
-            \${actionRequiredHTML}
+        const cardHtml = `
+          <div onclick="window.location.href='${activity.url}'" class="relative cursor-pointer bg-surface-container-lowest rounded-2xl p-4 flex gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:shadow-md transition-all active:scale-[0.99]">
+            ${actionRequiredHTML}
             <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[24px] text-primary">\${activity.icon}</span>
+              <span class="material-symbols-outlined text-[24px] text-primary">${activity.icon}</span>
             </div>
             <div class="flex-1 flex flex-col justify-center min-w-0 pr-6">
-              <h4 class="font-body-sm text-body-sm text-on-surface font-semibold truncate">\${activity.title}</h4>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 line-clamp-2">\${activity.description}</p>
-              <span class="font-label-caps text-[10px] text-on-surface-variant/60 mt-1">\${dateStr}</span>
+              <h4 class="font-body-sm text-body-sm text-on-surface font-semibold truncate">${activity.title}</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 line-clamp-2">${activity.description}</p>
+              <span class="font-label-caps text-[10px] text-on-surface-variant/60 mt-1">${dateStr}</span>
             </div>
           </div>
-        \`;
+        `;
         container.insertAdjacentHTML('beforeend', cardHtml);
       });
     }
   </script>
 </body>
 </html>
+
