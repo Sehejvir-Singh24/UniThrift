@@ -30,7 +30,7 @@
 <body class="bg-background pt-safe pb-safe min-h-screen font-body-lg">
 
 <header class="h-20 px-container-padding-mobile flex items-center justify-center">
-  <img alt="UniThrift Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtH4uYEmLByi1jW_bpwvfQ8lgafnrniPPxttkhpfAwQXnXw8NaT9mQkRksWXfo__XRM7d6Uvzm0Bwjn88BhIvEQONJqhM_exCVjyMuVo8JaM-QqfvxIedY9mpAB77aRx5NxpRDH4hHcAAK7XMuCqkpVLNDZbNaily1mDj9Sbn9wd4mk9nYQUiTqK5HOyLhdELnPMf9ECCHmvv5qA3vlmUb534EmdqX2-JyWeljbHwVMV0I03d9DZCZGd0vM"/>
+  <img alt="UniThrift Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/>
 </header>
 
 <main class="flex flex-col w-full min-h-[calc(100vh-80px)] px-container-padding-mobile py-8 relative bg-background">
@@ -226,7 +226,14 @@
         const { error } = await Promise.race([otpPromise, timeoutPromise]);
 
         if (error) {
-          showError(error.message);
+          let errMsg = error.message || '';
+          if (errMsg === '{}' || error.name === 'AuthRetryableFetchError' || error.status === 500) {
+            errMsg = 'Failed to send confirmation email. This is typically due to an SMTP configuration issue on the server. Please verify your custom SMTP settings.';
+          } else if (!errMsg) {
+            errMsg = typeof error === 'string' ? error : 'Something went wrong. Please try again.';
+          }
+          if (errMsg === '{}') errMsg = 'An unexpected server error occurred. Please try again or check SMTP settings.';
+          showError(errMsg);
           setLoading(false);
         } else {
           // Success! Show magic link message instead of going to OTP page
@@ -246,7 +253,14 @@
           continueBtn.style.display = 'none'; // hide the continue button completely
         }
       } catch (err) {
-        showError(err.message || 'Something went wrong. Please try again.');
+        let errMsg = err.message || '';
+        if (errMsg === '{}' || err.name === 'AuthRetryableFetchError' || err.status === 500) {
+          errMsg = 'Failed to send confirmation email. This is typically due to an SMTP configuration issue on the server. Please verify your custom SMTP settings.';
+        } else if (!errMsg) {
+          errMsg = typeof err === 'string' ? err : 'Something went wrong. Please try again.';
+        }
+        if (errMsg === '{}') errMsg = 'An unexpected server error occurred. Please try again or check SMTP settings.';
+        showError(errMsg);
         setLoading(false);
       }
     });

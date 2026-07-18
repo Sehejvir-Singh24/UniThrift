@@ -18,7 +18,7 @@
 <!-- Brand Logo / Identity -->
 <div class="flex flex-col items-center mb-xl">
 <div class="w-16 h-16 rounded-xl flex items-center justify-center mb-md">
-    <img alt="UniThrift Logo" class="h-16 w-auto object-contain drop-shadow-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLtH4uYEmLByi1jW_bpwvfQ8lgafnrniPPxttkhpfAwQXnXw8NaT9mQkRksWXfo__XRM7d6Uvzm0Bwjn88BhIvEQONJqhM_exCVjyMuVo8JaM-QqfvxIedY9mpAB77aRx5NxpRDH4hHcAAK7XMuCqkpVLNDZbNaily1mDj9Sbn9wd4mk9nYQUiTqK5HOyLhdELnPMf9ECCHmvv5qA3vlmUb534EmdqX2-JyWeljbHwVMV0I03d9DZCZGd0vM"/>
+    <img alt="UniThrift Logo" class="h-16 w-auto object-contain drop-shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/>
 </div>
 <h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">UniThrift</h1>
 <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Your campus buy & sell marketplace.</p>
@@ -54,6 +54,19 @@
 <input class="w-full h-[48px] px-md pt-base pb-base rounded-lg bg-surface-container border border-outline-variant font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="password" placeholder="••••••••" type="password"/>
 <button class="absolute right-md top-1/2 -translate-y-1/2 text-outline text-[20px] hover:text-on-surface transition-colors" onclick="togglePassword()" type="button">
 <span class="material-symbols-outlined" id="pass-icon">visibility</span>
+</button>
+</div>
+</div>
+
+<!-- Confirm Password Field -->
+<div id="confirm-password-container" class="hidden flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="confirm-password">Confirm Password</label>
+</div>
+<div class="relative group">
+<input class="w-full h-[48px] px-md pt-base pb-base rounded-lg bg-surface-container border border-outline-variant font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="confirm-password" placeholder="••••••••" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-outline text-[20px] hover:text-on-surface transition-colors" onclick="toggleConfirmPassword()" type="button">
+<span class="material-symbols-outlined" id="confirm-pass-icon">visibility</span>
 </button>
 </div>
 </div>
@@ -169,6 +182,7 @@
         const formTitle = document.getElementById('form-title');
         const formSubtitle = document.getElementById('form-subtitle');
         const roleSection = document.getElementById('role-section');
+        const confirmPasswordContainer = document.getElementById('confirm-password-container');
         const btnText = document.getElementById('btn-text');
         const toggleText = document.getElementById('toggle-auth-text');
         const errorDiv = document.getElementById('auth-error');
@@ -180,6 +194,8 @@
             formSubtitle.innerText = 'Join the campus buy & sell community';
             roleSection.classList.remove('hidden');
             roleSection.classList.add('flex');
+            confirmPasswordContainer.classList.remove('hidden');
+            confirmPasswordContainer.classList.add('flex');
             btnText.innerText = 'Sign Up';
             toggleText.innerHTML = `Already have an account? <button class="text-primary font-headline-md font-semibold hover:underline decoration-2 underline-offset-4" onclick="toggleAuthMode()">Sign in</button>`;
         } else {
@@ -187,6 +203,8 @@
             formSubtitle.innerText = 'Access your dashboard and workflow';
             roleSection.classList.add('hidden');
             roleSection.classList.remove('flex');
+            confirmPasswordContainer.classList.add('hidden');
+            confirmPasswordContainer.classList.remove('flex');
             btnText.innerText = 'Sign In';
             toggleText.innerHTML = `Don't have an account? <button class="text-primary font-headline-md font-semibold hover:underline decoration-2 underline-offset-4" onclick="toggleAuthMode()">Create account</button>`;
         }
@@ -218,20 +236,40 @@
       }
     }
 
+    function toggleConfirmPassword() {
+      const confirmPasswordInput = document.getElementById('confirm-password');
+      const icon = document.getElementById('confirm-pass-icon');
+      if (confirmPasswordInput.type === 'password') {
+        confirmPasswordInput.type = 'text';
+        icon.innerText = 'visibility_off';
+      } else {
+        confirmPasswordInput.type = 'password';
+        icon.innerText = 'visibility';
+      }
+    }
+
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
     const signinBtn = document.getElementById('signin-btn');
 
     function validateForm() {
         const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
         const isPasswordValid = passwordInput.value.length >= 6;
-        const isValid = isEmailValid && isPasswordValid;
+        let isValid = isEmailValid && isPasswordValid;
+        
+        if (isSignUp) {
+            const isConfirmPasswordValid = confirmPasswordInput.value === passwordInput.value;
+            isValid = isValid && isConfirmPasswordValid;
+        }
+        
         signinBtn.classList.toggle('opacity-50', !isValid);
         signinBtn.classList.toggle('pointer-events-none', !isValid);
     }
 
     emailInput.addEventListener('input', validateForm);
     passwordInput.addEventListener('input', validateForm);
+    confirmPasswordInput.addEventListener('input', validateForm);
 
     const otpInput = document.getElementById('otp-code');
     otpInput.addEventListener('input', (e) => {
@@ -279,6 +317,12 @@
             
             // UI Loading state
             const originalText = btnText.innerText;
+            
+            if (isSignUp && password !== confirmPasswordInput.value) {
+                showError("Passwords do not match.");
+                return;
+            }
+            
             signinBtn.classList.add('pointer-events-none');
             btnText.innerText = isSignUp ? 'Creating Account...' : 'Signing in...';
             btnIcon.innerText = 'progress_activity';
@@ -322,7 +366,17 @@
                 // If success, onAuthStateChange takes over
             } catch (err) {
                 console.error("Auth error occurred:", err);
-                const errMsg = err.message || (typeof err === 'string' ? err : JSON.stringify(err));
+                let errMsg = err.message || '';
+                
+                if (errMsg === '{}' || err.name === 'AuthRetryableFetchError' || err.status === 500) {
+                    errMsg = 'Failed to send confirmation email. This is typically due to an SMTP configuration issue on the server. Please verify your custom SMTP settings.';
+                } else if (!errMsg) {
+                    errMsg = typeof err === 'string' ? err : JSON.stringify(err);
+                }
+
+                if (errMsg === '{}') {
+                    errMsg = 'An unexpected server error occurred. Please try again or check SMTP settings.';
+                }
                 
                 if (errMsg.includes('already registered') || errMsg.includes('already exists')) {
                     showError('Email is already registered. Please Sign In.');
@@ -371,7 +425,15 @@
             
             // Success! The onAuthStateChange listener will automatically trigger and redirect them.
         } catch (err) {
-            errorDiv.innerText = err.message || "Verification failed. Please check the code and try again.";
+            let errMsg = err.message || '';
+            if (errMsg === '{}' || err.name === 'AuthRetryableFetchError' || err.status === 500) {
+                errMsg = "Server SMTP/connection error. Verification could not be processed.";
+            } else if (!errMsg) {
+                errMsg = typeof err === 'string' ? err : "Verification failed. Please check the code and try again.";
+            }
+            if (errMsg === '{}') errMsg = "Verification failed. Please try again.";
+
+            errorDiv.innerText = errMsg;
             errorDiv.classList.remove('hidden');
             
             verifyBtn.classList.remove('pointer-events-none', 'opacity-80');
