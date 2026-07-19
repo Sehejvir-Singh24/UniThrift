@@ -20,6 +20,21 @@
 </div>
 <input type="hidden" id="listing-type" value="need_flat"/>
 </div>
+</div>
+
+<!-- Images Section (Only for Have Room) -->
+<section id="images-section" class="hidden space-y-stack-md">
+  <div class="border-2 border-dashed border-primary rounded-xl p-8 bg-primary/5 flex flex-col items-center justify-center cursor-pointer relative hover:bg-primary/10 transition-colors" onclick="document.getElementById('image-upload').click()">
+    <div class="relative">
+      <span class="material-symbols-outlined text-[48px] text-primary">photo_camera</span>
+      <span class="material-symbols-outlined text-[20px] text-primary absolute bottom-0 right-[-8px] bg-white rounded-full">add_circle</span>
+    </div>
+    <p class="font-body-sm text-on-surface-variant mt-2 text-center">Upload Room Images (Max 5)</p>
+    <input type="file" id="image-upload" multiple accept="image/*" class="hidden" onchange="handleImageSelection(event)">
+  </div>
+  <div id="image-preview-container" class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+  </div>
+</section>
 
 <!-- Budget Section -->
 <section class="space-y-stack-md">
@@ -96,6 +111,16 @@
 <button class="lifestyle-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all flex items-center gap-1">
 <span class="material-symbols-outlined text-[18px]">menu_book</span> Studious
         </button>
+</div>
+</section>
+<!-- Amenities Tags -->
+<section id="amenities-section" class="hidden space-y-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface">Amenities</h2>
+<div class="flex flex-wrap gap-unit">
+<button class="amenity-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">WiFi</button>
+<button class="amenity-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">AC</button>
+<button class="amenity-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Laundry</button>
+<button class="amenity-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Kitchen</button>
 </div>
 </section>
 <!-- Roommate Preferences -->
@@ -175,6 +200,7 @@
 
   setupChips('.area-chip');
   setupChips('.lifestyle-chip');
+  setupChips('.amenity-chip');
 
   // Toggle Logic
   const toggleBtn = document.getElementById('flatmate-toggle');
@@ -220,21 +246,65 @@
     const btnHave = document.getElementById('type-have');
     const budgetTitle = document.getElementById('budget-title');
     const locationTitle = document.getElementById('location-title');
+    const imgSection = document.getElementById('images-section');
+    const lifestyleSection = document.getElementById('lifestyle-section');
+    const amenitiesSection = document.getElementById('amenities-section');
 
     if (type === 'need_flat') {
         btnNeed.className = 'flex-1 py-3 rounded-md font-body-sm text-sm bg-primary text-on-primary shadow-sm transition-all';
         btnHave.className = 'flex-1 py-3 rounded-md font-body-sm text-sm text-on-surface hover:bg-surface-container-high transition-all';
         budgetTitle.innerText = "Monthly Budget";
         locationTitle.innerText = "Preferred Areas";
+        imgSection.classList.add('hidden');
+        if(lifestyleSection) lifestyleSection.classList.remove('hidden');
+        if(amenitiesSection) amenitiesSection.classList.add('hidden');
     } else {
         btnHave.className = 'flex-1 py-3 rounded-md font-body-sm text-sm bg-primary text-on-primary shadow-sm transition-all';
         btnNeed.className = 'flex-1 py-3 rounded-md font-body-sm text-sm text-on-surface hover:bg-surface-container-high transition-all';
         budgetTitle.innerText = "Monthly Rent";
         locationTitle.innerText = "Exact Location";
+        imgSection.classList.remove('hidden');
+        if(lifestyleSection) lifestyleSection.classList.add('hidden');
+        if(amenitiesSection) amenitiesSection.classList.remove('hidden');
     }
   }
 
-  function saveRoommateRequirementsAndContinue() {
+  let selectedImages = [];
+  function handleImageSelection(event) {
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+        if (selectedImages.length >= 5) break;
+        selectedImages.push(files[i]);
+    }
+    renderImagePreviews();
+  }
+
+  function removeImage(index) {
+    selectedImages.splice(index, 1);
+    renderImagePreviews();
+  }
+
+  function renderImagePreviews() {
+    const container = document.getElementById('image-preview-container');
+    container.innerHTML = '';
+    selectedImages.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const div = document.createElement('div');
+            div.className = "relative flex-shrink-0 w-28 h-28 rounded-[16px] overflow-hidden shadow-sm";
+            div.innerHTML = \`
+                <img src="\${e.target.result}" class="w-full h-full object-cover"/>
+                <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-error rounded-full flex items-center justify-center text-white shadow-sm" onclick="event.stopPropagation(); removeImage(\${index})">
+                    <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+            \`;
+            container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+  }
+
+  async function saveRoommateRequirementsAndContinue() {
       const budgetOrRent = parseFloat(slider.value);
       const listingType = document.getElementById('listing-type').value;
       
@@ -250,9 +320,13 @@
       
       const tags = [];
       document.querySelectorAll('.lifestyle-chip.bg-primary').forEach(chip => {
-          // Keep only alphanumeric and standard characters
-          const txt = chip.textContent.replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ').trim();
+          const txt = chip.textContent.replace(/[^\\w\\s-]/g, '').replace(/\\s+/g, ' ').trim();
           tags.push(txt);
+      });
+      
+      const amenities = [];
+      document.querySelectorAll('.amenity-chip.bg-primary').forEach(chip => {
+          amenities.push(chip.textContent.trim());
       });
       
       if (areas.length === 0) {
@@ -264,7 +338,32 @@
           return;
       }
       
-      const title = listingType === 'need_flat' ? `Need ${roomType} in ${areas[0]}` : `Have ${roomType} in ${areas[0]}`;
+      const title = listingType === 'need_flat' ? \`Need \${roomType} in \${areas[0]}\` : \`Have \${roomType} in \${areas[0]}\`;
+      
+      // Upload images if any
+      let uploadedImageUrls = [];
+      if (listingType === 'have_flat' && selectedImages.length > 0) {
+          const btn = document.querySelector('button[onclick="saveRoommateRequirementsAndContinue()"]');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Uploading Images...';
+          btn.disabled = true;
+          
+          try {
+              for (const file of selectedImages) {
+                  // We assume uploadImage is defined in supabase.js
+                  const url = await uploadImage(file, 'roommate_images');
+                  if (url) uploadedImageUrls.push(url);
+              }
+          } catch(e) {
+              console.error("Image upload failed", e);
+              alert("Failed to upload images. Please try again.");
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+              return;
+          }
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+      }
       
       const roommateDraft = {
           title,
@@ -274,6 +373,8 @@
           preferred_area: areas.join(', '),
           bio,
           tags,
+          amenities: listingType === 'have_flat' ? amenities : [],
+          images: uploadedImageUrls,
           room_type: roomType,
           move_in_date: moveInDate || null
       };

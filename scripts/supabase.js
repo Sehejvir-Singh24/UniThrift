@@ -1288,3 +1288,39 @@ async function markNotificationsAsRead() {
     renderNotificationBadge(0);
   }
 }
+
+// ==========================================
+// STORAGE SYSTEM
+// ==========================================
+
+// Helper: Upload Image to Supabase Storage
+async function uploadImage(file, bucketName) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  // Create a unique file name
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${session.user.id}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase
+    .storage
+    .from(bucketName)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) {
+    console.error(`Error uploading image to ${bucketName}:`, error);
+    throw error;
+  }
+
+  // Get public URL
+  const { data: publicUrlData } = supabase
+    .storage
+    .from(bucketName)
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+}

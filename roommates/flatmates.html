@@ -4,10 +4,41 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <!-- Auth checked in DOMContentLoaded below -->
-  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Flatmates</h1>
-<div id="header-auth-area">
-  <!-- Populated dynamically -->
-</div></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full px-container-padding-mobile md:px-6 md:max-w-md md:mx-auto gap-stack-md relative h-full">
+</head><body class="bg-background font-body-lg text-on-background">
+<!-- How it works Popup -->
+<div id="how-it-works-popup" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm hidden items-center justify-center px-4 opacity-0 transition-opacity duration-300">
+  <div class="bg-surface-container-lowest rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300" id="popup-card">
+    <div class="bg-primary px-4 py-4 text-center">
+      <h2 class="font-title-md text-white font-bold tracking-wide">UniThrift</h2>
+    </div>
+    <div class="p-6 text-center flex flex-col gap-4">
+      <h3 class="font-headline-lg-mobile text-on-surface">How it works</h3>
+      <p class="font-body-sm text-on-surface-variant leading-relaxed">
+        Swipe right to connect with students looking for a flat or offering a room. If they swipe right on you too, it's a match and you can chat instantly on WhatsApp!
+      </p>
+      <button onclick="closePopup()" class="w-full mt-2 py-3 bg-primary text-white rounded-xl font-title-md hover:bg-primary-container transition-colors shadow-sm">
+        Got it!
+      </button>
+    </div>
+  </div>
+</div>
+
+<header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between">
+  <a href="/index.html" class="text-on-surface hover:text-primary transition-colors p-2 -ml-2">
+    <span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
+  </a>
+  <h1 class="font-title-md text-title-md text-on-surface absolute left-1/2 -translate-x-1/2">Find a Mate</h1>
+  <div class="flex items-center gap-4">
+    <a href="/roommates/matches.html" class="flex flex-col items-center justify-center text-on-surface hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[24px]">favorite</span>
+      <span class="font-label-caps text-[10px]">Matches</span>
+    </a>
+    <button class="flex flex-col items-center justify-center text-on-surface hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[24px]">tune</span>
+      <span class="font-label-caps text-[10px]">Filters</span>
+    </button>
+  </div>
+</div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full px-container-padding-mobile md:px-6 md:max-w-md md:mx-auto gap-stack-md relative h-full">
 
 <!-- Guest state: shown when not logged in -->
 <div id="guest-gate" class="hidden flex flex-col items-center justify-center py-16 text-center gap-5">
@@ -30,7 +61,7 @@
 
 <!-- Swipe section: shown when logged in (original design preserved) -->
 <div id="swipe-section" class="hidden">
-<div class="flex justify-between items-center py-stack-sm">
+<div class="flex justify-between items-center py-stack-sm hidden">
 <div class="flex flex-col">
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Find a Mate</h2>
 <p class="font-body-sm text-body-sm text-on-surface-variant">Swipe right to connect</p>
@@ -54,16 +85,19 @@
 </div>
 </div>
 <div class="absolute bottom-6 left-0 w-full px-container-padding-mobile z-40">
-<div class="flex justify-center items-center gap-6">
-<button class="w-16 h-16 rounded-full bg-surface-container-lowest shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex items-center justify-center text-error hover:bg-error-container hover:scale-105 transition-all duration-200 active:scale-95 group" id="btn-nope">
-<span class="material-symbols-outlined text-[32px] group-hover:rotate-[-15deg] transition-transform">close</span>
-</button>
-<button class="w-12 h-12 rounded-full bg-surface-container shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-secondary hover:bg-surface-variant hover:scale-105 transition-all duration-200 active:scale-95 group">
-<span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">star</span>
-</button>
-<button class="w-16 h-16 rounded-full bg-primary-container shadow-[0_4px_16px_rgba(34,197,94,0.3)] flex items-center justify-center text-on-primary hover:bg-primary hover:scale-105 transition-all duration-200 active:scale-95 group" id="btn-like">
-<span class="material-symbols-outlined text-[32px] group-hover:scale-125 transition-transform" style="font-variation-settings: 'FILL' 1;">favorite</span>
-</button>
+<div class="flex justify-center items-center gap-12">
+<div class="flex flex-col items-center gap-2">
+  <button class="w-16 h-16 rounded-full bg-[#D9534F] shadow-[0_4px_16px_rgba(217,83,79,0.4)] flex items-center justify-center text-white hover:scale-105 transition-all duration-200 active:scale-95 group" id="btn-nope" onclick="handleNope()">
+    <span class="material-symbols-outlined text-[36px] group-hover:rotate-[-15deg] transition-transform">close</span>
+  </button>
+  <span class="font-body-sm text-on-surface-variant font-medium">Pass</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+  <button class="w-16 h-16 rounded-full bg-primary shadow-[0_4px_16px_rgba(0,110,47,0.4)] flex items-center justify-center text-white hover:scale-105 transition-all duration-200 active:scale-95 group" id="btn-like" onclick="handleLike()">
+    <span class="material-symbols-outlined text-[36px] group-hover:scale-125 transition-transform" style="font-variation-settings: 'FILL' 1;">favorite</span>
+  </button>
+  <span class="font-body-sm text-on-surface-variant font-medium">Like</span>
+</div>
 </div>
 </div>
 </div><!-- end swipe-section -->
@@ -90,6 +124,20 @@
   let isDragging = false, startX = 0, currentX = 0, rotation = 0;
   const threshold = 100;
   let _myListingId = null;
+
+  function closePopup() {
+    const popup = document.getElementById('how-it-works-popup');
+    const card = document.getElementById('popup-card');
+    card.classList.remove('scale-100');
+    card.classList.add('scale-95');
+    popup.classList.remove('opacity-100');
+    popup.classList.add('opacity-0');
+    setTimeout(() => {
+      popup.classList.remove('flex');
+      popup.classList.add('hidden');
+    }, 300);
+    localStorage.setItem('matesPopupShown', 'true');
+  }
 
   function getTagIcon(tag) {
     tag = (tag || '').toLowerCase();
@@ -311,6 +359,21 @@
     document.getElementById('guest-gate').classList.add('hidden');
     document.getElementById('swipe-section').classList.remove('hidden');
     document.getElementById('fab-post').classList.remove('hidden');
+
+    // Show popup if first time
+    if (!localStorage.getItem('matesPopupShown')) {
+      const popup = document.getElementById('how-it-works-popup');
+      const card = document.getElementById('popup-card');
+      popup.classList.remove('hidden');
+      popup.classList.add('flex');
+      // small delay to allow display:flex to apply before opacity transition
+      requestAnimationFrame(() => {
+        popup.classList.remove('opacity-0');
+        popup.classList.add('opacity-100');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+      });
+    }
 
     // Check if user has their own active listing
     const myListing = await getUserRoommateListing();

@@ -45,23 +45,7 @@
   </div>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full h-[88px] glass shadow-[0_-1px_12px_rgba(0,0,0,0.04)] z-40 pb-safe md:hidden">
-  <div class="h-full px-8 flex items-center justify-between">
-    <a href="/index.html" class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
-      <span class="material-symbols-outlined">storefront</span>
-      <span class="font-label-caps text-[10px] tracking-wider uppercase">Market</span>
-    </a>
-    <a href="/roommates/flatmates.html" class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
-      <span class="material-symbols-outlined">group</span>
-      <span class="font-label-caps text-[10px] tracking-wider uppercase">Find</span>
-    </a>
-    <a href="/roommates/matches.html" class="flex flex-col items-center gap-1 text-primary relative group">
-      <div class="absolute -top-2 w-12 h-1 bg-primary rounded-full group-hover:scale-x-110 transition-transform"></div>
-      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
-      <span class="font-label-caps text-[10px] tracking-wider uppercase">Matches</span>
-    </a>
-  </div>
-</nav>
+<nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" href="/core/activity.html"><span class="material-symbols-outlined">notifications</span><span class="font-label-caps text-label-caps">Activity</span></a></div></nav>
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
