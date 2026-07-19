@@ -293,13 +293,18 @@
       return;
     }
 
-    // Logged in: show profile avatar
+    // Logged in: show profile avatar and matches icon
     const profile = await getProfile();
     if (authArea && profile) {
       authArea.innerHTML = `
-        <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
-          <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="${profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA'}"/>
-        </a>`;
+        <div class="flex items-center gap-4">
+          <a href="/roommates/matches.html" class="relative flex items-center justify-center text-primary hover:scale-110 transition-transform cursor-pointer">
+            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </a>
+          <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+            <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="${profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA'}"/>
+          </a>
+        </div>`;
     }
 
     // Show swipe section & FAB
