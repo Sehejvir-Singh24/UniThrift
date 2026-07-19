@@ -3,12 +3,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary": "#ffffff", "on-surface-variant": "#3d4a3d", "surface-bright": "#f8f9ff", "on-primary-fixed": "#002109", "surface-dim": "#cbdbf5", "primary-fixed-dim": "#4ae176", "inverse-on-surface": "#eaf1ff", "outline": "#6d7b6c", "surface": "#f8f9ff", "on-secondary-fixed-variant": "#3f465c", "surface-container-low": "#eff4ff", "secondary-fixed-dim": "#bec6e0", "on-secondary-container": "#5c647a", "tertiary-fixed-dim": "#bdcac1", "secondary-fixed": "#dae2fd", "error": "#ba1a1a", "tertiary-container": "#a2afa7", "inverse-on-surface": "#eaf1ff", "outline-variant": "#bccbb9", "on-tertiary-fixed": "#131e19", "secondary-container": "#dae2fd", "on-tertiary-fixed-variant": "#3e4943", "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "on-tertiary": "#ffffff", "tertiary-fixed": "#d9e6dd", "surface-tint": "#006e2f", "tertiary": "#55615a", "surface-container-highest": "#d3e4fe", "on-secondary": "#ffffff", "primary-container": "#22c55e", "background": "#f8f9ff", "primary-fixed": "#6bff8f", "primary": "#006e2f", "on-primary-fixed-variant": "#005321", "on-secondary-fixed": "#131b2e", "surface-container": "#e5eeff", "error-container": "#ffdad6", "surface-container-high": "#dce9ff", "on-tertiary-container": "#37433c", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", "on-primary-container": "#004b1e", "secondary": "#565e74", "inverse-primary": "#4ae176", "on-background": "#0b1c30", "on-surface": "#0b1c30" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "stack-sm": "8px", "stack-md": "16px", "stack-lg": "32px", "unit": "4px", "container-padding-mobile": "20px", "container-padding-desktop": "48px", "gutter": "16px" }, "fontFamily": { "body-lg": ["Geist"], "headline-lg-mobile": ["Geist"], "title-md": ["Geist"], "headline-lg": ["Geist"], "label-caps": ["Geist"], "body-sm": ["Geist"], "display-lg": ["Geist"] }, "fontSize": { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700" }] } } } }</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); } } .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }</style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
-    <script>
-      requireAuth();
-    </script>
+    <!-- Auth checked in DOMContentLoaded below -->
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Flatmates</h1>
+<div id="header-auth-area">
+  <!-- Populated dynamically -->
+</div></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full px-container-padding-mobile md:px-6 md:max-w-md md:mx-auto gap-stack-md relative h-full">
 
-<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full px-container-padding-mobile md:px-6 md:max-w-md md:mx-auto gap-stack-md relative h-full">
+<!-- Guest state: shown when not logged in -->
+<div id="guest-gate" class="hidden flex flex-col items-center justify-center py-16 text-center gap-5">
+  <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+    <span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'FILL' 1;">group</span>
+  </div>
+  <div>
+    <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-2">Find a Mate</h2>
+    <p class="font-body-sm text-body-sm text-on-surface-variant">Sign in to browse verified students looking for flatmates.</p>
+  </div>
+  <div class="flex flex-col gap-3 w-full max-w-xs">
+    <a href="/auth/login.html" class="w-full py-3.5 bg-primary text-on-primary rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-[20px]">login</span> Log In
+    </a>
+    <a href="/auth/login.html?signup=true" class="w-full py-3.5 bg-surface-container text-on-surface rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+      <span class="material-symbols-outlined text-[20px]">person_add</span> Sign Up
+    </a>
+  </div>
+</div>
+
+<!-- Swipe section: shown when logged in (original design preserved) -->
+<div id="swipe-section" class="hidden">
 <div class="flex justify-between items-center py-stack-sm">
 <div class="flex flex-col">
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Find a Mate</h2>
@@ -26,69 +47,9 @@
 </div>
 </div>
 <div class="absolute inset-0 w-full h-full rounded-[24px] bg-surface-container-lowest shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden z-10 origin-bottom touch-pan-y cursor-grab active:cursor-grabbing transition-transform duration-200" id="active-card">
-<div class="relative w-full h-[55%] bg-surface-variant">
-<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
-<img class="w-full h-full object-cover" data-alt="A candid, high-quality photo of a female university student in her early 20s. She is smiling warmly, wearing a casual but stylish oversized sweater. The background is slightly blurred showing a modern campus library with soft natural light streaming through large windows. Shot on 35mm lens, bright and inviting atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARg3SlzGhlwjUR-fqPgZE0IM_oq6H6G34Cgj8-FI4ASB9p-oQU9iNkGLNPfYvS7XFHjenzsWNgz-fspeJVlW3JLUhSS5sLkdLD1sba-26jEDtw4u6pwe02HqajshScLH6FigWLX3RlNdHd32iQS3ovo3gaQdTsdnb2HcBUNxas2YpyKAimmUvcGbnl4VcM3OrR3qAuPUTX1dEJFnCM4Bfyod1r-vCvr_B8JPI0JWvY5b4RnJJJ0ptLRll2UU1VpxW01ZTz4GuMg8QO"/>
-<div class="absolute top-4 left-4 z-20 flex gap-2">
-<span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px] text-primary">verified</span>
-                Verified
-            </span>
-</div>
-<div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10">
-<div class="flex items-baseline gap-2 text-white">
-<h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold">Priya</h3>
-<span class="font-title-md text-title-md opacity-90">20</span>
-</div>
-<p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">school</span> 3rd Year • Comp Sci
-          </p>
-</div>
-</div>
-<div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
-<div class="flex flex-col gap-2">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Looking For</h4>
-<div class="flex items-center gap-3">
-<div class="flex flex-col">
-<span class="font-title-md text-title-md text-primary-container">₹8k - 12k</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Budget</span>
-</div>
-<div class="w-px h-8 bg-surface-variant"></div>
-<div class="flex flex-col">
-<span class="font-title-md text-title-md text-on-surface">Koramangala</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Preferred Area</span>
-</div>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Lifestyle</h4>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px]">bedtime</span> Night Owl
-             </span>
-<span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px]">eco</span> Vegetarian
-             </span>
-<span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px]">smoke_free</span> Non-Smoker
-             </span>
-<span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px]">pets</span> Pet Friendly
-             </span>
-</div>
-</div>
-<div class="flex flex-col gap-2 mt-2">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">About me</h4>
-<p class="font-body-sm text-body-sm text-on-surface leading-relaxed">
-             Usually coding late or watching anime. Super clean in common areas. Looking for a chill flatmate who respects personal space but is down for occasional weekend chai.
-           </p>
-</div>
-</div>
-<div class="absolute inset-0 bg-error/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="nope-overlay">
-<div class="border-4 border-error text-error font-headline-lg text-headline-lg rounded-lg px-6 py-2 -rotate-12 opacity-80">NOPE</div>
-</div>
-<div class="absolute inset-0 bg-primary-container/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="like-overlay">
-<div class="border-4 border-primary-container text-primary-container font-headline-lg text-headline-lg rounded-lg px-6 py-2 rotate-12 opacity-80">LIKE</div>
+<div class="flex flex-col items-center justify-center h-full gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-[48px] animate-spin">progress_activity</span>
+<p class="font-body-sm">Loading profiles...</p>
 </div>
 </div>
 </div>
@@ -105,244 +66,288 @@
 </button>
 </div>
 </div>
-</div>
+</div><!-- end swipe-section -->
+
+</div></main>
+
+<!-- Bottom Navigation (same style as all other pages) -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="dashboard" href="/index.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="flatmates" href="/roommates/flatmates.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" href="/core/activity.html"><span class="material-symbols-outlined">notifications</span><span class="font-label-caps text-label-caps">Activity</span></a></div></nav>
+
+<!-- FAB: Post a Roommate Requirement -->
+<button id="fab-post" onclick="handlePostClick()" class="hidden fixed bottom-[80px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[24px]">group_add</span>
+    <span class="font-title-md text-[16px]" id="fab-label">Need Flat</span>
+</button>
+
 <style>
-    /* Hide scrollbar for clean look */
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 <script>
-  document.addEventListener('DOMContentLoaded', async () => {
+  let _isLoggedIn = false;
+  let postings = [];
+  let currentIndex = 0;
+  let isDragging = false, startX = 0, currentX = 0, rotation = 0;
+  const threshold = 100;
+  let _myListingId = null;
+
+  function getTagIcon(tag) {
+    tag = (tag || '').toLowerCase();
+    if (tag.includes('owl') || tag.includes('night')) return 'bedtime';
+    if (tag.includes('veg')) return 'eco';
+    if (tag.includes('smoke')) return 'smoke_free';
+    if (tag.includes('pet')) return 'pets';
+    if (tag.includes('clean')) return 'cleaning_services';
+    if (tag.includes('study') || tag.includes('studious')) return 'menu_book';
+    if (tag.includes('bird') || tag.includes('early')) return 'wb_sunny';
+    return 'star';
+  }
+
+  function renderActiveCard() {
     const card = document.getElementById('active-card');
-    const btnNope = document.getElementById('btn-nope');
-    const btnLike = document.getElementById('btn-like');
-    
-    let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
-    let rotation = 0;
-    
-    const threshold = 100; // pixels to trigger swipe
+    if (!card) return;
+    if (currentIndex >= postings.length) {
+      card.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-surface-container-lowest">
+          <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 animate-bounce">
+            <span class="material-symbols-outlined text-[40px]">check_circle</span>
+          </div>
+          <h3 class="font-headline-lg-mobile text-on-surface mb-2">All Caught Up!</h3>
+          <p class="font-body-sm text-on-surface-variant max-w-xs">There are no more roommate listings in your campus area right now. Check back later!</p>
+        </div>`;
+      document.getElementById('btn-nope').style.display = 'none';
+      document.getElementById('btn-like').style.display = 'none';
+      return;
+    }
 
-    // Dynamic Swiper State
-    let postings = [];
-    let currentIndex = 0;
+    const post = postings[currentIndex];
+    const profile = post.profiles || {};
+    const name = profile.full_name || 'Anonymous Student';
+    const college = profile.college || 'GGSIPU';
+    const year = profile.year_of_study || 'N/A';
+    const avatar = profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
 
+    let tagsHTML = '';
+    if (post.tags && post.tags.length > 0) {
+      tagsHTML = post.tags.map(t => `
+        <span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">${getTagIcon(t)}</span> ${t}
+        </span>`).join('');
+    }
+
+    card.innerHTML = `
+      <div class="relative w-full h-[55%] bg-surface-variant">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
+        <img class="w-full h-full object-cover" src="${avatar}" alt="${name}"/>
+        <div class="absolute top-4 left-4 z-20 flex gap-2">
+          <span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-primary">verified</span> Verified
+          </span>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10">
+          <div class="flex items-baseline gap-2 text-white">
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
+          </div>
+          <p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">school</span> ${year} • ${college}
+          </p>
+        </div>
+      </div>
+      <div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
+        <div class="flex flex-col gap-2">
+          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Looking For</h4>
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md text-primary-container">₹${post.budget}/mo</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Budget</span>
+            </div>
+            <div class="w-px h-8 bg-surface-variant"></div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md text-on-surface truncate max-w-[150px]">${post.preferred_area || 'Flexible'}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Preferred Area</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-3">
+          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Lifestyle</h4>
+          <div class="flex flex-wrap gap-2">${tagsHTML || '<span class="text-on-surface-variant font-body-sm">Flexible preferences</span>'}</div>
+        </div>
+        <div class="flex flex-col gap-2 mt-2">
+          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">About me</h4>
+          <p class="font-body-sm text-body-sm text-on-surface leading-relaxed">${post.bio || 'No description provided.'}</p>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-error/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="nope-overlay">
+        <div class="border-4 border-error text-error font-headline-lg text-headline-lg rounded-lg px-6 py-2 -rotate-12 opacity-80">NOPE</div>
+      </div>
+      <div class="absolute inset-0 bg-primary-container/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="like-overlay">
+        <div class="border-4 border-primary-container text-primary-container font-headline-lg text-headline-lg rounded-lg px-6 py-2 rotate-12 opacity-80">LIKE</div>
+      </div>`;
+  }
+
+  function updateCardTransform() {
+    const card = document.getElementById('active-card');
+    if (!card) return;
+    card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
+    const nopeOver = document.getElementById('nope-overlay');
+    const likeOver = document.getElementById('like-overlay');
+    if (!nopeOver || !likeOver) return;
+    if (currentX > 0) {
+      likeOver.style.opacity = Math.min(currentX / threshold, 1);
+      nopeOver.style.opacity = 0;
+    } else if (currentX < 0) {
+      nopeOver.style.opacity = Math.min(Math.abs(currentX) / threshold, 1);
+      likeOver.style.opacity = 0;
+    } else {
+      likeOver.style.opacity = 0;
+      nopeOver.style.opacity = 0;
+    }
+  }
+
+  function animateCardOut(direction, onComplete) {
+    const card = document.getElementById('active-card');
+    if (!card) return;
+    card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+    card.style.transform = `translateX(${direction * window.innerWidth}px) rotate(${direction * 30}deg)`;
+    card.style.opacity = 0;
+    const nopeOver = document.getElementById('nope-overlay');
+    const likeOver = document.getElementById('like-overlay');
+    if (direction > 0 && likeOver) likeOver.style.opacity = 1;
+    if (direction < 0 && nopeOver) nopeOver.style.opacity = 1;
+    setTimeout(() => {
+      if (onComplete) onComplete();
+      currentIndex++;
+      currentX = 0; rotation = 0;
+      card.style.transition = 'none';
+      card.style.transform = '';
+      card.style.opacity = 1;
+      renderActiveCard();
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        card.classList.remove('scale-95');
+      }, 50);
+    }, 400);
+  }
+
+  async function handleLike() {
+    if (currentIndex >= postings.length) return;
+    const post = postings[currentIndex];
+    animateCardOut(1, async () => {
+      try {
+        await likeRoommateListing(post.id, post.user_id);
+      } catch (e) {
+        console.warn("Could not save like:", e);
+      }
+    });
+  }
+
+  function handleNope() {
+    if (currentIndex >= postings.length) return;
+    animateCardOut(-1);
+  }
+
+  async function handlePostClick() {
+    if (!_isLoggedIn) {
+      window.location.href = '/auth/login.html';
+      return;
+    }
+    if (_myListingId) {
+      if (confirm('You already have an active post. Delete it and create a new one?')) {
+        try {
+          await deleteRoommateListing(_myListingId);
+          _myListingId = null;
+          document.getElementById('fab-label').textContent = 'Need Flat';
+          window.location.href = '/roommates/roommate_need_flat.html';
+        } catch(e) {
+          alert('Could not remove existing post. Try again.');
+        }
+      }
+    } else {
+      window.location.href = '/roommates/roommate_need_flat.html';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    _isLoggedIn = await checkAuth();
+    const authArea = document.getElementById('header-auth-area');
+
+    if (!_isLoggedIn) {
+      // Guest: show login/signup buttons in header
+      if (authArea) {
+        authArea.innerHTML = `
+          <div class="flex items-center gap-1">
+            <a href="/auth/login.html" class="px-3 py-1.5 text-on-surface hover:text-primary font-label-caps text-label-caps transition-colors">Log In</a>
+            <a href="/auth/login.html?signup=true" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">Sign Up</a>
+          </div>`;
+      }
+      document.getElementById('guest-gate').classList.remove('hidden');
+      document.getElementById('swipe-section').classList.add('hidden');
+      document.getElementById('fab-post').classList.add('hidden');
+      return;
+    }
+
+    // Logged in: show profile avatar
+    const profile = await getProfile();
+    if (authArea && profile) {
+      authArea.innerHTML = `
+        <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+          <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="${profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA'}"/>
+        </a>`;
+    }
+
+    // Show swipe section & FAB
+    document.getElementById('guest-gate').classList.add('hidden');
+    document.getElementById('swipe-section').classList.remove('hidden');
+    document.getElementById('fab-post').classList.remove('hidden');
+
+    // Check if user has their own active listing
+    const myListing = await getUserRoommateListing();
+    if (myListing) {
+      _myListingId = myListing.id;
+      document.getElementById('fab-label').textContent = 'Edit Post';
+    }
+
+    // Load the swipe deck
     try {
-        postings = await getRoommateListings();
+      postings = await getRoommateListings();
     } catch(e) {
-        console.error("Error loading roommate postings:", e);
+      console.error("Error loading postings:", e);
     }
-
-    function renderActiveCard() {
-        if (currentIndex >= postings.length) {
-            // Show all caught up card
-            card.innerHTML = `
-              <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-surface-container-lowest">
-                <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 animate-bounce">
-                  <span class="material-symbols-outlined text-[40px]">check_circle</span>
-                </div>
-                <h3 class="font-headline-lg-mobile text-on-surface mb-2">All Caught Up!</h3>
-                <p class="font-body-sm text-on-surface-variant max-w-xs">There are no more roommate listings in your campus area right now. Check back later!</p>
-              </div>
-            `;
-            // Hide control buttons
-            btnNope.style.display = 'none';
-            btnLike.style.display = 'none';
-            return;
-        }
-
-        const post = postings[currentIndex];
-        const profile = post.profiles || {};
-        const name = profile.full_name || 'Anonymous Student';
-        const college = profile.college || 'GGSIPU';
-        const year = profile.year_of_study || 'N/A';
-        const avatar = profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
-        
-        let tagsHTML = '';
-        if(post.tags && post.tags.length > 0) {
-            tagsHTML = post.tags.map(t => `
-              <span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[18px]">${getTagIcon(t)}</span> ${t}
-              </span>
-            `).join('');
-        }
-
-        card.innerHTML = `
-          <div class="relative w-full h-[55%] bg-surface-variant">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
-            <img class="w-full h-full object-cover" src="${avatar}" alt="${name}"/>
-            <div class="absolute top-4 left-4 z-20 flex gap-2">
-              <span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
-                <span class="material-symbols-outlined text-[14px] text-primary">verified</span> Verified
-              </span>
-            </div>
-            <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10">
-              <div class="flex items-baseline gap-2 text-white">
-                <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
-              </div>
-              <p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
-                <span class="material-symbols-outlined text-[16px]">school</span> ${year} • ${college}
-              </p>
-            </div>
-          </div>
-          <div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
-            <div class="flex flex-col gap-2">
-              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Looking For</h4>
-              <div class="flex items-center gap-3">
-                <div class="flex flex-col">
-                  <span class="font-title-md text-title-md text-primary-container">₹${post.budget}/mo</span>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant">Budget</span>
-                </div>
-                <div class="w-px h-8 bg-surface-variant"></div>
-                <div class="flex flex-col">
-                  <span class="font-title-md text-title-md text-on-surface truncate max-w-[150px]">${post.preferred_area || 'Flexible'}</span>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant">Preferred Area</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col gap-3">
-              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Lifestyle</h4>
-              <div class="flex flex-wrap gap-2">${tagsHTML || '<span class="text-on-surface-variant font-body-sm">Flexible preferences</span>'}</div>
-            </div>
-            <div class="flex flex-col gap-2 mt-2">
-              <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">About me</h4>
-              <p class="font-body-sm text-body-sm text-on-surface leading-relaxed">${post.bio || 'No description provided.'}</p>
-            </div>
-          </div>
-          <div class="absolute inset-0 bg-error/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="nope-overlay">
-            <div class="border-4 border-error text-error font-headline-lg text-headline-lg rounded-lg px-6 py-2 -rotate-12 opacity-80">NOPE</div>
-          </div>
-          <div class="absolute inset-0 bg-primary-container/20 z-30 opacity-0 pointer-events-none transition-opacity duration-200 flex items-center justify-center" id="like-overlay">
-            <div class="border-4 border-primary-container text-primary-container font-headline-lg text-headline-lg rounded-lg px-6 py-2 rotate-12 opacity-80">LIKE</div>
-          </div>
-        `;
-    }
-
-    function getTagIcon(tag) {
-        tag = tag.toLowerCase();
-        if (tag.includes('owl') || tag.includes('night')) return 'bedtime';
-        if (tag.includes('veg')) return 'eco';
-        if (tag.includes('smoke')) return 'smoke_free';
-        if (tag.includes('pet')) return 'pets';
-        if (tag.includes('clean')) return 'cleaning_services';
-        if (tag.includes('study')) return 'menu_book';
-        return 'star';
-    }
-
-    // Initialize first card
     renderActiveCard();
 
-    function updateCardTransform() {
-      card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
-      
-      const nopeOver = document.getElementById('nope-overlay');
-      const likeOver = document.getElementById('like-overlay');
-      if (!nopeOver || !likeOver) return;
+    const card = document.getElementById('active-card');
 
-      if (currentX > 0) {
-          likeOver.style.opacity = Math.min(currentX / threshold, 1);
-          nopeOver.style.opacity = 0;
-      } else if (currentX < 0) {
-          nopeOver.style.opacity = Math.min(Math.abs(currentX) / threshold, 1);
-          likeOver.style.opacity = 0;
-      } else {
-          likeOver.style.opacity = 0;
-          nopeOver.style.opacity = 0;
-      }
-    }
-
-    function animateCardOut(direction) {
-        card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-        const endX = direction * window.innerWidth;
-        const endRotation = direction * 30;
-        card.style.transform = `translateX(${endX}px) rotate(${endRotation}deg)`;
-        card.style.opacity = 0;
-        
-        const nopeOver = document.getElementById('nope-overlay');
-        const likeOver = document.getElementById('like-overlay');
-        if(direction > 0) {
-             if (likeOver) likeOver.style.opacity = 1;
-        } else {
-             if (nopeOver) nopeOver.style.opacity = 1;
-        }
-
-        setTimeout(() => {
-            currentIndex++;
-            resetCard();
-        }, 400);
-    }
-    
-    function resetCard() {
-        card.style.transition = 'none';
-        currentX = 0;
-        rotation = 0;
-        card.style.transform = '';
-        card.style.opacity = 1;
-        
-        // Re-render card content
-        renderActiveCard();
-        
-        // Minor visual feedback
-        card.classList.add('scale-95');
-        setTimeout(() => {
-            card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            card.classList.remove('scale-95');
-        }, 50);
-    }
-
-    // Touch Events
+    // Touch events
     card.addEventListener('touchstart', (e) => {
       if (currentIndex >= postings.length) return;
       isDragging = true;
       startX = e.touches[0].clientX;
       card.style.transition = 'none';
     });
-
     card.addEventListener('touchmove', (e) => {
       if (!isDragging) return;
-      const x = e.touches[0].clientX;
-      currentX = x - startX;
+      currentX = e.touches[0].clientX - startX;
       rotation = currentX * 0.1;
       updateCardTransform();
     });
-
     card.addEventListener('touchend', () => {
       if (!isDragging) return;
       isDragging = false;
       card.style.transition = 'transform 0.3s ease-out';
-
       if (currentX > threshold) {
-        animateCardOut(1); // Like
+        handleLike();
       } else if (currentX < -threshold) {
-        animateCardOut(-1); // Nope
+        handleNope();
       } else {
-        currentX = 0;
-        rotation = 0;
+        currentX = 0; rotation = 0;
         updateCardTransform();
       }
     });
-    
-    // Button Clicks
-    btnLike.addEventListener('click', () => {
-        if (currentIndex < postings.length) animateCardOut(1);
-    });
-    btnNope.addEventListener('click', () => {
-        if (currentIndex < postings.length) animateCardOut(-1);
-    });
+
+    // Button clicks
+    document.getElementById('btn-like').addEventListener('click', handleLike);
+    document.getElementById('btn-nope').addEventListener('click', handleNope);
   });
 </script>
-<!-- FAB: Post a Roommate Requirement -->
-<button onclick="verifyAction(() => window.location.href='/roommates/roommate_need_flat.html')" class="md:hidden fixed bottom-[120px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
-    <span class="material-symbols-outlined text-[24px]">group_add</span>
-    <span class="font-title-md text-[16px]">Need Flat</span>
-</button>
-
-
-
-
+</body></html>

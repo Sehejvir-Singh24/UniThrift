@@ -536,11 +536,19 @@ async function deleteProductAdmin(productId) {
 async function createRoommateListing(listing) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Not authenticated");
+
+  // Deactivate any existing listing first (one active post per user)
+  await supabase
+    .from('roommate_listings')
+    .update({ is_active: false })
+    .eq('user_id', session.user.id);
+
   const { error } = await supabase
     .from('roommate_listings')
     .insert({
       ...listing,
-      user_id: session.user.id
+      user_id: session.user.id,
+      is_active: true
     });
   if (error) {
     console.error("Error creating roommate listing:", error);
@@ -548,17 +556,118 @@ async function createRoommateListing(listing) {
   }
 }
 
-// Helper: Get Roommate Listings
+// Helper: Get Roommate Listings (for swipe deck)
+// Excludes the current user's own listing and listings they've already liked/swiped.
 async function getRoommateListings() {
-  const { data, error } = await supabase
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // Build the base query — only active listings
+  let query = supabase
     .from('roommate_listings')
     .select('*, profiles!user_id(full_name, avatar_url, college, year_of_study)')
+    .eq('is_active', true)
     .order('created_at', { ascending: false });
+
+  // If logged in, filter out own listing and already-liked listings
+  if (session) {
+    query = query.neq('user_id', session.user.id);
+
+    // Fetch already-liked listing IDs
+    const { data: likedRows } = await supabase
+      .from('roommate_likes')
+      .select('listing_id')
+      .eq('liker_id', session.user.id);
+
+    const likedIds = (likedRows || []).map(r => r.listing_id);
+    if (likedIds.length > 0) {
+      query = query.not('id', 'in', `(${likedIds.join(',')})`);
+    }
+  }
+
+  const { data, error } = await query;
   if (error) {
     console.error("Error fetching roommate listings:", error);
     return [];
   }
   return data || [];
+}
+
+// Helper: Get the current user's own active roommate listing
+async function getUserRoommateListing() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return null;
+
+  const { data, error } = await supabase
+    .from('roommate_listings')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .eq('is_active', true)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error("Error fetching user roommate listing:", error);
+  }
+  return data || null;
+}
+
+// Helper: Soft-delete (deactivate) user's own roommate listing
+async function deleteRoommateListing(id) {
+  const { error } = await supabase
+    .from('roommate_listings')
+    .update({ is_active: false })
+    .eq('id', id);
+  if (error) {
+    console.error("Error deactivating roommate listing:", error);
+    throw error;
+  }
+}
+
+// Helper: Like / Swipe-right on a roommate listing
+async function likeRoommateListing(listingId, likedUserId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from('roommate_likes')
+    .upsert({
+      liker_id: session.user.id,
+      liked_user_id: likedUserId,
+      listing_id: listingId
+    }, { onConflict: 'liker_id,listing_id' });
+
+  if (error) {
+    console.error("Error liking roommate listing:", error);
+    throw error;
+  }
+}
+
+// Helper: Get mutual matches (both users liked each other)
+async function getMyRoommateMatches() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
+
+  // Fetch people I liked
+  const { data: myLikes, error: likesError } = await supabase
+    .from('roommate_likes')
+    .select('liked_user_id, listing_id')
+    .eq('liker_id', session.user.id);
+
+  if (likesError || !myLikes || myLikes.length === 0) return [];
+
+  const likedUserIds = myLikes.map(l => l.liked_user_id);
+
+  // Find who among them also liked me back
+  const { data: theirLikes, error: theirError } = await supabase
+    .from('roommate_likes')
+    .select('liker_id, listing_id, profiles!liker_id(full_name, avatar_url, college, year_of_study)')
+    .in('liker_id', likedUserIds)
+    .eq('liked_user_id', session.user.id);
+
+  if (theirError) {
+    console.error("Error fetching mutual matches:", theirError);
+    return [];
+  }
+  return theirLikes || [];
 }
 
 // Helper: Delete Roommate Listing as Admin
