@@ -135,11 +135,17 @@
         </span>`).join('');
     }
 
+    const isProvider = post.listing_type === 'have_flat';
+    const typeBadge = isProvider 
+      ? '<span class="px-3 py-1 bg-primary/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-primary shadow-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">home</span> Room Available</span>'
+      : '<span class="px-3 py-1 bg-surface-container-highest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-primary">search</span> Looking for Room</span>';
+
     card.innerHTML = `
       <div class="relative w-full h-[55%] bg-surface-variant">
         <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
         <img class="w-full h-full object-cover" src="${avatar}" alt="${name}"/>
         <div class="absolute top-4 left-4 z-20 flex gap-2">
+          ${typeBadge}
           <span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px] text-primary">verified</span> Verified
           </span>
@@ -155,16 +161,16 @@
       </div>
       <div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
         <div class="flex flex-col gap-2">
-          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Looking For</h4>
+          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">${isProvider ? 'The Room' : 'Looking For'}</h4>
           <div class="flex items-center gap-3">
             <div class="flex flex-col">
-              <span class="font-title-md text-title-md text-primary-container">₹${post.budget}/mo</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">Budget</span>
+              <span class="font-title-md text-title-md text-primary-container">₹${isProvider ? post.rent : post.budget}/mo</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">${isProvider ? 'Rent' : 'Budget'}</span>
             </div>
             <div class="w-px h-8 bg-surface-variant"></div>
             <div class="flex flex-col">
               <span class="font-title-md text-title-md text-on-surface truncate max-w-[150px]">${post.preferred_area || 'Flexible'}</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">Preferred Area</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">${isProvider ? 'Location' : 'Preferred Area'}</span>
             </div>
           </div>
         </div>

@@ -104,7 +104,20 @@
 
       // Render Draft Details
       document.getElementById('preview-title').innerText = draftData.title;
-      document.getElementById('preview-budget').innerText = `₹${draftData.budget}/mo`;
+      
+      const budgetTitleEl = document.querySelector('#preview-budget').previousElementSibling;
+      const areaTitleEl = document.querySelector('#preview-area').previousElementSibling;
+      
+      if (draftData.listing_type === 'have_flat') {
+          budgetTitleEl.innerText = 'RENT';
+          areaTitleEl.innerText = 'LOCATION';
+          document.getElementById('preview-budget').innerText = `₹${draftData.rent}/mo`;
+      } else {
+          budgetTitleEl.innerText = 'BUDGET';
+          areaTitleEl.innerText = 'PREFERRED AREA';
+          document.getElementById('preview-budget').innerText = `₹${draftData.budget}/mo`;
+      }
+      
       document.getElementById('preview-area').innerText = draftData.preferred_area;
       document.getElementById('preview-type').innerText = draftData.room_type || 'Any';
       document.getElementById('preview-date').innerText = draftData.move_in_date ? new Date(draftData.move_in_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Flexible';

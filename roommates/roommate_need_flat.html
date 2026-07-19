@@ -7,10 +7,24 @@
     </script>
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-4 flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-on-surface/5 rounded-full transition-colors" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface">Post Requirement</h1><div class="ml-auto w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="relative w-full pt-16 pb-safe bg-background"><div class="flex flex-col w-full bg-surface">
 <div class="px-container-padding-mobile pt-stack-md pb-stack-lg space-y-stack-lg">
+<!-- Type Toggle Section -->
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">I am looking for:</label>
+<div class="flex bg-surface-container p-1 rounded-lg w-full gap-1">
+    <button type="button" id="type-need" class="flex-1 py-3 rounded-md font-body-sm text-sm bg-primary text-on-primary shadow-sm transition-all" onclick="selectListingType('need_flat')">
+    I Need a Place
+    </button>
+    <button type="button" id="type-have" class="flex-1 py-3 rounded-md font-body-sm text-sm text-on-surface hover:bg-surface-container-high transition-all" onclick="selectListingType('have_flat')">
+    I Have an Empty Room
+    </button>
+</div>
+<input type="hidden" id="listing-type" value="need_flat"/>
+</div>
+
 <!-- Budget Section -->
 <section class="space-y-stack-md">
 <div class="flex items-center justify-between">
-<h2 class="font-title-md text-title-md text-on-surface">Monthly Budget</h2>
+<h2 id="budget-title" class="font-title-md text-title-md text-on-surface">Monthly Budget</h2>
 <span class="font-title-md text-title-md text-primary" id="budget-display">₹15,000</span>
 </div>
 <div class="relative w-full h-8 flex items-center">
@@ -29,7 +43,7 @@
 </section>
 <!-- Location Section -->
 <section class="space-y-stack-md">
-<h2 class="font-title-md text-title-md text-on-surface">Preferred Areas</h2>
+<h2 id="location-title" class="font-title-md text-title-md text-on-surface">Preferred Areas</h2>
 <div class="flex flex-wrap gap-unit" id="areas-container">
 <!-- Default generic chips in case DB fails -->
 <button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-primary text-on-primary transition-all shadow-[0_4px_12px_rgba(34,197,94,0.2)]">Delhi NCR</button>
@@ -199,8 +213,30 @@
     });
   });
 
+  // Listing Type Toggle Logic
+  function selectListingType(type) {
+    document.getElementById('listing-type').value = type;
+    const btnNeed = document.getElementById('type-need');
+    const btnHave = document.getElementById('type-have');
+    const budgetTitle = document.getElementById('budget-title');
+    const locationTitle = document.getElementById('location-title');
+
+    if (type === 'need_flat') {
+        btnNeed.className = 'flex-1 py-3 rounded-md font-body-sm text-sm bg-primary text-on-primary shadow-sm transition-all';
+        btnHave.className = 'flex-1 py-3 rounded-md font-body-sm text-sm text-on-surface hover:bg-surface-container-high transition-all';
+        budgetTitle.innerText = "Monthly Budget";
+        locationTitle.innerText = "Preferred Areas";
+    } else {
+        btnHave.className = 'flex-1 py-3 rounded-md font-body-sm text-sm bg-primary text-on-primary shadow-sm transition-all';
+        btnNeed.className = 'flex-1 py-3 rounded-md font-body-sm text-sm text-on-surface hover:bg-surface-container-high transition-all';
+        budgetTitle.innerText = "Monthly Rent";
+        locationTitle.innerText = "Exact Location";
+    }
+  }
+
   function saveRoommateRequirementsAndContinue() {
-      const budget = parseFloat(slider.value);
+      const budgetOrRent = parseFloat(slider.value);
+      const listingType = document.getElementById('listing-type').value;
       
       const areas = [];
       document.querySelectorAll('.area-chip.bg-primary').forEach(chip => {
@@ -220,7 +256,7 @@
       });
       
       if (areas.length === 0) {
-          alert("Please select at least one preferred area.");
+          alert("Please select at least one area/location.");
           return;
       }
       if (!bio) {
@@ -228,11 +264,13 @@
           return;
       }
       
-      const title = `Need ${roomType} in ${areas[0]}`;
+      const title = listingType === 'need_flat' ? `Need ${roomType} in ${areas[0]}` : `Have ${roomType} in ${areas[0]}`;
       
       const roommateDraft = {
           title,
-          budget,
+          listing_type: listingType,
+          budget: listingType === 'need_flat' ? budgetOrRent : null,
+          rent: listingType === 'have_flat' ? budgetOrRent : null,
           preferred_area: areas.join(', '),
           bio,
           tags,

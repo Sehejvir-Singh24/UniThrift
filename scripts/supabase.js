@@ -659,7 +659,7 @@ async function getMyRoommateMatches() {
   // Find who among them also liked me back
   const { data: theirLikes, error: theirError } = await supabase
     .from('roommate_likes')
-    .select('liker_id, listing_id, profiles!liker_id(full_name, avatar_url, college, year_of_study)')
+    .select('liker_id, listing_id, profiles!liker_id(full_name, avatar_url, college, year_of_study, phone_number)')
     .in('liker_id', likedUserIds)
     .eq('liked_user_id', session.user.id);
 
