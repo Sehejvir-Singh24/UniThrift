@@ -48,13 +48,13 @@
 <!-- Avatar Upload Group -->
 <div class="flex flex-col items-center gap-2 mb-4">
   <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()">
-    <img id="profile-avatar" class="w-24 h-24 rounded-full object-cover shadow-sm ring-4 ring-surface-bright transition-opacity group-hover:opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz" />
+    <img id="profile-avatar" class="w-24 h-24 rounded-full object-cover shadow-sm ring-4 ring-surface-bright transition-opacity group-hover:opacity-80" src="https://api.dicebear.com/9.x/pixel-art/svg?seed=sunglasses&glassesProbability=100" />
     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
       <span class="material-symbols-outlined text-on-primary drop-shadow-md">photo_camera</span>
     </div>
   </div>
   <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="handleAvatarChange(event)">
-  <span class="font-label-caps text-on-surface-variant text-[10px]">Tap to upload profile picture (Required)</span>
+  <span class="font-label-caps text-on-surface-variant text-[10px]">Tap to upload profile picture (Optional)</span>
 </div>
 <!-- Input Group: Enrollment -->
 <div class="flex flex-col gap-2 mb-2">
@@ -184,9 +184,9 @@
             const isEnrollmentValid = (selectedYear === '1st Year' && enrollment.length === 0) || enrollment.length === 11;
             const isFatherNameValid = fatherName.trim().length > 2;
             
-            const defaultPlaceholder = "https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz";
+            const defaultPlaceholder = "https://api.dicebear.com/9.x/pixel-art/svg?seed=sunglasses&glassesProbability=100";
             const avatarSrc = document.getElementById('profile-avatar').src;
-            const hasAvatar = croppedBlob || (avatarSrc && avatarSrc !== defaultPlaceholder);
+            const hasAvatar = true; // Avatar is optional now
 
             const isValid = isEnrollmentValid && isFatherNameValid && fullname.length > 2 && phone.length === 10 && college && hasAvatar;
 
@@ -260,19 +260,16 @@
                     college: college,
                     father_name: fatherName.trim(),
                     is_verified: true,
-                    verification_status: \'verified\',
-                    father_name: fatherName.trim(),
-                    is_verified: true,
                     verification_status: 'verified'
                 };
 
                 if (publicUrl) {
                     profileUpdates.avatar_url = publicUrl;
                 } else {
-                    const defaultPlaceholder = "https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz";
+                    const defaultPlaceholder = "https://api.dicebear.com/9.x/pixel-art/svg?seed=sunglasses&glassesProbability=100";
                     const avatarSrc = document.getElementById('profile-avatar').src;
-                    if (avatarSrc && avatarSrc !== defaultPlaceholder) {
-                        profileUpdates.avatar_url = avatarSrc;
+                    if (avatarSrc) {
+                        profileUpdates.avatar_url = avatarSrc; // Save whatever is in the src
                     }
                 }
 
