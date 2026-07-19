@@ -26,33 +26,46 @@
           }
 
           // Personalize header
-          if (profile && profile.avatar_url) {
-            document.getElementById('header-avatar').src = profile.avatar_url;
-          }
-          document.getElementById('header-auth-area').innerHTML = `
-            <button onclick="logout()" class="text-on-surface-variant hover:text-error transition-colors flex items-center justify-center bg-surface-container rounded-full p-2 shadow-sm">
-              <span class="material-symbols-outlined text-[20px]">logout</span>
-            </button>
-            <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
-              <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
-            </a>`;
-          if (profile && profile.avatar_url) {
-            const av = document.getElementById('header-avatar');
-            if (av) av.src = profile.avatar_url;
+          const authArea = document.getElementById('header-auth-area');
+          if (authArea) {
+            authArea.innerHTML = `
+              <button onclick="logout()" class="text-on-surface-variant hover:text-error transition-colors flex items-center justify-center bg-surface-container rounded-full p-2 shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">logout</span>
+              </button>
+              <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+                <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+              </a>`;
+            if (profile && profile.avatar_url) {
+              const av = document.getElementById('header-avatar');
+              if (av) av.src = profile.avatar_url;
+            }
           }
 
           // Personalize greeting
-          const firstName = profile && profile.full_name ? profile.full_name.split(' ')[0] : '';
-          document.getElementById('greeting-text').textContent = `${getGreeting()}, ${firstName} 👋`;
+          const greetingText = document.getElementById('greeting-text');
+          if (greetingText) {
+            const firstName = profile && profile.full_name ? profile.full_name.split(' ')[0] : '';
+            greetingText.textContent = `${getGreeting()}, ${firstName} 👋`;
+          }
 
         } else {
           // --- Guest flow ---
-          document.getElementById('header-auth-area').innerHTML = `
-            <a href="/auth/login.html" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
-              <span class="material-symbols-outlined text-[16px]">login</span>
-              Log In / Sign Up
-            </a>`;
-          document.getElementById('greeting-text').textContent = `${getGreeting()} 👋`;
+          const authArea = document.getElementById('header-auth-area');
+          if (authArea) {
+            authArea.innerHTML = `
+              <div class="flex items-center gap-1">
+                <a href="/auth/login.html" class="px-3 py-1.5 text-on-surface hover:text-primary font-label-caps text-label-caps transition-colors">
+                  Log In
+                </a>
+                <a href="/auth/login.html?signup=true" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                  Sign Up
+                </a>
+              </div>`;
+          }
+          const greetingText = document.getElementById('greeting-text');
+          if (greetingText) {
+            greetingText.textContent = `${getGreeting()} 👋`;
+          }
         }
 
         // Load products for everyone
@@ -61,22 +74,28 @@
         const placeholder = document.getElementById('trending-placeholder');
 
         if (products.length === 0) {
-          placeholder.innerHTML = `
-            <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-              <span class="material-symbols-outlined text-[32px]">storefront</span>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">No items listed yet.</p>
-            <p class="font-label-caps text-label-caps text-primary-container">Be the first to sell!</p>
-          `;
+          if (placeholder) {
+            placeholder.innerHTML = `
+              <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[32px]">storefront</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">No items listed yet.</p>
+              <p class="font-label-caps text-label-caps text-primary-container">Be the first to sell!</p>
+            `;
+          }
         } else {
-          placeholder.remove();
-          products.forEach(p => {
-            grid.insertAdjacentHTML('beforeend', renderProductCard(p));
-          });
+          if (placeholder) placeholder.remove();
+          if (grid) {
+            products.forEach(p => {
+              grid.insertAdjacentHTML('beforeend', renderProductCard(p));
+            });
+          }
         }
       }
 
-      initPage();
+      document.addEventListener('DOMContentLoaded', () => {
+        initPage();
+      });
 
       supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN' && session) {

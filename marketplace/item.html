@@ -9,20 +9,25 @@
 
       async function initItemPage() {
         _isLoggedIn = await checkAuth();
-        if (_isLoggedIn) {
-          const profile = await getProfile();
-          const headerAuth = document.getElementById('header-auth-area');
-          if (headerAuth) {
+        const headerAuth = document.getElementById('header-auth-area');
+        if (headerAuth) {
+          if (_isLoggedIn) {
+            const profile = await getProfile();
             headerAuth.innerHTML = `<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a>`;
             if (profile && profile.avatar_url) {
               const av = document.getElementById('header-avatar');
               if (av) av.src = profile.avatar_url;
             }
-          }
-        } else {
-          const headerAuth = document.getElementById('header-auth-area');
-          if (headerAuth) {
-            headerAuth.innerHTML = `<a href="/auth/login.html" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform"><span class="material-symbols-outlined text-[16px]">login</span>Log In</a>`;
+          } else {
+            headerAuth.innerHTML = `
+              <div class="flex items-center gap-1">
+                <a href="/auth/login.html" class="px-3 py-1.5 text-on-surface hover:text-primary font-label-caps text-label-caps transition-colors">
+                  Log In
+                </a>
+                <a href="/auth/login.html?signup=true" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                  Sign Up
+                </a>
+              </div>`;
           }
         }
       }
@@ -35,7 +40,9 @@
         }
       }
 
-      initItemPage();
+      document.addEventListener('DOMContentLoaded', () => {
+        initItemPage();
+      });
     </script>
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-14 px-4 flex items-center"><button class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back_ios_new</span></button><h1 class="flex-1 font-title-md text-title-md text-center text-on-surface mr-8">Product Detail</h1><div id="header-auth-area" class="flex items-center"></div></div></header><main class="pt-14 pb-safe bg-background min-h-screen"><div class="flex flex-col md:flex-row md:max-w-5xl md:mx-auto md:pt-8 md:px-6 md:gap-12 w-full items-start">
 <!-- Left Column: Image Carousel -->

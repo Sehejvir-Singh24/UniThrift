@@ -74,13 +74,7 @@
       <div class="flex items-center gap-stack-sm">
         <span class="font-title-md text-title-md text-on-surface">Activity Hub</span>
       </div>
-      <a href="/core/profile.html" id="header-profile-link" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer hidden">
-        <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
-      </a>
-      <a href="/auth/login.html" id="header-login-btn" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform hidden">
-        <span class="material-symbols-outlined text-[16px]">login</span>
-        Log In / Sign Up
-      </a>
+      <div id="header-auth-area" class="flex items-center"></div>
     </div>
   </header>
 
@@ -142,10 +136,21 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const isLoggedIn = await checkAuth();
+      const authArea = document.getElementById('header-auth-area');
 
       if (!isLoggedIn) {
         // Show guest state in header
-        document.getElementById('header-login-btn').classList.remove('hidden');
+        if (authArea) {
+          authArea.innerHTML = `
+            <div class="flex items-center gap-1">
+              <a href="/auth/login.html" class="px-3 py-1.5 text-on-surface hover:text-primary font-label-caps text-label-caps transition-colors">
+                Log In
+              </a>
+              <a href="/auth/login.html?signup=true" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                Sign Up
+              </a>
+            </div>`;
+        }
 
         // Replace activity feed with guest placeholder
         document.getElementById('activity-feed').innerHTML = `
@@ -164,7 +169,7 @@
                 <span class="material-symbols-outlined text-[20px]">login</span>
                 Log In
               </a>
-              <a href="/auth/login.html" class="w-full py-3.5 bg-surface-container text-on-surface rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+              <a href="/auth/login.html?signup=true" class="w-full py-3.5 bg-surface-container text-on-surface rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
                 <span class="material-symbols-outlined text-[20px]">person_add</span>
                 Sign Up
               </a>
@@ -177,7 +182,12 @@
       }
 
       // --- Logged-in user flow ---
-      document.getElementById('header-profile-link').classList.remove('hidden');
+      if (authArea) {
+        authArea.innerHTML = `
+          <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+            <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+          </a>`;
+      }
 
       // Header avatar
       const profile = await getProfile();

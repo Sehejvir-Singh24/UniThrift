@@ -281,6 +281,12 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Check for signup query param to toggle auth mode on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('signup') === 'true') {
+            toggleAuthMode();
+        }
+
         // Auto-redirect if already logged in
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {

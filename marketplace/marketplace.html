@@ -6,22 +6,29 @@
     <script>
       async function initMarketplace() {
         const isLoggedIn = await checkAuth();
-        if (isLoggedIn) {
-          const profile = await getProfile();
-          document.getElementById('header-auth-area').innerHTML = `
-            <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
-              <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
-            </a>`;
-          if (profile && profile.avatar_url) {
-            const av = document.getElementById('header-avatar');
-            if (av) av.src = profile.avatar_url;
+        const authArea = document.getElementById('header-auth-area');
+        if (authArea) {
+          if (isLoggedIn) {
+            const profile = await getProfile();
+            authArea.innerHTML = `
+              <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+                <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+              </a>`;
+            if (profile && profile.avatar_url) {
+              const av = document.getElementById('header-avatar');
+              if (av) av.src = profile.avatar_url;
+            }
+          } else {
+            authArea.innerHTML = `
+              <div class="flex items-center gap-1">
+                <a href="/auth/login.html" class="px-3 py-1.5 text-on-surface hover:text-primary font-label-caps text-label-caps transition-colors">
+                  Log In
+                </a>
+                <a href="/auth/login.html?signup=true" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                  Sign Up
+                </a>
+              </div>`;
           }
-        } else {
-          document.getElementById('header-auth-area').innerHTML = `
-            <a href="/auth/login.html" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
-              <span class="material-symbols-outlined text-[16px]">login</span>
-              Log In / Sign Up
-            </a>`;
         }
       }
 
@@ -34,7 +41,9 @@
         }
       }
 
-      initMarketplace();
+      document.addEventListener('DOMContentLoaded', () => {
+        initMarketplace();
+      });
     </script>
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Marketplace</h1>
 
