@@ -11,6 +11,17 @@ const supabaseLib = window.supabase || window.Supabase;
 if (!supabaseLib) { console.error('Supabase SDK not loaded! Check the CDN script tag.'); }
 window.supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+window.escapeHTML = function(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[tag] || tag));
+};
+
 // Helper: Get Current User Profile
 async function getProfile() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -199,7 +210,7 @@ function renderProductCard(product) {
         </button>
       </div>
       <div class="p-4 flex flex-col gap-1">
-        <h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">${product.title}</h4>
+        <h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">${escapeHTML(product.title)}</h4>
         <p class="font-label-caps text-label-caps text-on-surface-variant">${condition}</p>
         <div class="flex items-center justify-between mt-1">
           <span class="font-title-md text-[18px] text-primary-container">${price}</span>
