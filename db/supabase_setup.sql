@@ -9,6 +9,7 @@ CREATE TABLE public.profiles (
   enrollment_number TEXT,
   year_of_study TEXT,
   id_url TEXT,
+  father_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -216,3 +217,7 @@ USING (
 
 -- Add college column
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS college TEXT;
+
+
+-- Added later
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS father_name TEXT;

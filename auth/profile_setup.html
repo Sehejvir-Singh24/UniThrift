@@ -101,6 +101,14 @@
         <span class="material-symbols-outlined absolute right-4 pointer-events-none text-on-surface-variant opacity-60 group-hover:text-primary transition-colors">expand_more</span>
     </div>
 </div>
+<!-- Input Group: Father's Name -->
+<div class="flex flex-col gap-2 group mb-4">
+  <label class="font-label-caps text-on-surface-variant ml-2 transition-colors group-focus-within:text-primary" for="father-name">Father’s Name</label>
+  <div class="relative flex items-center bg-surface-container-low rounded-xl focus-within:bg-surface-container transition-colors duration-200">
+    <span class="material-symbols-outlined absolute left-4 text-on-surface-variant opacity-60">family_restroom</span>
+    <input class="w-full bg-transparent font-body-lg text-on-surface py-4 pl-12 pr-4 outline-none placeholder:text-on-surface-variant/40 capitalize" id="father-name" oninput="checkFormCompleteness()" placeholder="As per university records" required type="text"/>
+  </div>
+</div>
 <!-- Input Group: Full Name -->
 <div class="flex flex-col gap-2 group">
 <label class="font-label-caps text-on-surface-variant ml-2 transition-colors group-focus-within:text-primary" for="fullname">Full Name</label>
@@ -167,18 +175,21 @@
 
         function checkFormCompleteness() {
             const enrollment = document.getElementById('enrollment').value;
+            const fatherName = document.getElementById(\'father-name\').value;
+            const fatherName = document.getElementById(\'father-name\').value;
             const fullname = document.getElementById('fullname').value;
             const college = document.getElementById('college').value;
             const phone = document.getElementById('phone').value;
             const btn = document.getElementById('next-btn');
 
             const isEnrollmentValid = (selectedYear === '1st Year' && enrollment.length === 0) || enrollment.length === 11;
+            const isFatherNameValid = fatherName.trim().length > 2;
             
             const defaultPlaceholder = "https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz";
             const avatarSrc = document.getElementById('profile-avatar').src;
             const hasAvatar = croppedBlob || (avatarSrc && avatarSrc !== defaultPlaceholder);
 
-            const isValid = isEnrollmentValid && fullname.length > 2 && phone.length === 10 && college && hasAvatar;
+            const isValid = isEnrollmentValid && isFatherNameValid && fullname.length > 2 && phone.length === 10 && college && hasAvatar;
 
             if (isValid) {
                 btn.removeAttribute('disabled');
@@ -224,6 +235,7 @@
             const progressBar = document.getElementById('progress-bar');
             
             const enrollment = document.getElementById('enrollment').value;
+            const fatherName = document.getElementById(\'father-name\').value;
             const fullname = document.getElementById('fullname').value;
             const college = document.getElementById('college').value;
             const phone = document.getElementById('phone').value;
@@ -246,7 +258,13 @@
                     phone_number: phone,
                     enrollment_number: enrollment,
                     year_of_study: selectedYear,
-                    college: college
+                    college: college,
+                    father_name: fatherName.trim(),
+                    is_verified: true,
+                    verification_status: \'verified\',
+                    father_name: fatherName.trim(),
+                    is_verified: true,
+                    verification_status: 'verified'
                 };
 
                 if (publicUrl) {
@@ -269,7 +287,7 @@
                 if(progressBar) progressBar.style.transform = 'scaleX(1)';
                 
                 setTimeout(() => {
-                    window.location.href = '/auth/id_verification.html';
+                    window.location.href = '/index.html';
                 }, 800);
             } catch (err) {
                 alert("Error saving profile: " + err.message);
@@ -380,14 +398,8 @@
                 return;
             }
             const profile = await getProfile();
-            if (profile && profile.full_name && profile.phone_number) {
-                if (profile.is_verified) {
-                    window.location.href = '/index.html';
-                } else if (profile.id_url) {
-                    window.location.href = '/auth/pending_verification.html';
-                } else {
-                    window.location.href = '/auth/id_verification.html';
-                }
+            if (profile && profile.full_name && profile.phone_number && profile.father_name) {
+                window.location.href = \'/index.html\';
                 return;
             }
 

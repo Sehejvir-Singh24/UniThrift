@@ -291,10 +291,8 @@
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 const profile = await getProfile();
-                if(profile && !profile.full_name) {
+                if (profile && (!profile.full_name || !profile.phone_number || !profile.father_name)) {
                     window.location.href = '/auth/profile_setup.html';
-                } else if(profile && !profile.is_verified && profile.verification_status !== 'pending') {
-                    window.location.href = '/auth/id_verification.html';
                 } else {
                     window.location.href = '/index.html'; 
                 }

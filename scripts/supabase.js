@@ -66,13 +66,9 @@ async function requireVerifiedSeller() {
   }
 
   // Non-verified users cannot sell
-  if (!profile.is_verified) {
-    alert("Your Student ID has not been verified yet. You can perform this action once your ID has been verified by the admin.");
-    if (profile.verification_status === 'pending') {
-      window.location.href = '/auth/pending_verification.html';
-    } else {
-      window.location.href = '/auth/id_verification.html';
-    }
+  if (!profile.full_name || !profile.phone_number || !profile.father_name) {
+    alert("Please complete your profile before continuing.");
+    window.location.href = '/auth/profile_setup.html';
     return false;
   }
   return true;
@@ -87,18 +83,13 @@ async function verifyAction(actionCallback) {
     return false;
   }
 
-  if (profile.is_verified || profile.role === 'admin') {
+  if (profile.role === 'admin' || (profile.full_name && profile.phone_number && profile.father_name)) {
     if (actionCallback) actionCallback();
     return true;
   }
 
-  alert("Your Student ID has not been verified yet. You can perform this action once your ID has been verified by the admin.");
-  
-  if (profile.verification_status === 'pending') {
-    window.location.href = '/auth/pending_verification.html';
-  } else {
-    window.location.href = '/auth/id_verification.html';
-  }
+  alert("Please complete your profile before continuing.");
+  window.location.href = '/auth/profile_setup.html';
   return false;
 }
 
