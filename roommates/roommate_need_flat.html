@@ -292,12 +292,12 @@
         reader.onload = (e) => {
             const div = document.createElement('div');
             div.className = "relative flex-shrink-0 w-28 h-28 rounded-[16px] overflow-hidden shadow-sm";
-            div.innerHTML = \`
-                <img src="\${e.target.result}" class="w-full h-full object-cover"/>
-                <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-error rounded-full flex items-center justify-center text-white shadow-sm" onclick="event.stopPropagation(); removeImage(\${index})">
+            div.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-full object-cover"/>
+                <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-error rounded-full flex items-center justify-center text-white shadow-sm" onclick="event.stopPropagation(); removeImage(${index})">
                     <span class="material-symbols-outlined text-[14px]">close</span>
                 </button>
-            \`;
+            `;
             container.appendChild(div);
         };
         reader.readAsDataURL(file);
@@ -320,7 +320,7 @@
       
       const tags = [];
       document.querySelectorAll('.lifestyle-chip.bg-primary').forEach(chip => {
-          const txt = chip.textContent.replace(/[^\\w\\s-]/g, '').replace(/\\s+/g, ' ').trim();
+          const txt = chip.textContent.replace(/[^ws-]/g, '').replace(/s+/g, ' ').trim();
           tags.push(txt);
       });
       
@@ -338,7 +338,7 @@
           return;
       }
       
-      const title = listingType === 'need_flat' ? \`Need \${roomType} in \${areas[0]}\` : \`Have \${roomType} in \${areas[0]}\`;
+      const title = listingType === 'need_flat' ? `Need ${roomType} in ${areas[0]}` : `Have ${roomType} in ${areas[0]}`;
       
       // Upload images if any
       let uploadedImageUrls = [];
