@@ -31,16 +31,13 @@
       document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
 
-    // Intercept all links pointing to roommates or pghostels
-    document.querySelectorAll('a[href*="/roommates/"], a[href*="/pghostels/"]').forEach(function (link) {
+    // Intercept all links pointing to pghostels
+    document.querySelectorAll('a[href*="/pghostels/"]').forEach(function (link) {
       link.addEventListener('click', function (e) {
         e.preventDefault();
         const href = link.getAttribute('href') || '';
-        const isRoommate = href.includes('/roommates/');
-        const title = isRoommate ? 'Roommate Finder' : 'PG & Hostel Finder';
-        const desc = isRoommate
-          ? "Find your perfect flatmate from verified GGSIPU students. We're building something awesome for you!"
-          : "Browse verified PGs and hostels near your campus. We're putting the finishing touches on this!";
+        const title = 'PG & Hostel Finder';
+        const desc = "Browse verified PGs and hostels near your campus. We're putting the finishing touches on this!";
         showComingSoon(title, desc);
       });
     });
