@@ -66,7 +66,7 @@
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
-  <script>requireAuth();</script>
+  <!-- Auth is checked in DOMContentLoaded below -->
 </head>
 <body class="bg-background font-body-lg text-on-background">
   <header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
@@ -74,8 +74,12 @@
       <div class="flex items-center gap-stack-sm">
         <span class="font-title-md text-title-md text-on-surface">Activity Hub</span>
       </div>
-      <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+      <a href="/core/profile.html" id="header-profile-link" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer hidden">
         <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+      </a>
+      <a href="/auth/login.html" id="header-login-btn" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform hidden">
+        <span class="material-symbols-outlined text-[16px]">login</span>
+        Log In / Sign Up
       </a>
     </div>
   </header>
@@ -137,6 +141,44 @@
     let allActivity = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
+      const isLoggedIn = await checkAuth();
+
+      if (!isLoggedIn) {
+        // Show guest state in header
+        document.getElementById('header-login-btn').classList.remove('hidden');
+
+        // Replace activity feed with guest placeholder
+        document.getElementById('activity-feed').innerHTML = `
+          <div class="flex flex-col items-center justify-center py-16 text-center gap-5 px-4">
+            <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Sign in to see your activity</h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[280px] mx-auto">
+                Offers, chats, and updates for your listings will all appear here once you log in.
+              </p>
+            </div>
+            <div class="flex flex-col gap-3 w-full max-w-xs mt-2">
+              <a href="/auth/login.html" class="w-full py-3.5 bg-primary text-on-primary rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-transform">
+                <span class="material-symbols-outlined text-[20px]">login</span>
+                Log In
+              </a>
+              <a href="/auth/login.html" class="w-full py-3.5 bg-surface-container text-on-surface rounded-2xl font-title-md text-title-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+                <span class="material-symbols-outlined text-[20px]">person_add</span>
+                Sign Up
+              </a>
+            </div>
+          </div>
+        `;
+        // Hide the tab switcher since it's irrelevant for guests
+        document.querySelector('.flex.bg-surface-container-low')?.classList.add('hidden');
+        return;
+      }
+
+      // --- Logged-in user flow ---
+      document.getElementById('header-profile-link').classList.remove('hidden');
+
       // Header avatar
       const profile = await getProfile();
       if (profile && profile.avatar_url) {

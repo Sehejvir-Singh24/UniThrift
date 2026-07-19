@@ -11,57 +11,83 @@
         return 'Good evening';
       }
 
-      async function checkVerificationStatus() {
-        const profile = await getProfile();
-        if (profile && !profile.full_name) {
-          window.location.href = '/auth/profile_setup.html';
-        } else if (profile && !profile.is_verified && profile.verification_status !== 'pending') {
-          window.location.href = '/auth/id_verification.html';
-        } else if (profile) {
+      async function initPage() {
+        const isLoggedIn = await checkAuth();
+
+        if (isLoggedIn) {
+          // --- Logged-in user flow ---
+          const profile = await getProfile();
+
+          // Redirect unfinished onboarding
+          if (profile && !profile.full_name) {
+            window.location.href = '/auth/profile_setup.html'; return;
+          } else if (profile && !profile.is_verified && profile.verification_status !== 'pending') {
+            window.location.href = '/auth/id_verification.html'; return;
+          }
+
+          // Personalize header
+          if (profile && profile.avatar_url) {
+            document.getElementById('header-avatar').src = profile.avatar_url;
+          }
+          document.getElementById('header-auth-area').innerHTML = `
+            <button onclick="logout()" class="text-on-surface-variant hover:text-error transition-colors flex items-center justify-center bg-surface-container rounded-full p-2 shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">logout</span>
+            </button>
+            <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer">
+              <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
+            </a>`;
+          if (profile && profile.avatar_url) {
+            const av = document.getElementById('header-avatar');
+            if (av) av.src = profile.avatar_url;
+          }
+
           // Personalize greeting
-          const firstName = profile.full_name ? profile.full_name.split(' ')[0] : '';
+          const firstName = profile && profile.full_name ? profile.full_name.split(' ')[0] : '';
           document.getElementById('greeting-text').textContent = `${getGreeting()}, ${firstName} 👋`;
 
-          // Load live products
-          const products = await getLatestProducts(4);
-          const grid = document.getElementById('trending-grid');
-          const placeholder = document.getElementById('trending-placeholder');
+        } else {
+          // --- Guest flow ---
+          document.getElementById('header-auth-area').innerHTML = `
+            <a href="/auth/login.html" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform">
+              <span class="material-symbols-outlined text-[16px]">login</span>
+              Log In / Sign Up
+            </a>`;
+          document.getElementById('greeting-text').textContent = `${getGreeting()} 👋`;
+        }
 
-          if (products.length === 0) {
-            placeholder.innerHTML = `
-              <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                <span class="material-symbols-outlined text-[32px]">storefront</span>
-              </div>
-              <p class="font-body-sm text-body-sm text-on-surface-variant">No items listed yet.</p>
-              <p class="font-label-caps text-label-caps text-primary-container">Be the first to sell!</p>
-            `;
-          } else {
-            placeholder.remove();
-            products.forEach(p => {
-              grid.insertAdjacentHTML('beforeend', renderProductCard(p));
-            });
-          }
+        // Load products for everyone
+        const products = await getLatestProducts(4);
+        const grid = document.getElementById('trending-grid');
+        const placeholder = document.getElementById('trending-placeholder');
+
+        if (products.length === 0) {
+          placeholder.innerHTML = `
+            <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[32px]">storefront</span>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">No items listed yet.</p>
+            <p class="font-label-caps text-label-caps text-primary-container">Be the first to sell!</p>
+          `;
+        } else {
+          placeholder.remove();
+          products.forEach(p => {
+            grid.insertAdjacentHTML('beforeend', renderProductCard(p));
+          });
         }
       }
 
-      requireAuth().then((isAuth) => {
-        if (isAuth) checkVerificationStatus();
-      });
+      initPage();
 
       supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          checkVerificationStatus();
+          initPage();
         }
       });
     </script>
   </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Dashboard</h1>
 
-<div class="flex items-center gap-3">
-  <button onclick="logout()" class="text-on-surface-variant hover:text-error transition-colors flex items-center justify-center bg-surface-container rounded-full p-2 shadow-sm">
-    <span class="material-symbols-outlined text-[20px]">logout</span>
-  </button>
-  
-  <a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a>
+<div class="flex items-center gap-3" id="header-auth-area">
+  <!-- Populated dynamically by initPage() based on auth state -->
 </div>
 </div></header>
 
@@ -69,6 +95,15 @@
   async function logout() {
     await supabase.auth.signOut();
     window.location.href = '/auth/login.html';
+  }
+
+  async function handleSellClick() {
+    const isLoggedIn = await checkAuth();
+    if (isLoggedIn) {
+      window.location.href = '/marketplace/add_photos.html';
+    } else {
+      window.location.href = '/auth/login.html';
+    }
   }
 </script>
 
@@ -306,7 +341,7 @@
 </div>
 
 <!-- Floating Action Button for Selling -->
-<button onclick="window.location.href='/marketplace/add_photos.html'" class="fixed bottom-[120px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
+<button onclick="handleSellClick()" class="fixed bottom-[120px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
     <span class="material-symbols-outlined text-[24px]">add</span>
     <span class="font-title-md text-[16px]">Sell</span>
 </button>

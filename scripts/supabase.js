@@ -40,6 +40,14 @@ async function requireAuth() {
   return true;
 }
 
+// Helper: Check Authentication (non-redirecting)
+// Returns true if a session exists, false otherwise.
+// Use this on guest-browsable pages instead of requireAuth().
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return !!session;
+}
+
 // Helper: Require Verified Seller
 // Redirects to pending_verification or id_verification if user is not verified.
 async function requireVerifiedSeller() {

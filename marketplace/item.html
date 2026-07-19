@@ -5,9 +5,39 @@
     <script src="/scripts/supabase.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-      requireAuth();
+      let _isLoggedIn = false;
+
+      async function initItemPage() {
+        _isLoggedIn = await checkAuth();
+        if (_isLoggedIn) {
+          const profile = await getProfile();
+          const headerAuth = document.getElementById('header-auth-area');
+          if (headerAuth) {
+            headerAuth.innerHTML = `<a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a>`;
+            if (profile && profile.avatar_url) {
+              const av = document.getElementById('header-avatar');
+              if (av) av.src = profile.avatar_url;
+            }
+          }
+        } else {
+          const headerAuth = document.getElementById('header-auth-area');
+          if (headerAuth) {
+            headerAuth.innerHTML = `<a href="/auth/login.html" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps shadow-sm hover:scale-105 active:scale-95 transition-transform"><span class="material-symbols-outlined text-[16px]">login</span>Log In</a>`;
+          }
+        }
+      }
+
+      function requireLoginForAction(callback) {
+        if (_isLoggedIn) {
+          verifyAction(callback);
+        } else {
+          window.location.href = '/auth/login.html';
+        }
+      }
+
+      initItemPage();
     </script>
-  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-14 px-4 flex items-center"><button class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back_ios_new</span></button><h1 class="flex-1 font-title-md text-title-md text-center text-on-surface mr-8">Product Detail</h1><a href="/core/profile.html" class="block w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20 hover:scale-105 transition-transform cursor-pointer"><img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></a></div></header><main class="pt-14 pb-safe bg-background min-h-screen"><div class="flex flex-col md:flex-row md:max-w-5xl md:mx-auto md:pt-8 md:px-6 md:gap-12 w-full items-start">
+  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-14 px-4 flex items-center"><button class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back_ios_new</span></button><h1 class="flex-1 font-title-md text-title-md text-center text-on-surface mr-8">Product Detail</h1><div id="header-auth-area" class="flex items-center"></div></div></header><main class="pt-14 pb-safe bg-background min-h-screen"><div class="flex flex-col md:flex-row md:max-w-5xl md:mx-auto md:pt-8 md:px-6 md:gap-12 w-full items-start">
 <!-- Left Column: Image Carousel -->
 <div class="relative w-full md:w-1/2 pt-4 md:pt-0 md:sticky md:top-24">
 <div id="product-images" class="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 md:px-0 pb-6 hide-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -84,10 +114,10 @@
 
 <!-- Desktop Bottom Actions -->
 <div id="action-buttons-desktop" class="hidden md:flex gap-3 mt-2">
-  <button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-4 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-surface-variant">
+  <button onclick="requireLoginForAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-4 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-surface-variant">
     Make Offer
   </button>
-  <button onclick="verifyAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
+  <button onclick="requireLoginForAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-4 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98] hover:bg-on-primary-fixed-variant">
     Reserve Item
   </button>
 </div>
@@ -100,10 +130,10 @@
 <!-- Sticky Bottom Bar (Mobile) -->
 <div id="action-buttons-mobile" class="md:hidden fixed bottom-0 left-0 right-0 glass shadow-[0_-4px_24px_rgba(0,0,0,0.04)] px-5 pb-safe pt-4 z-40 rounded-t-3xl">
 <div class="flex gap-3 max-w-lg mx-auto pb-4">
-<button onclick="verifyAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-3.5 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98]">
+<button onclick="requireLoginForAction(() => document.getElementById('offer-modal').classList.remove('hidden'))" class="flex-1 bg-surface-container shadow-sm text-on-surface py-3.5 rounded-xl text-center font-title-md text-title-md transition-transform active:scale-[0.98]">
         Make Offer
 </button>
-<button onclick="verifyAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
+<button onclick="requireLoginForAction(() => document.getElementById('reserve-modal').classList.remove('hidden'))" class="flex-1 bg-primary text-on-primary shadow-md py-3.5 rounded-xl font-title-md text-title-md transition-transform active:scale-[0.98]">
         Reserve Item
 </button>
 </div>
