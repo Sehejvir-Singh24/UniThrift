@@ -84,6 +84,7 @@
         } else {
           if (placeholder) placeholder.remove();
           if (grid) {
+            grid.innerHTML = '';
             products.forEach(p => {
               grid.insertAdjacentHTML('beforeend', renderProductCard(p));
             });
