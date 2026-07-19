@@ -667,7 +667,7 @@
 
         // --- FLATMATES TAB ---
         async function loadFlatmates() {
-            roommatePostings = await getRoommateListings();
+            roommatePostings = await getAllRoommateListingsAdmin();
             const grid = document.getElementById('flatmates-grid');
             const emptyState = document.getElementById('flatmates-empty');
             const badge = document.getElementById('flatmates-count-badge');
@@ -696,6 +696,13 @@
                     tagsHTML = post.tags.map(t => `<span class="bg-primary/10 text-primary font-body-sm text-[12px] px-2.5 py-1 rounded-full">${t}</span>`).join('');
                 }
 
+                let imagesHTML = '';
+                if (post.images && post.images.length > 0) {
+                    imagesHTML = `<div class="flex gap-2 overflow-x-auto mb-3 pb-2">
+                        ${post.images.map(img => `<img src="${img}" class="h-24 w-28 object-cover rounded-lg shadow-sm border flex-shrink-0" alt="Room Photo" />`).join('')}
+                    </div>`;
+                }
+
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center gap-3 mb-4">
@@ -705,17 +712,18 @@
                                 <p class="font-body-sm text-[12px] text-secondary">${profile.college || 'GGSIPU'} • ${profile.year_of_study || 'N/A'}</p>
                             </div>
                         </div>
-                        <h4 class="font-headline-lg-mobile text-[18px] text-on-surface mb-2">${post.title}</h4>
+                        <h4 class="font-headline-lg-mobile text-[18px] text-on-surface mb-2">${post.listing_type === 'have_flat' ? 'Have Room in ' : 'Need Room in '}${post.preferred_area || 'Flexible'}</h4>
                         <div class="grid grid-cols-2 gap-2 bg-surface-container-low p-3 rounded-xl mb-3">
                             <div>
-                                <div class="text-[10px] uppercase font-label-caps text-secondary">Budget</div>
-                                <div class="font-title-md text-[16px] text-primary">₹${post.budget}/mo</div>
+                                <div class="text-[10px] uppercase font-label-caps text-secondary">${post.listing_type === 'have_flat' ? 'Rent' : 'Budget'}</div>
+                                <div class="font-title-md text-[16px] text-primary">₹${post.rent || post.budget}/mo</div>
                             </div>
                             <div>
                                 <div class="text-[10px] uppercase font-label-caps text-secondary">Area</div>
                                 <div class="font-title-md text-[16px] text-on-surface truncate">${post.preferred_area || 'Flexible'}</div>
                             </div>
                         </div>
+                        ${imagesHTML}
                         <p class="font-body-sm text-on-surface-variant line-clamp-3 mb-4 leading-relaxed">${post.bio || 'No bio provided.'}</p>
                         <div class="flex flex-wrap gap-1.5 mb-4">${tagsHTML}</div>
                     </div>

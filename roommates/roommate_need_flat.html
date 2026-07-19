@@ -438,6 +438,47 @@
          }
       });
     }
+    
+    // Edit mode pre-fill
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('edit') === 'true') {
+      try {
+        const listing = await getUserRoommateListing();
+        if (listing) {
+          selectListingType(listing.listing_type);
+          
+          if (document.getElementById('budget-slider')) {
+             document.getElementById('budget-slider').value = listing.rent || listing.budget || 5000;
+             document.getElementById('budget-slider').dispatchEvent(new Event('input'));
+          }
+          
+          if (listing.preferred_gender) {
+             const genderBtns = document.querySelectorAll('#flatmate-options .flex > button');
+             genderBtns.forEach(b => {
+                if (b.textContent.trim().toLowerCase() === listing.preferred_gender.toLowerCase()) {
+                   b.click();
+                }
+             });
+          }
+          
+          if (listing.bio && document.getElementById('bio')) {
+             document.getElementById('bio').value = listing.bio;
+          }
+          
+          if (listing.preferred_area && document.getElementById('custom-area-input')) {
+             document.getElementById('custom-area-input').value = listing.preferred_area;
+          }
+          
+          if (listing.listing_type === 'have_flat') {
+             setTimeout(() => {
+                alert('Note: For security reasons, you must re-select your room photos when editing your post. Your old photos cannot be pre-filled.');
+             }, 500);
+          }
+        }
+      } catch(e) {
+        console.error("Error pre-filling edit mode:", e);
+      }
+    }
   });
 </script></main></body></html>
 

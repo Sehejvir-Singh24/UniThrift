@@ -188,10 +188,40 @@
       ? '<span class="px-3 py-1 bg-primary/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-primary shadow-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">home</span> Room Available</span>'
       : '<span class="px-3 py-1 bg-surface-container-highest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-primary">search</span> Looking for Room</span>';
 
+    let amenitiesHTML = '';
+    if (isProvider && post.amenities && post.amenities.length > 0) {
+      amenitiesHTML = `
+        <div class="flex flex-col gap-3">
+          <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Amenities</h4>
+          <div class="flex flex-wrap gap-2">
+            ${post.amenities.map(a => `<span class="px-3 py-1.5 bg-surface-container rounded-full font-body-sm text-body-sm text-on-surface flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">check_circle</span> ${a}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    const mainImage = isProvider && post.images && post.images.length > 0 ? post.images[0] : avatar;
+    const nameSection = isProvider && post.images && post.images.length > 0 
+      ? `<div class="flex items-center gap-3 text-white">
+           <img src="${avatar}" class="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" alt="Avatar"/>
+           <div>
+             <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
+             <p class="font-body-sm text-body-sm text-white/90 mt-0.5 flex items-center gap-1">
+               <span class="material-symbols-outlined text-[14px]">school</span> ${year} • ${college}
+             </p>
+           </div>
+         </div>`
+      : `<div class="flex items-baseline gap-2 text-white">
+           <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
+         </div>
+         <p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
+           <span class="material-symbols-outlined text-[16px]">school</span> ${year} • ${college}
+         </p>`;
+
     card.innerHTML = `
       <div class="relative w-full h-[55%] bg-surface-variant">
         <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent z-10 pointer-events-none"></div>
-        <img class="w-full h-full object-cover" src="${avatar}" alt="${name}"/>
+        <img class="w-full h-full object-cover" src="${mainImage}" alt="${name}"/>
         <div class="absolute top-4 left-4 z-20 flex gap-2">
           ${typeBadge}
           <span class="px-3 py-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full font-label-caps text-label-caps text-on-surface shadow-sm flex items-center gap-1">
@@ -199,12 +229,7 @@
           </span>
         </div>
         <div class="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10">
-          <div class="flex items-baseline gap-2 text-white">
-            <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold truncate max-w-[200px]">${name}</h3>
-          </div>
-          <p class="font-body-sm text-body-sm text-white/90 mt-1 flex items-center gap-1">
-            <span class="material-symbols-outlined text-[16px]">school</span> ${year} • ${college}
-          </p>
+          ${nameSection}
         </div>
       </div>
       <div class="p-5 flex flex-col gap-stack-md h-[45%] overflow-y-auto pb-20 scrollbar-hide">
@@ -222,6 +247,7 @@
             </div>
           </div>
         </div>
+        ${amenitiesHTML}
         <div class="flex flex-col gap-3">
           <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Lifestyle</h4>
           <div class="flex flex-wrap gap-2">${tagsHTML || '<span class="text-on-surface-variant font-body-sm">Flexible preferences</span>'}</div>
@@ -307,16 +333,7 @@
       return;
     }
     if (_myListingId) {
-      if (confirm('You already have an active post. Delete it and create a new one?')) {
-        try {
-          await deleteRoommateListing(_myListingId);
-          _myListingId = null;
-          document.getElementById('fab-label').textContent = 'Need Flat';
-          window.location.href = '/roommates/roommate_need_flat.html';
-        } catch(e) {
-          alert('Could not remove existing post. Try again.');
-        }
-      }
+      window.location.href = '/roommates/roommate_need_flat.html?edit=true';
     } else {
       window.location.href = '/roommates/roommate_need_flat.html';
     }
