@@ -682,6 +682,22 @@ async function deleteRoommateListingAdmin(id) {
   }
 }
 
+// Helper: Get local areas for a specific college
+async function getCollegeAreas(collegeName) {
+  if (!collegeName) return [];
+  const { data, error } = await supabase
+    .from('college_areas')
+    .select('areas')
+    .eq('college_name', collegeName)
+    .single();
+    
+  if (error) {
+    console.warn("Could not fetch college areas for", collegeName, error);
+    return [];
+  }
+  return data?.areas || [];
+}
+
 // Helper: Create PG Listing
 async function createPGListing(pgData) {
   const { error } = await supabase

@@ -30,11 +30,14 @@
 <!-- Location Section -->
 <section class="space-y-stack-md">
 <h2 class="font-title-md text-title-md text-on-surface">Preferred Areas</h2>
-<div class="flex flex-wrap gap-unit">
-<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-primary text-on-primary transition-all shadow-[0_4px_12px_rgba(34,197,94,0.2)]">North Campus</button>
-<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">GTB Nagar</button>
-<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Hudson Lane</button>
-<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">Rohini</button>
+<div class="flex flex-wrap gap-unit" id="areas-container">
+<!-- Default generic chips in case DB fails -->
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-primary text-on-primary transition-all shadow-[0_4px_12px_rgba(34,197,94,0.2)]">Delhi NCR</button>
+<button class="area-chip px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface transition-all">North Campus</button>
+</div>
+<div class="relative bg-surface-container rounded-xl p-3 flex items-center mt-2 focus-within:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant absolute left-3">add_location</span>
+<input type="text" id="custom-area-input" class="w-full bg-transparent pl-8 font-body-sm text-body-sm outline-none placeholder:text-on-surface-variant/60" placeholder="Type a custom area and press Enter">
 </div>
 </section>
 <!-- Logistics Section (Date & Type) -->
@@ -240,6 +243,63 @@
       sessionStorage.setItem('roommate_draft', JSON.stringify(roommateDraft));
       window.location.href = '/roommates/roommate_preview.html';
   }
+
+  // Load Smart Areas and handle custom inputs
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const profile = await getProfile();
+      if (profile && profile.college) {
+        const areas = await getCollegeAreas(profile.college);
+        if (areas && areas.length > 0) {
+          const container = document.getElementById('areas-container');
+          container.innerHTML = ''; // clear default
+          areas.forEach((area, index) => {
+             const btn = document.createElement('button');
+             btn.className = `area-chip px-4 py-2 rounded-full font-body-sm text-body-sm transition-all ${index === 0 ? 'bg-primary text-on-primary shadow-[0_4px_12px_rgba(34,197,94,0.2)]' : 'bg-surface-container text-on-surface'}`;
+             btn.textContent = area;
+             btn.addEventListener('click', () => {
+                if (btn.classList.contains('bg-primary')) {
+                    btn.classList.remove('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+                    btn.classList.add('bg-surface-container', 'text-on-surface');
+                } else {
+                    btn.classList.remove('bg-surface-container', 'text-on-surface');
+                    btn.classList.add('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+                }
+             });
+             container.appendChild(btn);
+          });
+        }
+      }
+    } catch(e) { console.error("Error loading smart areas:", e); }
+
+    // Custom area input handler
+    const areaInput = document.getElementById('custom-area-input');
+    if(areaInput) {
+      areaInput.addEventListener('keypress', (e) => {
+         if (e.key === 'Enter') {
+             e.preventDefault();
+             const val = areaInput.value.trim();
+             if (val) {
+                 const container = document.getElementById('areas-container');
+                 const btn = document.createElement('button');
+                 btn.className = 'area-chip px-4 py-2 rounded-full font-body-sm text-body-sm transition-all bg-primary text-on-primary shadow-[0_4px_12px_rgba(34,197,94,0.2)]';
+                 btn.textContent = val;
+                 btn.addEventListener('click', () => {
+                    if (btn.classList.contains('bg-primary')) {
+                        btn.classList.remove('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+                        btn.classList.add('bg-surface-container', 'text-on-surface');
+                    } else {
+                        btn.classList.remove('bg-surface-container', 'text-on-surface');
+                        btn.classList.add('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(34,197,94,0.2)]');
+                    }
+                 });
+                 container.appendChild(btn);
+                 areaInput.value = '';
+             }
+         }
+      });
+    }
+  });
 </script></main></body></html>
 
 
