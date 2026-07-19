@@ -19,12 +19,16 @@ This document serves as a guide to the current structure of the UniThrift codeba
   - Initializes the Supabase client.
   - Contains helper functions like `requireAuth()`, `requireVerifiedSeller()`, `getProfile()`, `updateProfile()`, `signInWithGoogle()`, and `logout()`.
   - Integrates the "Make an Offer" system API calls: `submitOffer()`, `getReceivedOffers()`, `getSentOffers()`, and `updateOfferStatus()`.
+  - Integrates the Roommate Swiping ecosystem API calls: `getCollegeAreas()`, `createRoommateListing()`, `getRoommateListings()`, `likeRoommateListing()`, and `getAllRoommateListingsAdmin()`.
   - Runs a global DOMContentLoaded listener to automatically fetch the active profile and sync the user's avatar image to all header navigation icons (via element `#header-avatar`) across all pages.
   - Included on every secure page to ensure session persistence.
 
 - **`/db/supabase_setup.sql`**: The master SQL script containing all core table definitions (e.g., the `profiles`, `products` schemas) and Row Level Security (RLS) policies.
 - **`/db/offers_migration.sql`**: Schema configuration and RLS security policies for the `offers` table.
 - **`/db/reservation_chat_setup.sql`**: Schema configuration and RLS for the `reservations` and `meetups` tables handling the transaction lifecycle.
+- **`/db/roommate_images_migration.sql`**: Configures the `roommate_images` storage bucket and applies secure RLS policies for image uploads.
+- **`/db/college_areas_migration.sql`**: Defines the `college_areas` mapping table to power dynamic area filtering.
+- **`/db/roommate_likes_migration.sql`**: Constructs the `roommate_likes` swiping engine schema and `roommate_matches` interaction state tables.
 
 ## The Onboarding Journey (Routing Flow)
 
@@ -57,6 +61,9 @@ The app employs a strict, linear onboarding flow to ensure data integrity:
 - **`/core/offers.html`**: The Central Offers Dashboard containing tabbed panels for **Offers Received** (Seller view) and **Offers Sent** (Buyer view).
 - **`/marketplace/offer_received.html`**: Dedicated seller processing screen for a received offer, enabling accepting, rejecting, or countering.
 - **`/core/chat.html`**: The Meetup Status dashboard where users negotiate the meetup location/time and eventually view the revealed phone number.
+- **`/roommates/roommate_need_flat.html`**: Form flow for posting roommate requirements with intelligent edit-mode pre-filling and dynamic area chips.
+- **`/roommates/flatmates.html`**: The full-screen immersive swipe deck for discovering flatmates with dynamic matching logic and room photo backgrounds.
+- **`/admin/dashboard.html`**: The moderation hub that uses unfiltered API endpoints to monitor all marketplace and roommate listings, including an inline image gallery for quick spam review.
 
 ## Deprecated/Legacy Files
 - **`/auth/otp_verification.html`**: Originally used for Magic Link login, but deprecated due to Supabase sandbox rate limits on emails. Replaced entirely by the email/password and Google OAuth flows.

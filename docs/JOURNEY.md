@@ -2,8 +2,27 @@
 
 This document chronicles what we have built so far and the roadmap for what we need to build next to bring the UniThrift Premium Campus Ecosystem to life.
 
-## Session 2: Make an Offer, Google OAuth & Onboarding Cropper (Today)
-We made massive progress today, expanding the app's features from simple static mockups into a fully connected, secure, and responsive campus marketplace! Here is a recap of everything that was accomplished and integrated:
+## Session 4: Roommate Swipe Feature & Admin Moderation (Today)
+We successfully built out the entire Flatmate finding ecosystem, including a robust admin panel to monitor and moderate activity!
+
+### 1. Roommate Swiping Ecosystem
+- **Database Schema & Matching (`db/roommate_likes_migration.sql`)**: Built the architecture for `roommate_listings` and `roommate_likes`, implementing a robust algorithm that generates a "match" only when two users mutually swipe right on each other.
+- **Dynamic Area Selection (`db/college_areas_migration.sql`)**: Replaced manual text input with dynamic location chips, pulling valid areas directly from the user's `college` profile field to ensure clean data formatting.
+- **Swipe Card UI**: Converted the simple swipe cards into immersive full-screen profiles. Flat providers now feature massive background photos of their rooms along with dynamically rendered amenities tags.
+
+### 2. Room Photos & Amenities Integration
+- **Image Compression & Uploads**: Fixed image compression pipelines allowing seekers to upload high-quality room photos directly from mobile devices without timeout errors.
+- **Post Edit Functionality**: Built a seamless "Edit Post" flow that detects an active listing and intelligently pre-fills the form with budget, gender, bio, and area data, bypassing the destructive "delete and start over" flow.
+
+### 3. Admin Dashboard Capabilities
+- **Unfiltered Monitoring**: Created a dedicated `getAllRoommateListingsAdmin()` function to allow admins to see ALL postings regardless of their own swipe activity or college filtering.
+- **Visual Moderation Tool**: Added a horizontally scrollable gallery directly inside the admin review cards, allowing moderators to instantly spot and delete spam room photos without leaving the dashboard.
+- **Dynamic Formatting**: Fixed data-rendering bugs ensuring that "Budget" vs "Rent" and auto-generated titles accurately reflect seeker vs provider intents.
+
+---
+
+## Session 2: Make an Offer, Google OAuth & Onboarding Cropper (Yesterday)
+We made massive progress, expanding the app's features from simple static mockups into a fully connected, secure, and responsive campus marketplace! Here is a recap of everything that was accomplished and integrated:
 
 ### 1. Mobile UI Responsiveness & Layout Fixes
 - Removed global `min-height` calculations which were causing layout shifting and "bouncing" scroll bugs on mobile devices.
