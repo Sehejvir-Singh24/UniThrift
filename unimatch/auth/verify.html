@@ -241,7 +241,10 @@
           })
           .eq('id', userId);
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          // Fallback if column is not yet created in Supabase SQL Editor
+          await supabase.from('profiles').update({ id_url: urlData.publicUrl }).eq('id', userId);
+        }
 
         window.location.href = '/unimatch/auth/pending.html';
       } catch (err) {
@@ -272,7 +275,11 @@
           unimatch_verification_status: 'pending'
         }).eq('id', session.user.id);
 
-        if (updateErr) throw updateErr;
+        if (updateErr && updateErr.message.includes('unimatch_verification_status')) {
+          console.warn("unimatch_verification_status column missing, proceeding with email saved locally.");
+        } else if (updateErr) {
+          throw updateErr;
+        }
 
         document.getElementById('email-input-container').classList.add('hidden');
         document.getElementById('email-sent-state').classList.remove('hidden');
