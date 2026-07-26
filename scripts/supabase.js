@@ -615,16 +615,23 @@ async function logout() {
 
 // Helper: Get Pending Verifications (for Admins)
 async function getPendingVerifications() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('verification_status', 'pending')
-    .order('created_at', { ascending: true });
-  if (error) {
-    console.error("Error fetching pending verifications:", error);
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+
+    return data.filter(p => 
+      p.unimatch_verification_status === 'pending' || 
+      p.verification_status === 'pending' || 
+      (p.id_url && p.id_url.trim().length > 0 && !p.is_verified && p.unimatch_verification_status !== 'verified')
+    );
+  } catch (e) {
+    console.error("Error in getPendingVerifications:", e);
     return [];
   }
-  return data || [];
 }
 
 // Helper: Get All Roommate Listings (for Admin Dashboard)
@@ -661,6 +668,7 @@ async function approveVerification(userId) {
     .update({
       is_verified: true,
       verification_status: 'verified',
+      unimatch_verification_status: 'verified',
       verification_feedback: null
     })
     .eq('id', userId);
@@ -677,7 +685,8 @@ async function rejectVerification(userId, feedback) {
     .update({
       is_verified: false,
       verification_status: 'rejected',
-      verification_feedback: feedback
+      unimatch_verification_status: 'rejected',
+      verification_feedback: feedback || 'ID Card not legible or invalid college email.'
     })
     .eq('id', userId);
   if (error) {

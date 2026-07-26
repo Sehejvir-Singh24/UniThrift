@@ -160,7 +160,14 @@
                 <h2 class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Control Panel</h2>
             </div>
 
-            <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn bg-primary-container text-on-primary-container rounded-xl mx-3 my-1 px-4 py-3 flex items-center gap-3 transition-all active:scale-98">
+            <button onclick="switchTab('verifications')" id="nav-verifications" class="nav-btn bg-primary-container text-on-primary-container rounded-xl mx-3 my-1 px-4 py-3 flex items-center justify-between transition-all active:scale-98">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">verified</span>
+                    <span class="font-label-caps text-[13px] tracking-wide text-left">ID Verifications</span>
+                </div>
+                <span id="pending-verifications-badge" class="px-2 py-0.5 bg-error text-white text-[11px] font-bold rounded-full hidden">0</span>
+            </button>
+            <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn text-on-surface-variant hover:bg-surface-variant/30 rounded-xl mx-3 my-1 px-4 py-3 flex items-center gap-3 transition-all active:scale-98">
                 <span class="material-symbols-outlined text-[20px]">storefront</span>
                 <span class="font-label-caps text-[13px] tracking-wide text-left">Marketplace</span>
             </button>
@@ -187,8 +194,32 @@
                 
 
 
+                <!-- SECTION: ID VERIFICATIONS -->
+                <section id="sec-verifications" class="tab-section">
+                    <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
+                        <div>
+                            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Student ID Verifications</h2>
+                            <p class="font-body-lg text-body-lg text-secondary">Review uploaded college ID cards, student emails, and UniMatch profile details to approve or reject verification.</p>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span id="verifications-count-badge" class="px-3 py-1 bg-surface-container-highest text-primary font-label-caps text-label-caps rounded-full">0 Pending</span>
+                        </div>
+                    </div>
+                    <div id="verifications-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Rendered dynamically -->
+                    </div>
+                    <!-- Empty State -->
+                    <div id="verifications-empty" class="hidden flex flex-col items-center justify-center p-12 text-center bg-surface-container-lowest rounded-3xl border border-dashed border-outline-variant/50">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                            <span class="material-symbols-outlined text-[32px]" style="font-variation-settings:'FILL' 1;">verified</span>
+                        </div>
+                        <h3 class="font-title-md text-title-md text-on-surface mb-1">All Caught Up!</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">There are no pending ID card or student email verification requests right now.</p>
+                    </div>
+                </section>
+
                 <!-- SECTION: MARKETPLACE -->
-                <section id="sec-marketplace" class="tab-section">
+                <section id="sec-marketplace" class="tab-section hidden">
                     <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
                         <div>
                             <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Marketplace Listings</h2>
@@ -280,9 +311,10 @@
                                 <thead>
                                     <tr class="bg-surface-container-low border-b border-outline-variant/20 font-label-caps text-[11px] text-on-surface-variant tracking-wider uppercase">
                                         <th class="py-4 px-6">User</th>
-                                        <th class="py-4 px-6">College / Year</th>
-                                        <th class="py-4 px-6">Enrollment Number</th>
-                                        <th class="py-4 px-6">Father's Name</th>
+                                        <th class="py-4 px-6">College / Major</th>
+                                        <th class="py-4 px-6">UniMatch Instagram</th>
+                                        <th class="py-4 px-6">Verification</th>
+                                        <th class="py-4 px-6">ID Document</th>
                                         <th class="py-4 px-6">Role</th>
                                     </tr>
                                 </thead>
@@ -356,11 +388,130 @@
 
         async function initDashboard() {
             await Promise.all([
+                loadVerifications(),
                 loadMarketplace(),
                 loadFlatmates(),
                 loadPGListings(),
                 loadUsers()
             ]);
+        }
+
+        // --- ID VERIFICATIONS TAB ---
+        let pendingVerifications = [];
+
+        async function loadVerifications() {
+            pendingVerifications = await getPendingVerifications();
+            const grid = document.getElementById('verifications-grid');
+            const emptyState = document.getElementById('verifications-empty');
+            const badge = document.getElementById('verifications-count-badge');
+            const navBadge = document.getElementById('pending-verifications-badge');
+
+            if (navBadge) {
+                if (pendingVerifications.length > 0) {
+                    navBadge.textContent = pendingVerifications.length;
+                    navBadge.classList.remove('hidden');
+                } else {
+                    navBadge.classList.add('hidden');
+                }
+            }
+            if (badge) badge.innerText = `${pendingVerifications.length} Pending`;
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (pendingVerifications.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            pendingVerifications.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'bg-surface-container-lowest rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant/30 flex flex-col justify-between';
+
+                const avatar = user.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
+                const idUrl = user.id_url || '';
+                const insta = user.instagram_username ? `@${user.instagram_username.replace('@','')}` : 'Not set';
+                const verifyEmail = user.unimatch_verify_email || user.email || 'N/A';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border-2 border-primary/20" alt="Avatar"/>
+                                <div>
+                                    <h3 class="font-title-md text-[16px] text-on-surface font-bold">${escapeHTML(user.full_name) || 'Student'}</h3>
+                                    <p class="font-body-sm text-[12px] text-secondary">${escapeHTML(user.college) || 'GGSIPU'} • ${escapeHTML(user.major || user.year_of_study) || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[11px] font-bold rounded-full">Pending</span>
+                        </div>
+
+                        <!-- ID Card Document Preview -->
+                        <div class="bg-surface-container-low p-3 rounded-2xl mb-4 border border-outline-variant/20">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-bold text-secondary uppercase tracking-wider">Uploaded Student ID Card</span>
+                                ${idUrl ? `<button onclick="openLightbox('${idUrl}')" class="text-primary text-[11px] font-bold flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-[14px]">zoom_in</span> Inspect ID</button>` : ''}
+                            </div>
+                            ${idUrl ? `
+                                <div class="h-44 rounded-xl overflow-hidden bg-black/5 cursor-pointer relative group" onclick="openLightbox('${idUrl}')">
+                                    <img src="${idUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="ID Document"/>
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">Click to enlarge ID card</div>
+                                </div>
+                            ` : `
+                                <div class="h-28 rounded-xl bg-surface-container flex flex-col items-center justify-center text-secondary text-xs">
+                                    <span class="material-symbols-outlined text-[28px]">no_sim</span>
+                                    <span>No ID Photo Uploaded</span>
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- UniMatch & Verification Details -->
+                        <div class="space-y-2 text-xs bg-surface-container/40 p-3.5 rounded-xl mb-4">
+                            <div class="flex justify-between"><span class="text-secondary">Student Email:</span><span class="font-semibold text-on-surface">${escapeHTML(verifyEmail)}</span></div>
+                            <div class="flex justify-between"><span class="text-secondary">UniMatch Handle:</span><span class="font-semibold text-primary">${escapeHTML(insta)}</span></div>
+                            <div class="flex justify-between"><span class="text-secondary">Profile Setup:</span><span class="font-semibold ${user.unimatch_profile_complete ? 'text-green-600' : 'text-amber-600'}">${user.unimatch_profile_complete ? 'Complete' : 'Incomplete'}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-outline-variant/10">
+                        <button onclick="handleRejectUser('${user.id}')" class="bg-error-container text-error py-2.5 rounded-xl font-label-caps text-[12px] flex items-center justify-center gap-1 hover:bg-error hover:text-on-error transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">close</span> Reject
+                        </button>
+                        <button onclick="handleApproveUser('${user.id}')" class="bg-primary text-on-primary py-2.5 rounded-xl font-label-caps text-[12px] flex items-center justify-center gap-1 hover:opacity-95 transition-transform active:scale-95 shadow-md">
+                            <span class="material-symbols-outlined text-[16px]">verified</span> Approve Student
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function handleApproveUser(userId) {
+            if (!confirm("Approve this student's verification status? They will gain verified access on UniThrift and UniMatch.")) return;
+            try {
+                await approveVerification(userId);
+                alert("Student verified successfully!");
+                await initDashboard();
+            } catch (e) {
+                alert("Error approving user: " + e.message);
+            }
+        }
+
+        async function handleRejectUser(userId) {
+            const reason = prompt("Enter reason for rejection (or leave default):", "ID Card photo not legible or invalid student status.");
+            if (reason === null) return;
+            try {
+                await rejectVerification(userId, reason);
+                alert("Verification rejected.");
+                await initDashboard();
+            } catch (e) {
+                alert("Error rejecting user: " + e.message);
+            }
         }
 
         // --- USERS TAB ---
@@ -384,6 +535,10 @@
 
             allUsers.forEach(user => {
                 const avatar = user.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
+                const insta = user.instagram_username ? `@${user.instagram_username.replace('@','')}` : 'N/A';
+                const isVerified = user.is_verified || user.unimatch_verification_status === 'verified';
+                const statusText = isVerified ? 'Verified' : (user.unimatch_verification_status || user.verification_status || 'Unverified');
+                const statusBadgeClass = isVerified ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-surface-container-low/30 transition-colors';
@@ -399,13 +554,16 @@
                     </td>
                     <td class="py-4 px-6 text-on-surface-variant font-body-sm text-[13px]">
                         ${escapeHTML(user.college) || 'N/A'} <br/>
-                        <span class="text-secondary text-[11px]">${escapeHTML(user.year_of_study) || 'N/A'}</span>
+                        <span class="text-secondary text-[11px]">${escapeHTML(user.major || user.year_of_study) || 'N/A'}</span>
                     </td>
-                    <td class="py-4 px-6 font-mono text-[13px] text-on-surface-variant">
-                        ${escapeHTML(user.enrollment_number) || 'N/A'}
+                    <td class="py-4 px-6 text-[13px] text-primary font-semibold">
+                        ${escapeHTML(insta)}
                     </td>
-                    <td class="py-4 px-6 text-[13px] text-on-surface-variant">
-                        ${escapeHTML(user.father_name) || 'N/A'}
+                    <td class="py-4 px-6">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${statusBadgeClass}">${escapeHTML(statusText)}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        ${user.id_url ? `<button onclick="openLightbox('${user.id_url}')" class="text-xs text-primary font-semibold flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-[14px]">visibility</span> View ID</button>` : `<span class="text-xs text-secondary opacity-60">No ID</span>`}
                     </td>
                     <td class="py-4 px-6">
                         <span class="font-label-caps text-[11px] uppercase tracking-wider text-secondary">${escapeHTML(user.role) || 'customer'}</span>
