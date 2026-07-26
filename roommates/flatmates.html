@@ -329,9 +329,16 @@
     await loadListings();
   });
 
+  function resetUnlocks() {
+    localStorage.removeItem('unithrift_unlocked_flatmates');
+    renderListings();
+  }
+
   // Check if a listing's contact info is unlocked by current user
   function isListingUnlocked(listingId, listingUserId) {
-    if (_currentUserId && listingUserId && listingUserId === _currentUserId) return true;
+    if (window.location.search.includes('reset=true') || window.location.search.includes('lock=true')) {
+      localStorage.removeItem('unithrift_unlocked_flatmates');
+    }
     const unlockedList = JSON.parse(localStorage.getItem('unithrift_unlocked_flatmates') || '[]');
     return unlockedList.includes(listingId);
   }
