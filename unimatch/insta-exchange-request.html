@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exchange Instagram - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-container": "#7a1f3d", "surface-container": "#efeeec", "on-surface-variant": "#554245",
+          "surface-container-lowest": "#ffffff", "on-surface": "#1a1c1b", "outline": "#887275",
+          "background": "#faf9f7", "primary": "#5c0427", "on-primary": "#ffffff", "surface": "#faf9f7",
+          "secondary-container": "#ffca98", "secondary": "#7d562d"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "stack-gap-sm": "12px", "stack-gap-lg": "32px", "section-margin": "48px", "container-padding": "24px", "unit": "4px", "stack-gap-md": "20px" },
+        fontFamily: { "display": ["Inter"], "title-md": ["Inter"], "body-lg": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "button": ["Inter"], "body-md": ["Inter"] },
+        fontSize: {
+          "display": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+          "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+          "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "button": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+          "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { min-height: max(884px, 100dvh); background-color: #faf9f7; color: #1a1c1b; }
+  @keyframes slideRight { to { transform: translateX(0); } }
+  @keyframes slideLeft { to { transform: translateX(0); } }
+  @keyframes fadeIn { to { opacity: 1; } }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col justify-center items-center p-container-padding font-body-md antialiased">
+
+<header class="w-full flex justify-between items-center fixed top-0 left-0 p-container-padding z-50">
+  <button onclick="location.href='/unimatch/discover.html'" aria-label="Close" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[0_4px_30px_rgba(0,0,0,0.04)] text-on-surface hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+  <span class="font-display text-title-md text-primary tracking-tight font-bold">UniMatch</span>
+  <div class="w-10 h-10"></div>
+</header>
+
+<main class="w-full max-w-md mx-auto flex flex-col items-center text-center space-y-section-margin">
+
+  <!-- Overlapping Avatars -->
+  <div class="relative w-full flex justify-center items-center pt-24 pb-8">
+    <div class="flex items-center justify-center relative w-64 h-32">
+      <!-- User Avatar (Left) -->
+      <div class="absolute left-6 z-10 w-28 h-28 rounded-full border-4 border-background bg-surface-container-lowest overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] transform transition-transform duration-700 ease-out translate-x-4 animate-[slideRight_1s_ease-out_forwards]">
+        <img id="user-photo" alt="Your Profile" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=780&q=80"/>
+      </div>
+      <!-- Match Avatar (Right) -->
+      <div class="absolute right-6 z-20 w-28 h-28 rounded-full border-4 border-background bg-surface-container-lowest overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] transform transition-transform duration-700 ease-out -translate-x-4 animate-[slideLeft_1s_ease-out_forwards]">
+        <img id="match-photo" alt="Eleanor's Profile" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typography & Messaging -->
+  <div class="flex flex-col items-center space-y-stack-gap-md px-4 w-full max-w-[340px]">
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">Exchange Instagram?</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant">
+      You both completed the <span class="font-medium text-primary" id="challenge-name">Coffee Match</span> challenge! Would you like to share your Instagram with Eleanor?
+    </p>
+
+    <!-- Context Badge -->
+    <div class="mt-4 flex items-center gap-2 px-4 py-2 bg-primary-container/10 rounded-full border border-primary-container/20">
+      <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+      <span class="font-label-caps text-label-caps text-primary font-semibold">Mutual Connection Established</span>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="w-full flex flex-col gap-stack-gap-sm mt-section-margin px-container-padding max-w-[340px]">
+    <button onclick="handleShareInstagram()" class="w-full py-4 bg-primary text-on-primary font-button text-button rounded-full active:scale-95 transition-transform duration-200 ease-in-out shadow-[0_8px_30px_rgba(92,4,39,0.15)] flex items-center justify-center gap-2">
+      Share Instagram
+    </button>
+    <button onclick="location.href='/unimatch/discover.html'" class="w-full py-4 bg-transparent text-outline font-button text-button rounded-full active:scale-95 transition-transform duration-200 ease-in-out hover:text-on-surface">
+      Maybe later
+    </button>
+  </div>
+</main>
+
+<script>
+  function handleShareInstagram() {
+    window.location.href = '/unimatch/insta-exchange-success.html';
+  }
+</script>
+</body></html>

@@ -67,3 +67,107 @@ The app employs a strict, linear onboarding flow to ensure data integrity:
 
 ## Deprecated/Legacy Files
 - **`/auth/otp_verification.html`**: Originally used for Magic Link login, but deprecated due to Supabase sandbox rate limits on emails. Replaced entirely by the email/password and Google OAuth flows.
+
+## UniMatch Ecosystem Architecture (New Expansion)
+
+UniMatch is an exclusive campus dating and social networking sub-system designed with a distinct deep maroon palette (`#5c0427`, `#7a1f3d`, `#faf9f7`). It allows verified students to find study partners, friends, coffee buddies, event companions, and dating matches.
+
+### 1. Dual Ecosystem Portal (`/index.html`)
+- **Portal Landing Page:** Redesigned index page acting as the gateway choice screen between **UniThrift** (Sustainable campus marketplace) and **UniMatch** (Exclusive student community).
+- **Dynamic Header Status (`#user-status-area`):** Integrates Supabase session checking to show a user greeting (`Hi, <name>`) and Sign Out button when authenticated, or a Sign In button routing to `/unimatch/auth/login.html` when unauthenticated.
+
+### 2. Directory Structure & Page Breakdown (`/unimatch`)
+- **`/unimatch/welcome.html`**: The entry landing page featuring a full-width hero image, trust badges, and an automated auth-routing script that redirects logged-in users to their pending onboarding step (`verify.html`, `instagram.html`, `profile-setup/basic-info.html`, or `discover.html`).
+- **`/unimatch/discover.html`**: The primary full-screen card swiping deck with remaining daily likes counter, hidden admirers badge ("12 Admirers"), detailed profile bio & interest tags, and an interactive match modal overlay.
+- **`/unimatch/icebreaker.html`**: Bento grid selector featuring interactive icebreakers (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore, Surprise Me) required before exchanging Instagram handles.
+- **`/unimatch/insta-exchange-request.html` & `/unimatch/insta-exchange-success.html`**: Mutual consent request and approval flow for exchanging Instagram handles.
+- **`/unimatch/connection-success.html`**: Celebratory match notification view with direct Instagram deep-linking (`instagram://user?...`).
+- **`/unimatch/hidden-likes.html`**: Admirers discovery view displaying blurred profile cards of students who liked the user.
+- **`/unimatch/out-of-likes.html`**: Daily swipe limit state screen with return countdown and invite options.
+
+#### Authentication & Verification Subfolder (`/unimatch/auth`)
+- **`/unimatch/auth/login.html`**: Dual-mode (Sign In / Create Account) interface supporting **Google OAuth** (`signInWithOAuth`) and **Email OTP** (`signInWithOtp`, `verifyOtp`).
+- **`/unimatch/auth/verify.html`**: Student ID Verification gate enforcement for UniMatch.
+- **`/unimatch/auth/instagram.html`**: Step 2 of 3 onboarding requiring mandatory Instagram handle input (`@username`), emphasizing privacy controls.
+- **`/unimatch/auth/verified.html` & `/unimatch/auth/pending.html`**: Verification confirmation and pending status screens.
+
+#### Multi-Step Profile Setup Subfolder (`/unimatch/profile-setup`)
+- **`/unimatch/profile-setup/basic-info.html`**: Step 1 - Full Name, Major, Year of Study (1st Year through Graduate), and Bio with a 150-character live counter.
+- **`/unimatch/profile-setup/looking-for.html`**: Step 2 - Intent selection cards (Friends, Coffee Buddy, Study Partner, Event Buddy, Dating).
+- **`/unimatch/profile-setup/interests.html`**: Step 3 - Searchable interest chips grouped by Academic, Lifestyle, Hobbies, and Tech & Culture.
+- **`/unimatch/profile-setup/photos.html`**: Step 4 - Photo grid supporting 1 to 6 profile pictures uploaded directly to Supabase storage (`profile_photos` bucket).
+- **`/unimatch/profile-setup/review.html`**: Step 5 - Full profile card preview allowing inline edits before marking `unimatch_profile_complete = true`.
+
+#### Profile Management Subfolder (`/unimatch/profile`)
+- **`/unimatch/profile/my-profile.html`**: User profile management dashboard.
+- **`/unimatch/profile/edit-profile.html`**: Profile editing form.
+- **`/unimatch/profile/notifications.html`**: Social notification settings & log.
+- **`/unimatch/profile/privacy-security.html`**: Privacy, visibility, and account security controls.
+
+## Backend Connectivity & Current Supabase Status for UniMatch
+
+### Currently Linked to Supabase Backend
+1. **Authentication:** All UniMatch auth pages (`welcome.html`, `login.html`, `instagram.html`, `verify.html`) use `supabase.auth` (`getSession()`, `signInWithOAuth`, `signInWithOtp`, `verifyOtp`, `logout()`).
+2. **Profile Data Sync:** The profile setup flow (`basic-info.html`, `looking-for.html`, `interests.html`, `photos.html`, `review.html`, `instagram.html`) actively writes and reads user fields from the `profiles` table in Supabase:
+   - `full_name`, `major`, `year_of_study`, `bio`
+   - `instagram_username`
+   - `looking_for` (stored as JSON string array)
+   - `interests` (stored as JSON string array)
+   - `profile_photos` (stored as JSON array of Supabase Public Storage URLs)
+   - `unimatch_profile_complete` (boolean completion flag)
+
+### Currently NOT Linked to Supabase (Pending Backend Integration)
+1. **Discovery Profile Feed (`discover.html`):** Currently operates on a static JavaScript array (`DISCOVERY_PROFILES`). It does NOT yet query real student profiles from Supabase.
+2. **Daily Like Limits (`discover.html`):** The 5 daily likes limit (`remainingLikes`) is currently tracked in local frontend JavaScript state rather than fetched from database records.
+3. **Swiping Engine & Mutual Matches:** Calling `handleConnect()` or `handlePass()` triggers frontend-only modal popups and card index increments. It does NOT yet record likes into a `unimatch_likes` table or calculate mutual matches via a Supabase query.
+4. **Icebreakers & Instagram Exchange:** `icebreaker.html`, `insta-exchange-request.html`, `hidden-likes.html`, and `connection-success.html` present static mockup interactions without backend persistent state.
+
+### Required Supabase Migrations & Schema for Complete UniMatch Integration
+To fully connect UniMatch to Supabase, the following database schema migrations must be applied:
+
+```sql
+-- 1. Extend profiles table with UniMatch fields
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS instagram_username TEXT,
+  ADD COLUMN IF NOT EXISTS major TEXT,
+  ADD COLUMN IF NOT EXISTS bio TEXT,
+  ADD COLUMN IF NOT EXISTS looking_for JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS interests JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS profile_photos JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS unimatch_profile_complete BOOLEAN DEFAULT FALSE;
+
+-- 2. Create unimatch_likes table for swiping logic
+CREATE TABLE IF NOT EXISTS public.unimatch_likes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  liker_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  liked_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  action TEXT CHECK (action IN ('like', 'pass')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(liker_id, liked_id)
+);
+
+-- 3. Create unimatch_matches table for confirmed connections
+CREATE TABLE IF NOT EXISTS public.unimatch_matches (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user1_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user2_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  icebreaker_completed BOOLEAN DEFAULT FALSE,
+  insta_shared_user1 BOOLEAN DEFAULT FALSE,
+  insta_shared_user2 BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user1_id, user2_id)
+);
+
+-- 4. Enable Row Level Security (RLS)
+ALTER TABLE public.unimatch_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.unimatch_matches ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own likes"
+  ON public.unimatch_likes FOR ALL
+  USING (auth.uid() = liker_id);
+
+CREATE POLICY "Users can view their matches"
+  ON public.unimatch_matches FOR SELECT
+  USING (auth.uid() = user1_id OR auth.uid() = user2_id);
+```
+

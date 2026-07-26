@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Likes Reached - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "secondary-container": "#ffca98", "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4",
+          "outline": "#887275", "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff",
+          "on-surface": "#1a1c1b", "background": "#faf9f7", "primary-container": "#7a1f3d",
+          "secondary": "#7d562d", "on-primary": "#ffffff", "primary": "#5c0427", "surface": "#faf9f7",
+          "surface-container-high": "#e9e8e6",
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "section-margin": "48px", "stack-gap-lg": "32px", "container-padding": "24px", "stack-gap-md": "20px", "unit": "4px", "stack-gap-sm": "12px" },
+        fontFamily: { "title-md": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "display": ["Inter"], "body-md": ["Inter"], "button": ["Inter"] },
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #faf9f7; color: #1a1c1b; font-family: 'Inter', sans-serif; min-height: max(884px, 100dvh); }
+  .ambient-shadow { box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.04); }
+  .btn-interactive { transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease; }
+  .btn-interactive:active { transform: scale(0.97); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col bg-background">
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-container-padding py-stack-gap-sm">
+  <button onclick="location.href='/unimatch/discover.html'" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 p-2 -ml-2 rounded-full">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="font-display text-display text-primary font-bold tracking-tight">UniMatch</h1>
+  <button class="text-primary hover:opacity-80 transition-opacity font-button text-button">Help</button>
+</header>
+
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-container-padding pt-24 pb-32 max-w-md mx-auto w-full text-center">
+
+  <!-- Graphic Area -->
+  <div class="relative w-48 h-48 mb-10 flex items-center justify-center">
+    <div class="absolute inset-0 bg-primary-container rounded-full opacity-10 animate-pulse"></div>
+    <div class="absolute inset-4 bg-primary-container rounded-full opacity-20"></div>
+    <div class="z-10 bg-surface-container-lowest rounded-full p-8 ambient-shadow border border-surface-container-high relative">
+      <span class="material-symbols-outlined text-[64px] text-primary" style="font-variation-settings: 'FILL' 1, 'wght' 300;">favorite</span>
+      <div class="absolute bottom-2 right-2 bg-background border-2 border-surface-container-lowest rounded-full w-10 h-10 flex items-center justify-center ambient-shadow">
+        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">schedule</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typography -->
+  <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-gap-sm font-bold">Daily Likes Reached</h2>
+  <p class="font-body-md text-body-md text-on-surface-variant mb-section-margin max-w-[280px]">
+    You've used all 5 free likes for today. Discover more connections by unlocking premium likes.
+  </p>
+
+  <!-- Offer Card -->
+  <div class="w-full bg-surface-container-lowest rounded-[24px] p-container-padding ambient-shadow mb-stack-gap-lg border border-surface-container-high/50 flex flex-col items-center">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+      <span class="font-title-md text-title-md text-on-surface font-semibold">Get 5 more likes</span>
+    </div>
+    <span class="font-display text-[32px] leading-tight text-primary font-bold mb-4">₹59</span>
+    <button onclick="handlePurchase()" class="w-full bg-primary text-on-primary font-button text-button py-4 rounded-full btn-interactive hover:opacity-90 font-semibold shadow-lg">
+      Purchase Likes
+    </button>
+  </div>
+
+  <!-- Secondary Action -->
+  <button onclick="location.href='/unimatch/discover.html'" class="w-full bg-transparent border-none text-on-surface-variant font-button text-button py-4 rounded-full btn-interactive hover:text-on-surface hover:bg-surface-container-low transition-colors font-medium">
+    Come back tomorrow
+  </button>
+</main>
+
+<script>
+  function handlePurchase() {
+    alert("Payment successful! 5 Likes added to your daily limit.");
+    window.location.href = '/unimatch/discover.html';
+  }
+</script>
+</body></html>

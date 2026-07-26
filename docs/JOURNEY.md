@@ -93,21 +93,77 @@ We built out the core onboarding and user authentication flow:
 
 ---
 
-## What We Need To Do Next (Future Roadmap)
-Now that onboarding, authentication, profile sync, and offer submissions are fully dynamic and functional, here is what we need to tackle next:
+## Session 5: UniMatch Expansion & Multi-Step Student Discovery Ecosystem (Latest)
+We expanded the platform from a marketplace into a full-scale dual ecosystem by creating **UniMatch**—an exclusive social and dating environment tailored for verified campus students.
 
-### 1. In-App Notifications
-- **Goal:** Notify buyers/sellers when their offers are accepted, rejected, or countered.
+### 1. Dual Ecosystem Gateway Landing Page (`index.html`)
+- **Portal Interface:** Transformed `index.html` into a portal screen where users select between **UniThrift** (Sustainable campus marketplace) and **UniMatch** (Exclusive student community).
+- **Dynamic Header Auth State:** Integrated Supabase Auth session checks (`supabase.auth.getSession()`) in `index.html` to display a personalized welcome badge (`Hi, <name>`) and Sign Out button for authenticated users, or a direct Sign In button for guests.
+
+### 2. Deep Maroon Visual System & 18+ Interface Templates
+- Established the UniMatch visual system using curated HSL color tokens (`#5c0427` maroon, `#7a1f3d` container, `#faf9f7` surface).
+- Built out full page flows across `/unimatch/`, `/unimatch/auth/`, `/unimatch/profile-setup/`, and `/unimatch/profile/`.
+
+### 3. Smart Onboarding & Instagram Verification Journey
+- **Auth Guard & Routing (`welcome.html` & `auth/login.html`):** Integrated Google OAuth and Email OTP login flows. Implemented linear onboarding routing checks:
+  1. Verification Check (`/unimatch/auth/verify.html`)
+  2. Instagram Setup (`/unimatch/auth/instagram.html`)
+  3. Multi-Step Profile Setup (`/unimatch/profile-setup/basic-info.html`)
+  4. Active Discovery (`/unimatch/discover.html`)
+- **5-Step Profile Builder:**
+  - **Basic Info (`basic-info.html`):** Major, Year of Study, and live character counter (150 max) for Bio.
+  - **Intent Selection (`looking-for.html`):** Choice cards for Friends, Coffee Buddy, Study Partner, Event Buddy, and Dating.
+  - **Searchable Interests (`interests.html`):** Categorized chip selectors for Academic, Lifestyle, Hobbies, and Tech & Culture.
+  - **Photo Grid Upload (`photos.html`):** Supports uploading up to 6 profile pictures directly to Supabase Public Storage (`profile_photos` bucket).
+  - **Live Preview (`review.html`):** Interactive card preview with edit shortcuts before setting `unimatch_profile_complete = true`.
+
+### 4. Interactive Social Dynamics & Mutual Consent Protocol
+- **Full-Screen Swiping Deck (`discover.html`):** Implemented card stack rendering with verified student badges, interest chips, remaining daily likes counter, and "12 Admirers" hidden likes indicator.
+- **Icebreaker Challenge (`icebreaker.html`):** Created a Bento Grid selector for mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore).
+- **Privacy-First Instagram Exchange (`insta-exchange-request.html`, `insta-exchange-success.html`, `connection-success.html`):** Built a mutual agreement protocol so Instagram handles remain private until both users agree to share, featuring one-tap deep links (`instagram://user?...`).
+
+### 5. Supabase Connectivity Analysis & Current Gap Audit
+- **Connected & Functional:**
+  - Supabase Auth session management and Google/OTP sign-in.
+  - User profile attributes in `profiles` table: `full_name`, `major`, `year_of_study`, `bio`, `instagram_username`, `looking_for` (JSON), `interests` (JSON), `profile_photos` (JSON), and `unimatch_profile_complete`.
+- **Not Yet Connected (Pending Integration):**
+  - `discover.html` profile deck currently relies on local mock array `DISCOVERY_PROFILES`.
+  - Daily likes counter (`remainingLikes = 5`) is stored in frontend JavaScript memory.
+  - Swiping actions (`handleConnect()`, `handlePass()`) do not yet write to a backend `unimatch_likes` table.
+  - Icebreaker responses and Instagram exchange confirmations do not yet persist in a backend `unimatch_matches` table.
+
+---
+
+## What We Need To Do Next (Future Roadmap)
+
+Now that the UniMatch UI flows, multi-step profile builder, and frontend interaction screens are fully built, here is what we need to tackle next:
+
+### 1. Execute UniMatch Supabase Database Migration (`db/unimatch_setup.sql`)
+- **Goal:** Link all UniMatch frontend screens directly to live Supabase PostgreSQL tables.
+- **Tasks:**
+  - Create migration script extending `profiles` schema with `instagram_username`, `major`, `bio`, `looking_for`, `interests`, `profile_photos`, and `unimatch_profile_complete`.
+  - Create `unimatch_likes` table (`liker_id`, `liked_id`, `action`, `created_at`).
+  - Create `unimatch_matches` table (`user1_id`, `user2_id`, `icebreaker_completed`, `insta_shared_user1`, `insta_shared_user2`).
+  - Configure Row Level Security (RLS) policies for secure swiping and match visibility.
+
+### 2. Wire `discover.html` & Interaction Screens to Live Database Queries
+- Replace static `DISCOVERY_PROFILES` with a dynamic query fetching unswiped student profiles from Supabase.
+- Store likes in `unimatch_likes` on swipe right, calculate real-time mutual matches, and trigger match popups dynamically.
+- Fetch real admirer profiles for `hidden-likes.html` and persist icebreaker completion states in `unimatch_matches`.
+
+### 3. In-App Notifications
+- **Goal:** Notify buyers/sellers when their offers are accepted, rejected, or countered, and notify UniMatch users of new mutual matches.
 - **Tasks:**
   - Create a `notifications` table in Supabase.
   - Set up a dashboard notification bell in the header that queries this table.
   - Trigger notification records when offers are sent, countered, or responded to.
 
-### 2. College Verification Enhancements (ID Verification Upload)
+### 4. College Verification Enhancements (ID Verification Upload)
 - **Goal:** Set up secure, private image file storage for ID verification.
 - **Tasks:**
   - Create an `id-cards` private storage bucket in Supabase.
   - Implement image upload and OCR/Admin review panel to verify student cards.
 
-### 3. Redesign Chat UI for Mobile (Stitch)
+### 5. Redesign Chat UI for Mobile (Stitch)
 - **Goal:** Improve the layout of the mobile meetup view with the Stitch design system.
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>It's a Connection! - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-container": "#7a1f3d", "outline-variant": "#dac0c4", "tertiary-fixed": "#e8e2d7",
+          "on-tertiary": "#ffffff", "surface-dim": "#dadad8", "on-primary": "#ffffff",
+          "on-surface-variant": "#554245", "surface-container": "#efeeec", "secondary-container": "#ffca98",
+          "primary-fixed": "#ffd9df", "surface-container-lowest": "#ffffff", "background": "#faf9f7",
+          "outline": "#887275", "secondary": "#7d562d", "on-surface": "#1a1c1b",
+          "surface": "#faf9f7", "surface-container-low": "#f4f3f1", "primary": "#5c0427",
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "unit": "4px", "stack-gap-sm": "12px", "stack-gap-md": "20px", "container-padding": "24px", "stack-gap-lg": "32px", "section-margin": "48px" },
+        fontFamily: { "headline-lg": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"], "display": ["Inter"], "button": ["Inter"], "body-lg": ["Inter"] },
+        fontSize: {
+          "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+          "display": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "button": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+          "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  @keyframes fade-in-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes scale-in { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+  .animate-fade-in-up { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+  .animate-scale-in { animation: scale-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+<body class="bg-background text-on-background h-full overflow-hidden flex flex-col relative">
+
+<!-- WebGL Shader Background Canvas -->
+<div class="fixed inset-0 w-full h-full z-0 opacity-50 pointer-events-none">
+  <canvas id="shader-canvas" class="w-full h-full block"></canvas>
+</div>
+
+<!-- Main Content Container -->
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding relative z-10 w-full max-w-md mx-auto h-full">
+
+  <!-- Overlapping Profile Photos -->
+  <div class="flex items-center justify-center mb-stack-gap-lg relative animate-scale-in">
+    <div class="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-surface overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.08)] z-10 -mr-6">
+      <img id="user-photo" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=780&q=80" alt="Your profile photo"/>
+    </div>
+    <div class="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-surface overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.08)] z-0 relative">
+      <img id="match-photo" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80" alt="Eleanor's photo"/>
+    </div>
+    <div class="absolute bg-surface rounded-full p-2 shadow-[0_4px_20px_rgba(0,0,0,0.06)] z-20 animate-scale-in delay-200">
+      <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+    </div>
+  </div>
+
+  <!-- Typography -->
+  <div class="text-center mb-section-margin flex flex-col gap-stack-gap-sm w-full">
+    <h1 class="font-display text-display text-primary animate-fade-in-up delay-100">It's a Connection!</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant animate-fade-in-up delay-200 px-4" id="connection-subtitle">
+      You and Eleanor both want to be Study Partners.
+    </p>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="w-full flex flex-col gap-stack-gap-md animate-fade-in-up delay-400">
+    <button onclick="location.href='/unimatch/icebreaker.html'" class="w-full bg-primary text-on-primary font-button text-button py-4 px-6 rounded-full hover:scale-[0.98] transition-transform duration-200 ease-in-out shadow-[0_8px_30px_rgba(92,4,39,0.2)] flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">chat_bubble</span>
+      Pick an Icebreaker
+    </button>
+    <button onclick="location.href='/unimatch/discover.html'" class="w-full bg-transparent border-2 border-outline-variant text-on-surface font-button text-button py-4 px-6 rounded-full hover:bg-surface-container-low hover:scale-[0.98] transition-all duration-200 ease-in-out">
+      Message Later
+    </button>
+  </div>
+</main>
+
+<button onclick="location.href='/unimatch/discover.html'" class="absolute top-6 right-6 z-20 text-on-surface-variant hover:text-on-surface p-2 rounded-full hover:bg-surface-container transition-colors">
+  <span class="material-symbols-outlined">close</span>
+</button>
+
+<script>
+  // WebGL Shader Animation
+  (function() {
+    const canvas = document.getElementById('shader-canvas');
+    function syncSize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+    }
+    window.addEventListener('resize', syncSize);
+    syncSize();
+
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+
+    const vs = `attribute vec2 a_position; varying vec2 v_texCoord; void main() { v_texCoord = a_position * 0.5 + 0.5; gl_Position = vec4(a_position, 0.0, 1.0); }`;
+    const fs = `precision highp float; uniform float u_time; uniform vec2 u_resolution; varying vec2 v_texCoord;
+    void main() {
+      vec2 uv = v_texCoord;
+      vec3 color1 = vec3(0.36, 0.015, 0.152); // Burgundy
+      vec3 color2 = vec3(0.98, 0.976, 0.969); // Warm White
+      float pulse = 0.5 + 0.5 * sin(u_time * 0.5);
+      vec3 bgColor = mix(color2, color2 * 0.98, pulse);
+      float sparkle = 0.0;
+      for(float i = 0.0; i < 5.0; i++) {
+        vec2 pos = vec2(sin(u_time * 0.2 + i * 1.5) * 0.4 + 0.5, cos(u_time * 0.3 + i * 2.0) * 0.4 + 0.5);
+        float dist = distance(uv, pos);
+        sparkle += smoothstep(0.02, 0.0, dist) * 0.3;
+      }
+      gl_FragColor = vec4(bgColor + vec3(0.831, 0.639, 0.451) * sparkle, 1.0);
+    }`;
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const pos = gl.getAttribLocation(prog, 'a_position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    function render(t) {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      if (uTime) gl.uniform1f(uTime, t * 0.001);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(render);
+    }
+    render(0);
+  })();
+</script>
+</body></html>

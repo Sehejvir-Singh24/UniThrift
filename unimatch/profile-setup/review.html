@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UniMatch - Review Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-surface": "#1a1c1b", "surface-container": "#efeeec", "on-surface-variant": "#554245",
+          "secondary-container": "#ffca98", "primary": "#5c0427", "outline-variant": "#dac0c4",
+          "on-background": "#1a1c1b", "on-primary": "#ffffff", "surface": "#faf9f7",
+          "background": "#faf9f7", "primary-container": "#7a1f3d", "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f3f1", "surface-variant": "#e3e2e0", "outline": "#887275",
+        },
+        "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        "spacing": { "stack-gap-md": "20px", "unit": "4px", "section-margin": "48px", "stack-gap-sm": "12px", "stack-gap-lg": "32px", "container-padding": "24px" },
+        "fontFamily": { "button": ["Inter"], "label-caps": ["Inter"], "body-lg": ["Inter"], "title-md": ["Inter"], "headline-lg-mobile": ["Inter"], "body-md": ["Inter"] },
+        "fontSize": {
+          "button": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+          "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+          "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+          "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+          "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+        }
+      }
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  body { font-family: 'Inter', sans-serif; min-height: max(884px, 100dvh); }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+
+<header class="w-full flex justify-between items-center px-container-padding py-stack-gap-sm fixed top-0 z-50 bg-background/90 backdrop-blur-md">
+  <button aria-label="Go back" onclick="history.back()" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors">
+    <span class="material-symbols-outlined text-on-background">arrow_back</span>
+  </button>
+  <h1 class="font-title-md text-title-md text-on-background">Almost there</h1>
+  <div class="w-10"></div>
+</header>
+
+<main class="flex-grow pt-[80px] pb-32 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-stack-gap-lg">
+  <div class="text-center mt-stack-gap-md mb-stack-gap-md">
+    <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-2">Preview your profile</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant">This is how others will see you on UniMatch.</p>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative group">
+    <!-- Image -->
+    <div class="relative h-96 w-full" id="hero-photo-wrap">
+      <img id="hero-photo" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80" alt="Profile photo"/>
+      <button class="absolute top-4 right-4 bg-surface/80 backdrop-blur-md p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200" onclick="window.location.href='/unimatch/profile-setup/photos.html'">
+        <span class="material-symbols-outlined text-on-surface text-[20px]">edit</span>
+      </button>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 w-full p-container-padding text-white">
+        <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-semibold flex items-center gap-2" id="preview-name">
+          Your Name, —
+          <span class="material-symbols-outlined text-secondary-container text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+        </h3>
+        <p class="font-body-lg text-body-lg opacity-90 mt-1 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[18px]">school</span>
+          <span id="preview-major">Your Major</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-container-padding flex flex-col gap-stack-gap-md">
+      <!-- Bio -->
+      <div class="relative group/section">
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-title-md text-title-md text-on-background">About Me</h4>
+          <button class="text-primary opacity-0 group-hover/section:opacity-100 transition-opacity" onclick="window.location.href='/unimatch/profile-setup/basic-info.html'">
+            <span class="material-symbols-outlined text-[20px]">edit</span>
+          </button>
+        </div>
+        <p id="preview-bio" class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Your bio will appear here.</p>
+      </div>
+
+      <div class="h-px bg-surface-variant w-full"></div>
+
+      <!-- Interests -->
+      <div class="relative group/section">
+        <div class="flex justify-between items-center mb-4">
+          <h4 class="font-title-md text-title-md text-on-background">Interests</h4>
+          <button class="text-primary opacity-0 group-hover/section:opacity-100 transition-opacity" onclick="window.location.href='/unimatch/profile-setup/interests.html'">
+            <span class="material-symbols-outlined text-[20px]">edit</span>
+          </button>
+        </div>
+        <div id="preview-interests" class="flex flex-wrap gap-2">
+          <span class="text-on-surface-variant font-body-md text-body-md">No interests selected yet.</span>
+        </div>
+      </div>
+
+      <div class="h-px bg-surface-variant w-full"></div>
+
+      <!-- Looking For -->
+      <div class="relative group/section">
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-title-md text-title-md text-on-background">Looking for</h4>
+          <button class="text-primary opacity-0 group-hover/section:opacity-100 transition-opacity" onclick="window.location.href='/unimatch/profile-setup/looking-for.html'">
+            <span class="material-symbols-outlined text-[20px]">edit</span>
+          </button>
+        </div>
+        <div id="preview-looking-for" class="flex flex-col gap-2"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full p-container-padding bg-background/90 backdrop-blur-xl border-t border-surface-variant z-50 flex justify-center">
+  <button id="publish-btn" onclick="handlePublish()" class="w-full max-w-sm bg-primary text-on-primary font-button text-button py-4 rounded-full shadow-[0_8px_30px_rgba(92,4,39,0.2)] hover:scale-[0.98] transition-transform duration-200 ease-in-out">
+    Publish Profile
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  const GOAL_ICONS = {
+    'Friends': 'group',
+    'Coffee Buddy': 'local_cafe',
+    'Study Partner': 'menu_book',
+    'Event Buddy': 'celebration',
+    'Dating': 'favorite',
+  };
+
+  (async () => {
+    const ok = await requireAuth();
+    if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
+
+    const profile = await getProfile();
+    if (!profile) return;
+
+    // Name
+    if (profile.full_name) {
+      const age = profile.age ? `, ${profile.age}` : '';
+      document.getElementById('preview-name').innerHTML = `${profile.full_name}${age} <span class="material-symbols-outlined text-secondary-container text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>`;
+    }
+
+    // Major
+    if (profile.major) document.getElementById('preview-major').textContent = profile.major;
+
+    // Bio
+    if (profile.bio) document.getElementById('preview-bio').textContent = profile.bio;
+
+    // Hero photo
+    if (profile.profile_photos) {
+      const photos = JSON.parse(profile.profile_photos);
+      if (photos.length > 0) document.getElementById('hero-photo').src = photos[0];
+    }
+
+    // Interests
+    if (profile.interests) {
+      const interests = JSON.parse(profile.interests);
+      const container = document.getElementById('preview-interests');
+      if (interests.length > 0) {
+        container.innerHTML = interests.map(i =>
+          `<span class="bg-primary/10 text-primary px-4 py-2 rounded-full font-label-caps text-label-caps">${i}</span>`
+        ).join('');
+      }
+    }
+
+    // Looking For
+    if (profile.looking_for) {
+      const goals = JSON.parse(profile.looking_for);
+      const container = document.getElementById('preview-looking-for');
+      container.innerHTML = goals.map(g => `
+        <div class="flex items-center gap-3 bg-surface-container-low p-4 rounded-lg">
+          <span class="material-symbols-outlined text-primary text-[24px]">${GOAL_ICONS[g] || 'star'}</span>
+          <p class="font-body-md text-body-md font-medium text-on-background">${g}</p>
+        </div>
+      `).join('');
+    }
+  })();
+
+  async function handlePublish() {
+    const btn = document.getElementById('publish-btn');
+    btn.textContent = 'Publishing...';
+    btn.disabled = true;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    await supabase.from('profiles').update({ unimatch_profile_complete: true }).eq('id', session.user.id);
+    window.location.href = '/unimatch/discover.html';
+  }
+</script>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniMatch – Verify Student Status</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "um-primary": "#5c0427",
+            "um-primary-container": "#7a1f3d",
+            "um-on-primary": "#ffffff",
+            "um-surface": "#faf9f7",
+            "um-surface-container": "#efeeec",
+            "um-surface-container-low": "#f4f3f1",
+            "um-surface-container-lowest": "#ffffff",
+            "um-on-surface": "#1a1c1b",
+            "um-on-surface-variant": "#554245",
+            "um-outline": "#887275",
+            "um-outline-variant": "#dac0c4",
+            "um-error": "#ba1a1a",
+            "um-error-container": "#ffdad6",
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+  </style>
+</head>
+<body class="bg-um-surface min-h-screen flex flex-col pt-safe">
+
+  <!-- Header -->
+  <header class="h-14 px-4 flex items-center justify-between border-b border-um-outline-variant/30">
+    <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-um-surface-container active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-um-on-surface-variant text-[22px]">arrow_back</span>
+    </button>
+    <span class="font-semibold text-um-primary text-[16px]">UniMatch</span>
+    <div class="w-10"></div>
+  </header>
+
+  <!-- Main content -->
+  <div class="flex flex-col flex-1 px-6 pt-6 pb-8 gap-6 max-w-md mx-auto w-full overflow-y-auto" style="padding-bottom: max(env(safe-area-inset-bottom), 32px);">
+
+    <!-- Icon + Heading -->
+    <div class="flex flex-col items-center text-center gap-3">
+      <div class="w-14 h-14 rounded-full bg-um-surface-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-um-primary text-[28px]" style="font-variation-settings:'FILL' 1;">school</span>
+      </div>
+      <div>
+        <h1 class="text-[28px] font-semibold text-um-on-surface leading-tight tracking-tight">Verify your<br/>student status.</h1>
+        <p class="text-[14px] text-um-on-surface-variant mt-1.5 leading-relaxed">
+          To keep our community safe and exclusive, please verify your college status.
+        </p>
+      </div>
+    </div>
+
+    <!-- Error banner -->
+    <div id="error-banner" class="hidden bg-um-error-container text-um-error text-[13px] font-medium px-4 py-3 rounded-2xl"></div>
+
+    <!-- OPTION 1: Photo ID Upload Card -->
+    <div class="bg-um-surface-container-lowest rounded-3xl p-5 border border-um-outline-variant/40 flex flex-col gap-4 shadow-sm">
+      <button
+        id="upload-area"
+        onclick="triggerUpload()"
+        class="w-full rounded-2xl bg-um-surface-container-low relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 transition-all active:scale-[0.99] group border border-dashed border-um-outline-variant hover:border-um-primary"
+        style="min-height: 140px;"
+      >
+        <!-- Preview -->
+        <div id="id-preview" class="hidden absolute inset-0 w-full h-full">
+          <img id="preview-img" class="w-full h-full object-cover" alt="ID preview"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-white text-[12px] font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                ID card attached
+              </span>
+              <button onclick="removeFile(event)" class="bg-white/20 backdrop-blur rounded-full p-1 text-white active:scale-95">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder -->
+        <div id="upload-placeholder" class="flex flex-col items-center gap-2 text-center">
+          <div class="w-12 h-12 rounded-full bg-um-surface-container flex items-center justify-center group-hover:bg-um-primary group-hover:text-um-on-primary transition-colors text-um-primary">
+            <span class="material-symbols-outlined text-[24px]">add_a_photo</span>
+          </div>
+          <div>
+            <p class="font-semibold text-um-on-surface text-[14px]">Take a photo of your ID</p>
+            <p class="text-[12px] text-um-on-surface-variant mt-0.5">College ID, Admit Card or School ID</p>
+          </div>
+        </div>
+      </button>
+      <input type="file" id="id-file-input" accept="image/*" capture="environment" class="hidden"/>
+
+      <button
+        id="upload-btn"
+        onclick="handleIdUpload()"
+        disabled
+        class="w-full h-[48px] bg-um-primary text-um-on-primary text-[15px] font-semibold rounded-full flex items-center justify-center gap-2 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98] transition-all"
+        style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
+      >
+        <span id="upload-btn-text">Upload ID Card</span>
+        <span class="material-symbols-outlined text-[18px]">upload</span>
+      </button>
+    </div>
+
+    <!-- OR Divider -->
+    <div class="flex items-center gap-3 px-2">
+      <div class="flex-1 h-px bg-um-outline-variant/60"></div>
+      <span class="text-[12px] text-um-outline font-semibold uppercase tracking-wider">OR</span>
+      <div class="flex-1 h-px bg-um-outline-variant/60"></div>
+    </div>
+
+    <!-- OPTION 2: Email Verification Card -->
+    <div class="bg-um-surface-container-lowest rounded-3xl p-5 border border-um-outline-variant/40 flex flex-col gap-4 shadow-sm">
+      <div class="flex flex-col gap-1">
+        <h3 class="font-semibold text-um-on-surface text-[15px]">Verify via Email</h3>
+        <p class="text-[13px] text-um-on-surface-variant leading-relaxed">
+          Enter your college email or portal address
+        </p>
+      </div>
+
+      <div class="relative">
+        <input
+          id="verify-email-input"
+          type="email"
+          placeholder="student@college.ac.in"
+          class="w-full h-[48px] px-4 pr-10 rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[14px] focus:outline-none focus:border-um-primary transition-colors placeholder:text-um-outline"
+        />
+        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-um-outline text-[18px]">mail</span>
+      </div>
+
+      <button
+        id="email-verify-btn"
+        onclick="handleEmailVerify()"
+        class="w-full h-[48px] bg-um-primary text-um-on-primary text-[15px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+        style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
+      >
+        <span id="email-verify-btn-text">Send Verification Link</span>
+        <span class="material-symbols-outlined text-[18px]">send</span>
+      </button>
+
+      <!-- Email sent state -->
+      <div id="email-sent-state" class="hidden flex-col items-center gap-2 py-2 text-center">
+        <div class="w-10 h-10 rounded-full bg-um-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-um-primary text-[22px]" style="font-variation-settings:'FILL' 1;">mark_email_read</span>
+        </div>
+        <p class="font-semibold text-um-on-surface text-[14px]">Check your inbox</p>
+        <p class="text-[12px] text-um-on-surface-variant">We sent a verification link to your email.</p>
+        <button onclick="resetEmailPanel()" class="text-um-primary text-[12px] font-semibold underline mt-1">Use another email</button>
+      </div>
+    </div>
+
+    <!-- Trust footer -->
+    <div class="flex items-center justify-center gap-1.5 text-center mt-2">
+      <span class="material-symbols-outlined text-um-outline text-[14px]" style="font-variation-settings:'FILL' 1;">lock</span>
+      <span class="text-[12px] text-um-outline">We never share your data. Verification is instant.</span>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/supabase.js"></script>
+  <script>
+    // Guard
+    (async () => {
+      const ok = await requireAuth();
+      if (!ok) window.location.href = '/unimatch/auth/login.html';
+    })();
+
+    let selectedFile = null;
+
+    function triggerUpload() {
+      document.getElementById('id-file-input').click();
+    }
+
+    document.getElementById('id-file-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      selectedFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('preview-img').src = ev.target.result;
+        document.getElementById('id-preview').classList.remove('hidden');
+        document.getElementById('upload-placeholder').classList.add('hidden');
+        document.getElementById('upload-btn').disabled = false;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function removeFile(e) {
+      e.stopPropagation();
+      selectedFile = null;
+      document.getElementById('id-preview').classList.add('hidden');
+      document.getElementById('upload-placeholder').classList.remove('hidden');
+      document.getElementById('upload-btn').disabled = true;
+      document.getElementById('id-file-input').value = '';
+    }
+
+    async function handleIdUpload() {
+      if (!selectedFile) return;
+
+      const btn = document.getElementById('upload-btn');
+      const btnText = document.getElementById('upload-btn-text');
+      btn.disabled = true;
+      btnText.textContent = 'Uploading...';
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session.user.id;
+        const ext = selectedFile.name.split('.').pop();
+        const path = `unimatch_ids/${userId}/college_id.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('id_cards')
+          .upload(path, selectedFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage.from('id_cards').getPublicUrl(path);
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            id_url: urlData.publicUrl,
+            unimatch_verification_status: 'pending'
+          })
+          .eq('id', userId);
+
+        if (profileError) throw profileError;
+
+        window.location.href = '/unimatch/auth/pending.html';
+      } catch (err) {
+        showError('Upload failed: ' + err.message);
+        btn.disabled = false;
+        btnText.textContent = 'Upload ID Card';
+      }
+    }
+
+    async function handleEmailVerify() {
+      const email = document.getElementById('verify-email-input').value.trim();
+      if (!email || !email.includes('@')) {
+        showError('Please enter a valid email address.');
+        return;
+      }
+
+      const btn = document.getElementById('email-verify-btn');
+      const btnText = document.getElementById('email-verify-btn-text');
+      btn.classList.add('opacity-60', 'pointer-events-none');
+      btnText.textContent = 'Sending...';
+
+      const { data: { session } } = await supabase.auth.getSession();
+      await supabase.from('profiles').update({
+        unimatch_verify_email: email,
+        unimatch_verification_status: 'pending'
+      }).eq('id', session.user.id);
+
+      btn.parentElement.classList.add('hidden');
+      document.getElementById('email-sent-state').classList.remove('hidden');
+      document.getElementById('email-sent-state').classList.add('flex');
+      clearError();
+    }
+
+    function resetEmailPanel() {
+      document.getElementById('email-verify-btn').parentElement.classList.remove('hidden');
+      document.getElementById('email-sent-state').classList.add('hidden');
+      document.getElementById('email-sent-state').classList.remove('flex');
+      document.getElementById('email-verify-btn').classList.remove('opacity-60', 'pointer-events-none');
+      document.getElementById('email-verify-btn-text').textContent = 'Send Verification Link';
+      document.getElementById('verify-email-input').value = '';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-banner');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function clearError() {
+      document.getElementById('error-banner').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

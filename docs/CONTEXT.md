@@ -24,7 +24,13 @@ The platform does NOT handle full payments, selling of products directly, or shi
 - Buyers can send custom price offers on listings before reserving.
 - Sellers have a dedicated dashboard (`core/offers.html`) to review received offers and can effortlessly Accept, Counter, or Reject them.
 
+### 4. UniMatch Social Ecosystem
+- **Exclusive Campus Networking:** Tailored sub-app allowing verified students to connect based on shared intents (Study Partner, Friends, Coffee Buddy, Event Companion, Dating).
+- **Deep Maroon Theme:** Distinct visual identity using maroon accents (`#5c0427`, `#7a1f3d`).
+- **Privacy-First Instagram Consent:** Instagram handles remain hidden until both users swipe right, complete an icebreaker, and mutually grant consent.
+
 ## Tech Stack
 - **Frontend:** Vanilla HTML/JS, Tailwind CSS (via CDN).
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Storage).
 - **Design Aesthetic:** Premium, modern, glassmorphism interfaces, smooth state transitions, and tailored typography (Geist font, Material Symbols).
+

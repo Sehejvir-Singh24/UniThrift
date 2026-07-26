@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Icebreaker Selection - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-container": "#7a1f3d", "outline-variant": "#dac0c4", "tertiary-fixed": "#e8e2d7",
+          "on-tertiary": "#ffffff", "surface-dim": "#dadad8", "on-primary": "#ffffff",
+          "on-surface-variant": "#554245", "surface-container": "#efeeec", "secondary-container": "#ffca98",
+          "primary-fixed": "#ffd9df", "surface-container-lowest": "#ffffff", "background": "#faf9f7",
+          "outline": "#887275", "secondary": "#7d562d", "on-surface": "#1a1c1b",
+          "surface": "#faf9f7", "surface-container-low": "#f4f3f1", "primary": "#5c0427",
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "unit": "4px", "stack-gap-sm": "12px", "stack-gap-md": "20px", "container-padding": "24px", "stack-gap-lg": "32px", "section-margin": "48px" },
+        fontFamily: { "headline-lg": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"], "display": ["Inter"], "button": ["Inter"], "body-lg": ["Inter"] },
+        fontSize: {
+          "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+          "display": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "button": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+          "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { min-height: max(884px, 100dvh); background-color: #faf9f7; color: #1a1c1b; }
+  .icebreaker-card { transition: all 0.2s ease-in-out; }
+  .icebreaker-card:hover { transform: scale(0.98); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); }
+  .icebreaker-card:active { transform: scale(0.95); }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+
+<main class="flex-1 px-container-padding py-section-margin max-w-3xl mx-auto w-full flex flex-col justify-center">
+
+  <!-- Header Section -->
+  <div class="text-center mb-section-margin">
+    <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-stack-gap-sm">Break the ice</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto">Start your connection with a playful challenge.</p>
+  </div>
+
+  <!-- Bento Grid Selection -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-stack-gap-md mb-section-margin">
+
+    <!-- Coffee Match -->
+    <button onclick="selectIcebreaker('Coffee Match')" class="icebreaker-card bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 aspect-square w-full relative overflow-hidden group">
+      <div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary mb-2 relative z-10">
+        <span class="material-symbols-outlined text-[32px]">coffee</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface relative z-10 text-center">Coffee Match</span>
+    </button>
+
+    <!-- Music Vibes -->
+    <button onclick="selectIcebreaker('Music Vibes')" class="icebreaker-card bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 aspect-square w-full relative overflow-hidden group">
+      <div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary mb-2 relative z-10">
+        <span class="material-symbols-outlined text-[32px]">music_note</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface relative z-10 text-center">Music Vibes</span>
+    </button>
+
+    <!-- Food Debate -->
+    <button onclick="selectIcebreaker('Food Debate')" class="icebreaker-card bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 aspect-square w-full relative overflow-hidden group">
+      <div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary mb-2 relative z-10">
+        <span class="material-symbols-outlined text-[32px]">restaurant</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface relative z-10 text-center">Food Debate</span>
+    </button>
+
+    <!-- Watchlist -->
+    <button onclick="selectIcebreaker('Watchlist')" class="icebreaker-card bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 aspect-square w-full relative overflow-hidden group md:col-start-2">
+      <div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary mb-2 relative z-10">
+        <span class="material-symbols-outlined text-[32px]">movie</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface relative z-10 text-center">Watchlist</span>
+    </button>
+
+    <!-- Campus Lore -->
+    <button onclick="selectIcebreaker('Campus Lore')" class="icebreaker-card bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 aspect-square w-full relative overflow-hidden group">
+      <div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary mb-2 relative z-10">
+        <span class="material-symbols-outlined text-[32px]">school</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface relative z-10 text-center">Campus Lore</span>
+    </button>
+
+    <!-- Surprise Me -->
+    <button onclick="selectIcebreaker('Surprise Me')" class="icebreaker-card bg-primary text-on-primary rounded-lg p-6 flex flex-col items-center justify-center gap-stack-gap-sm shadow-[0_8px_40px_rgba(122,31,61,0.2)] border border-primary-container aspect-square w-full relative overflow-hidden group col-span-2 md:col-span-1 md:col-start-1 md:row-start-2">
+      <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white mb-2 relative z-10 backdrop-blur-sm">
+        <span class="material-symbols-outlined text-[32px]">casino</span>
+      </div>
+      <span class="font-title-md text-title-md text-white relative z-10 text-center">Surprise Me</span>
+    </button>
+  </div>
+
+  <!-- Footer Action -->
+  <div class="text-center mt-auto pb-stack-gap-lg">
+    <button onclick="location.href='/unimatch/discover.html'" class="font-button text-button text-on-surface-variant hover:text-primary transition-colors duration-200">
+      Skip for now
+    </button>
+  </div>
+</main>
+
+<script>
+  function selectIcebreaker(name) {
+    window.location.href = '/unimatch/insta-exchange-request.html';
+  }
+</script>
+</body></html>

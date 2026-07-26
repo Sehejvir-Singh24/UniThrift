@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniMatch – Connect Instagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "um-primary": "#5c0427",
+            "um-primary-container": "#7a1f3d",
+            "um-on-primary": "#ffffff",
+            "um-surface": "#faf9f7",
+            "um-surface-container": "#efeeec",
+            "um-surface-container-low": "#f4f3f1",
+            "um-surface-container-lowest": "#ffffff",
+            "um-on-surface": "#1a1c1b",
+            "um-on-surface-variant": "#554245",
+            "um-outline": "#887275",
+            "um-outline-variant": "#dac0c4",
+            "um-error": "#ba1a1a",
+            "um-error-container": "#ffdad6",
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .ig-gradient { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .input-focused { border-color: #5c0427 !important; }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim { animation: fade-up 0.4s ease both; }
+  </style>
+</head>
+<body class="bg-um-surface min-h-screen flex flex-col pt-safe">
+
+  <!-- Header -->
+  <header class="h-14 px-4 flex items-center justify-between border-b border-um-outline-variant/30">
+    <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-um-surface-container active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-um-on-surface-variant text-[22px]">arrow_back</span>
+    </button>
+    <span class="font-semibold text-um-primary text-[16px]">UniMatch</span>
+    <a href="#" class="text-[13px] text-um-outline font-medium">Help</a>
+  </header>
+
+  <!-- Progress bar: step 2 of 3 -->
+  <div class="flex gap-2 px-6 pt-5 pb-1">
+    <div class="h-1 flex-1 bg-um-primary rounded-full"></div>
+    <div class="h-1 flex-1 bg-um-primary rounded-full"></div>
+    <div class="h-1 flex-1 bg-um-outline-variant rounded-full"></div>
+  </div>
+  <p class="px-6 text-[11px] text-um-outline font-medium">Step 2 of 3 — Instagram</p>
+
+  <!-- Main -->
+  <div class="flex flex-col flex-1 px-6 pt-6 gap-7 overflow-y-auto" style="padding-bottom: max(env(safe-area-inset-bottom), 40px);">
+
+    <!-- Heading -->
+    <div class="flex flex-col gap-2">
+      <h1 class="text-[30px] font-semibold text-um-on-surface leading-tight tracking-tight">Express yourself.</h1>
+      <p class="text-[15px] text-um-on-surface-variant leading-relaxed">
+        Connect your Instagram to show your personality to fellow students. Your handle is only shared when you both agree.
+      </p>
+    </div>
+
+    <!-- Privacy highlight -->
+    <div class="bg-um-surface-container-lowest rounded-2xl p-4 border border-um-outline-variant/40 flex items-start gap-3">
+      <div class="ig-gradient w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+        <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+      </div>
+      <div class="flex flex-col gap-1">
+        <p class="font-semibold text-um-on-surface text-[14px]">Private until both agree</p>
+        <p class="text-[13px] text-um-on-surface-variant leading-relaxed">
+          Your Instagram handle is <strong>never shown to anyone</strong> until you and your connection both choose to share.
+        </p>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error-banner" class="hidden bg-um-error-container text-um-error text-[13px] font-medium px-4 py-3 rounded-2xl"></div>
+
+    <!-- Input -->
+    <div class="flex flex-col gap-2">
+      <label class="text-[12px] font-semibold text-um-on-surface-variant uppercase tracking-widest">Your Instagram Handle</label>
+      <div class="relative flex items-center">
+        <div class="absolute left-4 flex items-center pointer-events-none">
+          <div class="ig-gradient w-6 h-6 rounded-md flex items-center justify-center mr-1">
+            <span class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+          </div>
+          <span class="text-um-on-surface font-semibold text-[16px] ml-2">@</span>
+        </div>
+        <input
+          id="instagram-input"
+          type="text"
+          inputmode="text"
+          autocomplete="username"
+          placeholder="yourhandle"
+          oninput="handleInput()"
+          class="w-full h-[56px] pl-[72px] pr-4 rounded-2xl bg-um-surface-container border-2 border-um-outline-variant text-um-on-surface text-[16px] font-medium focus:outline-none transition-colors"
+          style="font-family: 'Inter', sans-serif;"
+        />
+      </div>
+      <p id="handle-hint" class="hidden text-[12px] text-um-on-surface-variant pl-1">e.g., @alexstudent or just alexstudent</p>
+    </div>
+
+    <!-- How it works -->
+    <div class="flex flex-col gap-3">
+      <p class="text-[12px] font-semibold text-um-outline uppercase tracking-widest">How it works</p>
+      <div class="flex flex-col gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-um-surface-container flex items-center justify-center shrink-0">
+            <span class="text-um-primary font-bold text-[13px]">1</span>
+          </div>
+          <p class="text-[14px] text-um-on-surface-variant leading-relaxed pt-1">You connect and match with another verified student</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-um-surface-container flex items-center justify-center shrink-0">
+            <span class="text-um-primary font-bold text-[13px]">2</span>
+          </div>
+          <p class="text-[14px] text-um-on-surface-variant leading-relaxed pt-1">You both complete a short icebreaker together</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-um-surface-container flex items-center justify-center shrink-0">
+            <span class="text-um-primary font-bold text-[13px]">3</span>
+          </div>
+          <p class="text-[14px] text-um-on-surface-variant leading-relaxed pt-1">Only when both agree, Instagrams are revealed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="flex flex-col gap-3 mt-auto pt-4">
+      <button
+        id="connect-btn"
+        onclick="handleConnect()"
+        disabled
+        class="w-full h-[56px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98] transition-all"
+        style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
+      >
+        <div class="ig-gradient w-5 h-5 rounded-md flex items-center justify-center">
+          <span class="material-symbols-outlined text-white text-[12px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+        </div>
+        <span id="connect-btn-text">Connect Instagram</span>
+      </button>
+
+      <p class="text-center text-[12px] text-um-outline">
+        This is required to start discovering. You can change it any time in settings.
+      </p>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/supabase.js"></script>
+  <script>
+    // Guard
+    (async () => {
+      const ok = await requireAuth();
+      if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
+
+      const profile = await getProfile();
+      if (!profile) return;
+
+      // If not verified, send back
+      if (!profile.is_verified) {
+        window.location.href = '/unimatch/auth/verify.html';
+        return;
+      }
+
+      // Pre-fill if already set
+      if (profile.instagram_username) {
+        document.getElementById('instagram-input').value = profile.instagram_username.replace('@', '');
+        updateBtn(true);
+      }
+    })();
+
+    function handleInput() {
+      const val = document.getElementById('instagram-input').value.trim();
+      const hint = document.getElementById('handle-hint');
+      const valid = val.length >= 1 && /^@?[a-zA-Z0-9._]{1,30}$/.test(val);
+      hint.classList.toggle('hidden', val.length === 0);
+      updateBtn(valid);
+    }
+
+    function updateBtn(valid) {
+      document.getElementById('connect-btn').disabled = !valid;
+    }
+
+    async function handleConnect() {
+      let handle = document.getElementById('instagram-input').value.trim();
+      handle = handle.replace(/^@/, ''); // strip leading @
+
+      if (!handle) return;
+
+      const btn = document.getElementById('connect-btn');
+      const btnText = document.getElementById('connect-btn-text');
+      btn.disabled = true;
+      btnText.textContent = 'Saving...';
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ instagram_username: handle })
+        .eq('id', session.user.id);
+
+      if (error) {
+        document.getElementById('error-banner').textContent = 'Failed to save: ' + error.message;
+        document.getElementById('error-banner').classList.remove('hidden');
+        btn.disabled = false;
+        btnText.textContent = 'Connect Instagram';
+        return;
+      }
+
+      // Route to profile setup (step 3)
+      window.location.href = '/unimatch/profile-setup.html';
+    }
+  </script>
+</body>
+</html>

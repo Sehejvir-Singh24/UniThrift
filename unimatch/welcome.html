@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniMatch – Connect with your community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "um-primary": "#5c0427",
+            "um-primary-container": "#7a1f3d",
+            "um-on-primary": "#ffffff",
+            "um-surface": "#faf9f7",
+            "um-surface-container": "#efeeec",
+            "um-surface-container-low": "#f4f3f1",
+            "um-on-surface": "#1a1c1b",
+            "um-on-surface-variant": "#554245",
+            "um-outline": "#887275",
+            "um-outline-variant": "#dac0c4",
+          },
+          fontFamily: { "inter": ["Inter"] },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .hero-overlay {
+      background: linear-gradient(
+        to bottom,
+        rgba(250,249,247,0) 0%,
+        rgba(250,249,247,0.1) 30%,
+        rgba(250,249,247,0.85) 65%,
+        rgba(250,249,247,1) 85%
+      );
+    }
+  </style>
+</head>
+<body class="bg-um-surface text-um-on-surface min-h-screen flex flex-col pt-safe">
+
+  <!-- Header -->
+  <header class="absolute top-0 left-0 right-0 z-20 pt-safe">
+    <div class="h-14 px-6 flex items-center">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-um-primary text-[22px]" style="font-variation-settings:'FILL' 1;">school</span>
+        <span class="font-semibold text-um-primary text-[18px] tracking-tight">UniMatch</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="relative w-full" style="height: 58vh; min-height: 300px;">
+    <!-- Campus photo -->
+    <img
+      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80&auto=format&fit=crop"
+      alt="Students connecting on campus"
+      class="absolute inset-0 w-full h-full object-cover object-top"
+    />
+    <!-- Gradient overlay fading to surface -->
+    <div class="hero-overlay absolute inset-0"></div>
+  </div>
+
+  <!-- Content card (flows below hero) -->
+  <div class="flex flex-col flex-1 px-6 pb-safe -mt-8 relative z-10">
+    <div class="flex flex-col gap-6">
+
+      <!-- Text -->
+      <div class="flex flex-col gap-2">
+        <h1 class="text-[30px] font-semibold text-um-on-surface leading-tight tracking-tight">
+          Connect with your<br/>community.
+        </h1>
+        <p class="text-[15px] text-um-on-surface-variant leading-relaxed">
+          An exclusive space for verified students to discover mutual interests and build real connections.
+        </p>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex flex-col gap-3 mt-2">
+        <a
+          href="/unimatch/auth/login.html?mode=signup"
+          id="get-started-btn"
+          class="w-full bg-um-primary text-um-on-primary text-[16px] font-semibold py-4 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-md"
+          style="box-shadow: 0 4px 20px rgba(92,4,39,0.25);"
+        >
+          Get Started
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </a>
+
+        <a
+          href="/unimatch/auth/login.html"
+          class="w-full bg-transparent border border-um-outline-variant text-um-on-surface text-[16px] font-semibold py-4 rounded-full flex items-center justify-center active:scale-[0.98] transition-transform"
+        >
+          Sign In
+        </a>
+      </div>
+
+      <!-- Trust badge -->
+      <div class="flex items-center justify-center gap-2 mt-1">
+        <span class="material-symbols-outlined text-um-outline text-[14px]" style="font-variation-settings:'FILL' 1;">verified_user</span>
+        <span class="text-[11px] font-semibold tracking-widest text-um-outline uppercase">Verified Student Access Only</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Auth routing script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/supabase.js"></script>
+  <script>
+    // If already logged in, route to the right step
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return; // Stay on welcome
+
+      const profile = await getProfile();
+      if (!profile) return;
+
+      if (!profile.is_verified) {
+        window.location.href = '/unimatch/auth/verify.html';
+        return;
+      }
+      if (!profile.instagram_username) {
+        window.location.href = '/unimatch/auth/instagram.html';
+        return;
+      }
+      if (!profile.unimatch_profile_complete) {
+        window.location.href = '/unimatch/profile-setup.html';
+        return;
+      }
+      window.location.href = '/unimatch/discover.html';
+    })();
+  </script>
+</body>
+</html>

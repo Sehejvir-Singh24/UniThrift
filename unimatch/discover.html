@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>UniMatch - Discover</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "outline-variant": "#dac0c4", "on-tertiary": "#ffffff", "surface-container-low": "#f4f3f1",
+          "surface-container": "#efeeec", "tertiary-container": "#45423a", "surface-container-highest": "#e3e2e0",
+          "on-tertiary-fixed": "#1d1b15", "outline": "#887275", "surface-dim": "#dadad8",
+          "primary-fixed": "#ffd9df", "tertiary-fixed": "#e8e2d7", "background": "#faf9f7",
+          "surface-bright": "#faf9f7", "on-primary-fixed-variant": "#802442", "primary-container": "#7a1f3d",
+          "primary": "#5c0427", "inverse-on-surface": "#f1f1ef", "on-surface-variant": "#554245",
+          "surface-container-high": "#e9e8e6", "primary-fixed-dim": "#ffb1c2", "on-primary": "#ffffff",
+          "secondary": "#7d562d", "surface": "#faf9f7", "error": "#ba1a1a", "on-secondary-fixed-variant": "#623f18",
+          "surface-variant": "#e3e2e0", "on-primary-fixed": "#3f0018", "on-secondary": "#ffffff",
+          "secondary-container": "#ffca98", "tertiary-fixed-dim": "#cbc6bb", "on-error": "#ffffff",
+          "on-tertiary-container": "#b3aea4", "tertiary": "#2e2c25", "on-primary-container": "#ff8ba8",
+          "on-error-container": "#93000a", "surface-tint": "#9f3c59", "on-surface": "#1a1c1b",
+          "secondary-fixed-dim": "#f0bd8b", "secondary-fixed": "#ffdcbd", "on-secondary-container": "#7a532a",
+          "on-tertiary-fixed-variant": "#49473f", "on-background": "#1a1c1b", "surface-container-lowest": "#ffffff",
+          "on-secondary-fixed": "#2c1600", "inverse-surface": "#2f3130", "inverse-primary": "#ffb1c2",
+          "error-container": "#ffdad6"
+        },
+        "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        "spacing": { "unit": "4px", "stack-gap-lg": "32px", "stack-gap-sm": "12px", "section-margin": "48px", "container-padding": "24px", "stack-gap-md": "20px" },
+        "fontFamily": { "title-md": ["Inter"], "display": ["Inter"], "label-caps": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "button": ["Inter"] },
+        "fontSize": {
+          "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+          "display": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+          "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+          "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+          "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+          "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "button": ["16px", { "lineHeight": "20px", "fontWeight": "600" }]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .ambient-shadow { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04); }
+  .ambient-shadow-strong { box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08); }
+</style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col pt-16 pb-24 md:pb-0 overflow-x-hidden">
+
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl transition-opacity">
+  <div class="flex justify-between items-center px-container-padding h-16 w-full">
+    <button onclick="toggleSideMenu()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out p-2 -ml-2 rounded-full">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1 class="font-display text-primary tracking-tight text-[24px] leading-[32px] md:text-display m-0">UniMatch</h1>
+    <button onclick="location.href='/unimatch/welcome.html'" title="Switch App" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out p-2 -mr-2 rounded-full relative">
+      <span class="material-symbols-outlined">swap_horiz</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-start w-full max-w-lg mx-auto px-container-padding mt-4 relative">
+
+  <!-- Status Indicator -->
+  <div class="w-full flex justify-center mb-stack-gap-md z-10">
+    <button onclick="location.href='/unimatch/out-of-likes.html'" class="bg-surface-container-high/60 backdrop-blur-md px-4 py-1.5 rounded-full flex items-center gap-2 border border-surface-variant hover:bg-surface-container-high transition-colors">
+      <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+      <span class="font-label-caps text-label-caps text-on-surface-variant tracking-wider" id="likes-count">5 LIKES REMAINING</span>
+    </button>
+    <button onclick="location.href='/unimatch/hidden-likes.html'" class="ml-2 bg-secondary-container/30 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 border border-secondary-container/50 hover:bg-secondary-container/50 transition-colors text-primary text-xs font-semibold">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">visibility</span>
+      <span>12 Admirers</span>
+    </button>
+  </div>
+
+  <!-- Discovery Card Stack -->
+  <div class="relative w-full aspect-[3/4] md:aspect-[4/5] max-h-[618px]">
+    <!-- Background Card (Stack effect) -->
+    <div class="absolute inset-x-4 -bottom-4 top-4 bg-surface-container-low rounded-[24px] ambient-shadow opacity-60 scale-[0.96] z-0 origin-bottom pointer-events-none"></div>
+
+    <!-- Primary Active Card -->
+    <article id="active-card" class="absolute inset-0 bg-surface-container-lowest rounded-[24px] ambient-shadow-strong overflow-hidden flex flex-col z-10 transition-all duration-300">
+      <!-- Image Section -->
+      <div class="relative w-full flex-grow overflow-hidden bg-surface-container">
+        <img id="card-img" class="absolute inset-0 w-full h-full object-cover" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80" alt="Student portrait"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+
+        <!-- Verified Badge -->
+        <div class="absolute top-4 right-4 bg-secondary/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm border border-secondary-fixed/30">
+          <span class="material-symbols-outlined text-on-secondary text-sm block" style="font-variation-settings: 'FILL' 1;">verified</span>
+        </div>
+
+        <!-- Core Info Overlay -->
+        <div class="absolute bottom-0 left-0 w-full p-container-padding text-white">
+          <div class="flex items-end justify-between mb-2">
+            <div>
+              <h2 id="card-name-age" class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white m-0">Eleanor, 21</h2>
+              <p id="card-major-year" class="font-body-md text-body-md text-white/90 flex items-center gap-1 mt-1">
+                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">school</span>
+                Architecture, 3rd Year
+              </p>
+            </div>
+          </div>
+          <p id="card-university" class="font-body-md text-body-md text-white/70 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">location_on</span>
+            Stanford University
+          </p>
+        </div>
+      </div>
+
+      <!-- Detail Section -->
+      <div class="bg-surface-container-lowest p-container-padding flex flex-col gap-stack-gap-md shrink-0">
+        <!-- Bio & Looking For -->
+        <div class="flex flex-col gap-3">
+          <div id="card-goal-badge" class="inline-flex self-start bg-primary/10 text-primary px-3 py-1 rounded-full items-center gap-1.5 border border-primary/20">
+            <span class="material-symbols-outlined text-[14px]">visibility</span>
+            <span class="font-label-caps text-label-caps tracking-wide" id="card-goal-text">STUDY PARTNER</span>
+          </div>
+          <p id="card-bio" class="font-body-lg text-body-lg text-on-surface">
+            Coffee enthusiast and late-night studio dweller. Always looking for someone to review floor plans and debate brutalism over an iced latte.
+          </p>
+        </div>
+
+        <!-- Interest Chips -->
+        <div id="card-interests" class="flex flex-wrap gap-2 pt-2 border-t border-surface-variant">
+          <span class="px-4 py-1.5 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-full border border-outline-variant/50">Design</span>
+          <span class="px-4 py-1.5 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-full border border-outline-variant/50">Coffee</span>
+          <span class="px-4 py-1.5 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-full border border-outline-variant/50">Museums</span>
+          <span class="px-4 py-1.5 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-full border border-outline-variant/50">Photography</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Action Area -->
+  <div class="w-full flex justify-center items-center gap-8 mt-section-margin z-20 pb-8">
+    <!-- Pass Button -->
+    <button onclick="handlePass()" class="w-16 h-16 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors ambient-shadow active:scale-95 duration-150 ease-in-out">
+      <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'wght' 300;">close</span>
+    </button>
+    <!-- Connect Button -->
+    <button onclick="handleConnect()" class="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-on-primary ambient-shadow hover:bg-primary/90 transition-colors active:scale-95 duration-150 ease-in-out">
+      <span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+    </button>
+  </div>
+</main>
+
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-2xl rounded-t-lg shadow-[0_-4px_30px_rgba(0,0,0,0.04)] pb-safe">
+  <div class="flex justify-around items-center px-4 pb-6 pt-3">
+    <!-- Discover (Active) -->
+    <button class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-1">
+      <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
+      <span class="font-label-caps text-label-caps">Discover</span>
+    </button>
+    <!-- Messages -->
+    <button onclick="alert('Messages feature coming soon!')" class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined mb-1">chat_bubble</span>
+      <span class="font-label-caps text-label-caps">Messages</span>
+    </button>
+    <!-- Events -->
+    <button onclick="alert('Events feature coming soon!')" class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined mb-1">event_available</span>
+      <span class="font-label-caps text-label-caps">Events</span>
+    </button>
+    <!-- Profile -->
+    <button onclick="location.href='/unimatch/profile-setup/basic-info.html'" class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined mb-1">account_circle</span>
+      <span class="font-label-caps text-label-caps">Profile</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Match Popup Modal -->
+<div id="match-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-md flex items-center justify-center p-6">
+  <div class="bg-surface-container-lowest rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-4 shadow-2xl border border-outline-variant/30">
+    <div class="w-16 h-16 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary mb-1">
+      <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+    </div>
+    <h3 class="text-2xl font-bold text-primary">It's a Match!</h3>
+    <p class="text-xs text-on-surface-variant leading-relaxed">You and <span id="match-student-name" class="font-semibold text-on-surface">Eleanor</span> both connected on UniMatch!</p>
+    <div class="w-full bg-surface-container-low p-3 rounded-2xl flex items-center justify-between text-xs my-2">
+      <span class="text-on-surface-variant">Instagram:</span>
+      <span id="match-student-insta" class="font-semibold text-primary">@eleanor_arch</span>
+    </div>
+    <button onclick="closeMatchModal()" class="w-full py-3.5 rounded-full bg-primary text-on-primary font-semibold text-sm hover:opacity-90 transition-opacity">Send DM on Instagram</button>
+    <button onclick="closeMatchModal()" class="text-xs text-on-surface-variant font-medium hover:underline">Keep Discovering</button>
+  </div>
+</div>
+
+<style>
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .pb-safe { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  const DISCOVERY_PROFILES = [
+    {
+      name: "Eleanor", age: 21, major: "Architecture", year: "3rd Year", university: "Stanford University",
+      goal: "STUDY PARTNER", instagram: "eleanor_arch",
+      bio: "Coffee enthusiast and late-night studio dweller. Always looking for someone to review floor plans and debate brutalism over an iced latte.",
+      interests: ["Design", "Coffee", "Museums", "Photography"],
+      photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80"
+    },
+    {
+      name: "Marcus", age: 22, major: "Computer Science", year: "4th Year", university: "UC Berkeley",
+      goal: "COFFEE BUDDY", instagram: "marcus_dev",
+      bio: "Building AI agents and brewing pour-over coffees. Hit me up if you want to brainstorm startup ideas!",
+      interests: ["AI / ML", "Startups", "Coffee Shops", "Open Source"],
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=780&q=80"
+    },
+    {
+      name: "Chloe", age: 20, major: "Literature", year: "2nd Year", university: "Columbia University",
+      goal: "FRIENDS", instagram: "chloe_reads",
+      bio: "Passionate about modern fiction, film photography, and finding quiet reading spots on campus.",
+      interests: ["Literature", "Film", "Creative Writing", "Thrifting"],
+      photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=780&q=80"
+    }
+  ];
+
+  let cardIndex = 0;
+  let remainingLikes = 5;
+
+  (async () => {
+    const ok = await requireAuth();
+    if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
+    renderCard(0);
+  })();
+
+  function renderCard(idx) {
+    const p = DISCOVERY_PROFILES[idx % DISCOVERY_PROFILES.length];
+    document.getElementById('card-img').src = p.photo;
+    document.getElementById('card-name-age').textContent = `${p.name}, ${p.age}`;
+    document.getElementById('card-major-year').innerHTML = `<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">school</span> ${p.major}, ${p.year}`;
+    document.getElementById('card-university').innerHTML = `<span class="material-symbols-outlined text-[14px]">location_on</span> ${p.university}`;
+    document.getElementById('card-goal-text').textContent = p.goal;
+    document.getElementById('card-bio').textContent = p.bio;
+    document.getElementById('card-interests').innerHTML = p.interests.map(i =>
+      `<span class="px-4 py-1.5 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-full border border-outline-variant/50">${i}</span>`
+    ).join('');
+  }
+
+  function handlePass() {
+    cardIndex++;
+    renderCard(cardIndex);
+  }
+
+  function handleConnect() {
+    if (remainingLikes <= 0) {
+      window.location.href = '/unimatch/out-of-likes.html';
+      return;
+    }
+    remainingLikes--;
+    document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+    const p = DISCOVERY_PROFILES[cardIndex % DISCOVERY_PROFILES.length];
+    document.getElementById('match-student-name').textContent = p.name;
+    document.getElementById('match-student-insta').textContent = `@${p.instagram}`;
+    document.getElementById('match-modal').classList.remove('hidden');
+  }
+
+  function closeMatchModal() {
+    document.getElementById('match-modal').classList.add('hidden');
+    handlePass();
+  }
+
+  function toggleSideMenu() {
+    alert("Navigating to Profile Settings");
+    window.location.href = '/unimatch/profile-setup/basic-info.html';
+  }
+</script>
+</body></html>

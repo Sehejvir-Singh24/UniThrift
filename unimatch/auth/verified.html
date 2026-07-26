@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniMatch – You're Verified!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "um-primary": "#5c0427",
+            "um-on-primary": "#ffffff",
+            "um-surface": "#faf9f7",
+            "um-surface-container": "#efeeec",
+            "um-surface-container-lowest": "#ffffff",
+            "um-on-surface": "#1a1c1b",
+            "um-on-surface-variant": "#554245",
+            "um-outline": "#887275",
+            "um-gold": "#d4a373",
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+    @keyframes badge-pop {
+      0%   { transform: scale(0.4); opacity: 0; }
+      60%  { transform: scale(1.15); }
+      80%  { transform: scale(0.95); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .badge-anim { animation: badge-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both; }
+    .text-anim-1 { animation: fade-up 0.5s ease 0.8s both; }
+    .text-anim-2 { animation: fade-up 0.5s ease 1.0s both; }
+    .btn-anim   { animation: fade-up 0.5s ease 1.2s both; }
+  </style>
+</head>
+<body class="bg-um-surface min-h-screen flex flex-col items-center justify-center pt-safe pb-safe px-6 text-center gap-8">
+
+  <!-- Badge -->
+  <div class="badge-anim">
+    <div class="relative w-28 h-28 flex items-center justify-center">
+      <!-- Outer ring -->
+      <div class="absolute inset-0 rounded-full border-4 border-um-gold/30"></div>
+      <!-- Inner circle -->
+      <div class="w-24 h-24 rounded-full bg-um-surface-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-um-gold text-[52px]" style="font-variation-settings:'FILL' 1;">verified</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text -->
+  <div class="flex flex-col gap-3 max-w-xs">
+    <h1 id="headline" class="text-anim-1 text-[36px] font-semibold text-um-on-surface leading-tight tracking-tight">
+      You're in!
+    </h1>
+    <p class="text-anim-2 text-[15px] text-um-on-surface-variant leading-relaxed">
+      Your account is verified. Welcome to the UniMatch community.
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div class="btn-anim w-full max-w-sm flex flex-col gap-3">
+    <a
+      href="/unimatch/auth/instagram.html"
+      class="w-full h-[56px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+      style="box-shadow: 0 4px 20px rgba(92,4,39,0.25);"
+    >
+      Start Discovering
+      <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/supabase.js"></script>
+  <script>
+    (async () => {
+      const ok = await requireAuth();
+      if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
+
+      // Personalise with first name
+      const profile = await getProfile();
+      if (profile && profile.full_name) {
+        const firstName = profile.full_name.split(' ')[0];
+        document.getElementById('headline').textContent = `You're in, ${firstName}!`;
+      }
+    })();
+  </script>
+</body>
+</html>

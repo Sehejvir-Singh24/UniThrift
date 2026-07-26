@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UniMatch - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-error": "#ffffff", "surface-tint": "#9f3c59", "tertiary": "#2e2c25",
+          "error-container": "#ffdad6", "on-surface-variant": "#554245", "surface": "#faf9f7",
+          "surface-container-low": "#f4f3f1", "on-background": "#1a1c1b", "secondary": "#7d562d",
+          "surface-container": "#efeeec", "secondary-container": "#ffca98", "primary-container": "#7a1f3d",
+          "on-surface": "#1a1c1b", "primary": "#5c0427", "background": "#faf9f7", "on-primary": "#ffffff",
+          "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "outline-variant": "#dac0c4",
+          "outline": "#887275", "surface-variant": "#e3e2e0"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "stack-gap-lg": "32px", "section-margin": "48px", "stack-gap-md": "20px", "stack-gap-sm": "12px", "container-padding": "24px", "unit": "4px" },
+        fontFamily: { "label-caps": ["Inter"], "button": ["Inter"], "body-lg": ["Inter"], "display": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "title-md": ["Inter"] },
+        fontSize: {
+          "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+          "button": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+          "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+          "display": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+          "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+          "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
+  .ambient-shadow { box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04); }
+  .list-divider { border-bottom: 1px solid #efeeec; }
+  .list-item { transition: background-color 0.2s ease-in-out; }
+  .list-item:active { transform: scale(0.98); }
+</style>
+</head>
+<body class="antialiased pb-24 min-h-screen relative">
+
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm opacity-95">
+  <div class="flex justify-between items-center px-container-padding h-16 w-full">
+    <button onclick="location.href='/unimatch/discover.html'" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2 rounded-full">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">UniMatch</h1>
+    <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
+      <img id="header-avatar" alt="User Profile" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80"/>
+    </div>
+  </div>
+</header>
+
+<main class="pt-24 px-container-padding max-w-2xl mx-auto">
+  <!-- Profile Header -->
+  <section class="flex flex-col items-center mb-section-margin">
+    <div class="relative w-32 h-32 rounded-full overflow-hidden mb-stack-gap-md shadow-[0_8px_40px_rgba(0,0,0,0.08)] border-4 border-surface-container-lowest">
+      <img id="profile-avatar" alt="Profile Photo" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80"/>
+    </div>
+    <div class="flex items-center gap-2 mb-unit">
+      <h2 id="profile-name" class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">Eleanor Vance</h2>
+      <span class="material-symbols-outlined text-[#D4AF37]" style="font-variation-settings: 'FILL' 1;">verified</span>
+    </div>
+    <p id="profile-subtext" class="font-body-md text-body-md text-on-surface-variant">Architecture, Oxford University</p>
+  </section>
+
+  <!-- Account Settings -->
+  <section class="mb-section-margin bg-surface-container-lowest rounded-2xl p-container-padding ambient-shadow">
+    <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm px-4 font-semibold">Account</h3>
+    <ul class="flex flex-col">
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4 list-divider" href="/unimatch/profile/edit-profile.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">edit</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Edit Profile</span>
+          </div>
+          <span class="material-symbols-outlined text-outline">chevron_right</span>
+        </a>
+      </li>
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4 list-divider" href="/unimatch/auth/verify.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">verified_user</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Verification</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-body-md text-body-md text-[#D4AF37] font-semibold">Verified</span>
+            <span class="material-symbols-outlined text-outline">chevron_right</span>
+          </div>
+        </a>
+      </li>
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4" href="/unimatch/insta-exchange-request.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">photo_camera</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Instagram</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="profile-insta-handle" class="font-body-md text-body-md text-on-surface-variant">@eleanor_arch</span>
+            <span class="material-symbols-outlined text-outline">chevron_right</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- App Settings -->
+  <section class="mb-section-margin bg-surface-container-lowest rounded-2xl p-container-padding ambient-shadow">
+    <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm px-4 font-semibold">Settings</h3>
+    <ul class="flex flex-col">
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4 list-divider" href="/unimatch/profile/privacy-security.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">lock</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Privacy & Security</span>
+          </div>
+          <span class="material-symbols-outlined text-outline">chevron_right</span>
+        </a>
+      </li>
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4 list-divider" href="/unimatch/profile/privacy-security.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">block</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Blocked Users</span>
+          </div>
+          <span class="material-symbols-outlined text-outline">chevron_right</span>
+        </a>
+      </li>
+      <li class="list-item rounded-xl">
+        <a class="flex items-center justify-between p-4 list-divider" href="/unimatch/profile/notifications.html">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            <span class="font-body-lg text-body-lg text-on-surface">Notifications</span>
+          </div>
+          <span class="material-symbols-outlined text-outline">chevron_right</span>
+        </a>
+      </li>
+      <li class="list-item rounded-xl">
+        <button onclick="handleLogout()" class="w-full flex items-center justify-between p-4 text-left">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-error">logout</span>
+            <span class="font-body-lg text-body-lg text-error font-semibold">Log Out</span>
+          </div>
+        </button>
+      </li>
+    </ul>
+  </section>
+</main>
+
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.04)] md:hidden">
+  <div class="flex justify-around items-center w-full px-container-padding py-3">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors" href="/unimatch/discover.html">
+      <span class="material-symbols-outlined mb-1">explore</span>
+      <span class="font-label-caps text-label-caps">Discover</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors" href="/unimatch/discover.html">
+      <span class="material-symbols-outlined mb-1">chat_bubble</span>
+      <span class="font-label-caps text-label-caps">Messages</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors" href="/unimatch/discover.html">
+      <span class="material-symbols-outlined mb-1">calendar_today</span>
+      <span class="font-label-caps text-label-caps">Events</span>
+    </a>
+    <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5" href="/unimatch/profile/my-profile.html">
+      <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+      <span class="font-label-caps text-label-caps">Profile</span>
+    </a>
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  (async () => {
+    const ok = await requireAuth();
+    if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
+
+    const profile = await getProfile();
+    if (profile) {
+      if (profile.full_name) document.getElementById('profile-name').textContent = profile.full_name;
+      if (profile.major) document.getElementById('profile-subtext').textContent = `${profile.major}${profile.year_of_study ? ', ' + profile.year_of_study : ''}`;
+      if (profile.instagram_handle) document.getElementById('profile-insta-handle').textContent = `@${profile.instagram_handle.replace('@','')}`;
+      if (profile.profile_photos) {
+        const photos = JSON.parse(profile.profile_photos);
+        if (photos.length > 0) {
+          document.getElementById('profile-avatar').src = photos[0];
+          document.getElementById('header-avatar').src = photos[0];
+        }
+      }
+    }
+  })();
+
+  async function handleLogout() {
+    await logout();
+    window.location.href = '/unimatch/welcome.html';
+  }
+</script>
+</body></html>

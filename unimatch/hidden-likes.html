@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>See who likes you - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "secondary-container": "#ffca98", "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4",
+          "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff", "on-surface": "#1a1c1b",
+          "background": "#faf9f7", "primary-container": "#7a1f3d", "primary": "#5c0427",
+          "on-primary": "#ffffff", "surface": "#faf9f7", "surface-container-high": "#e9e8e6"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "section-margin": "48px", "stack-gap-lg": "32px", "container-padding": "24px", "stack-gap-md": "20px", "unit": "4px", "stack-gap-sm": "12px" },
+        fontFamily: { "title-md": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "display": ["Inter"], "body-md": ["Inter"], "button": ["Inter"] },
+      }
+    }
+  }
+</script>
+<style>
+  body { -webkit-font-smoothing: antialiased; background-color: #faf9f7; color: #1a1c1b; font-family: 'Inter', sans-serif; min-height: max(884px, 100dvh); }
+  .ambient-shadow { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06); }
+  .blur-grid { filter: blur(14px) opacity(0.85); transition: filter 0.5s ease-in-out; }
+  .unblur-container:hover .blur-grid { filter: blur(4px) opacity(0.95); }
+</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md relative overflow-x-hidden">
+
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-container-padding py-stack-gap-sm">
+  <button onclick="location.href='/unimatch/discover.html'" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors group">
+    <span class="material-symbols-outlined text-primary group-hover:opacity-80 transition-opacity">arrow_back</span>
+  </button>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold tracking-tight">See who likes you</h1>
+  <button class="font-button text-button text-on-surface-variant hover:opacity-80 transition-opacity">Help</button>
+</header>
+
+<!-- Main Canvas -->
+<main class="flex-grow pt-[88px] pb-section-margin px-container-padding flex flex-col md:max-w-2xl md:mx-auto w-full relative">
+  <!-- Context Text -->
+  <div class="text-center mb-stack-gap-lg px-4 relative z-10">
+    <p class="font-body-lg text-body-lg text-on-surface-variant">
+      You have <span class="font-semibold text-primary">12 admirers</span> waiting to connect.
+    </p>
+  </div>
+
+  <!-- Blurred Grid of Admirers -->
+  <div class="relative w-full aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden mb-section-margin unblur-container cursor-pointer ambient-shadow">
+    <div class="absolute inset-0 grid grid-cols-2 md:grid-cols-3 gap-1.5 p-1.5 blur-grid z-0">
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80" alt="Admirer 1"/>
+      </div>
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=780&q=80" alt="Admirer 2"/>
+      </div>
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden hidden md:block">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=780&q=80" alt="Admirer 3"/>
+      </div>
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80" alt="Admirer 4"/>
+      </div>
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=780&q=80" alt="Admirer 5"/>
+      </div>
+      <div class="bg-surface-variant w-full h-full rounded-xl overflow-hidden hidden md:block">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=780&q=80" alt="Admirer 6"/>
+      </div>
+    </div>
+
+    <!-- Overlay Gradient -->
+    <div class="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent z-10 pointer-events-none"></div>
+
+    <!-- Center Floating Heart -->
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 bg-surface/80 backdrop-blur-md rounded-full flex items-center justify-center ambient-shadow border border-white/40">
+      <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+    </div>
+  </div>
+</main>
+
+<!-- Bottom Sheet Unlock Card -->
+<div class="fixed bottom-0 left-0 w-full z-40 px-container-padding pb-section-margin md:pb-container-padding flex justify-center">
+  <div class="w-full md:max-w-md bg-surface rounded-3xl p-container-padding ambient-shadow border border-surface-container-highest flex flex-col items-center text-center">
+    <div class="w-12 h-1 bg-surface-container-high rounded-full mb-stack-gap-md"></div>
+    <h2 class="font-title-md text-title-md text-on-surface mb-unit font-bold">Reveal all admirers</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant mb-stack-gap-md px-4">
+      Unlock instantly to see who liked your profile and start meaningful conversations.
+    </p>
+
+    <div class="flex items-center justify-center gap-2 mb-stack-gap-lg">
+      <span class="font-display text-3xl font-bold text-primary">₹39</span>
+      <span class="font-label-caps text-label-caps text-on-surface-variant px-2.5 py-1 bg-surface-container-low rounded-full font-semibold">ONE-TIME</span>
+    </div>
+
+    <button onclick="handleUnlock()" class="w-full bg-primary text-on-primary font-button text-button py-4 rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all duration-200 font-semibold shadow-lg">
+      <span class="material-symbols-outlined">lock_open</span>
+      Unlock now
+    </button>
+
+    <button onclick="location.href='/unimatch/discover.html'" class="mt-stack-gap-md font-button text-button text-on-surface-variant py-2 hover:text-primary transition-colors">
+      Maybe later
+    </button>
+  </div>
+</div>
+
+<script>
+  function handleUnlock() {
+    alert("Admirers unlocked! You can now see all 12 students who liked your profile.");
+    window.location.href = '/unimatch/discover.html';
+  }
+</script>
+</body></html>

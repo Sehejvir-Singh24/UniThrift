@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>It's official! - UniMatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-container": "#7a1f3d", "surface-container": "#efeeec", "on-surface-variant": "#554245",
+          "surface-container-lowest": "#ffffff", "on-surface": "#1a1c1b", "outline": "#887275",
+          "background": "#faf9f7", "primary": "#5c0427", "on-primary": "#ffffff", "surface": "#faf9f7",
+          "secondary-container": "#ffca98", "surface-container-low": "#f4f3f1"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "stack-gap-sm": "12px", "stack-gap-lg": "32px", "section-margin": "48px", "container-padding": "24px", "unit": "4px", "stack-gap-md": "20px" },
+        fontFamily: { "display": ["Inter"], "title-md": ["Inter"], "body-lg": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "button": ["Inter"], "body-md": ["Inter"] },
+        fontSize: {
+          "display": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+          "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+          "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "button": ["16px", {"lineHeight": "20px", "fontWeight": "600"}]
+        },
+        animation: {
+          'pulse-slow': 'pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          'float-up': 'float-up 0.8s ease-out forwards',
+        },
+        keyframes: {
+          'pulse-slow': { '0%, 100%': { opacity: '0.4', transform: 'scale(1)' }, '50%': { opacity: '0.7', transform: 'scale(1.05)' } },
+          'float-up': { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #faf9f7; min-height: max(884px, 100dvh); }
+  .ambient-bg {
+    background: radial-gradient(circle at 50% 30%, rgba(122, 31, 61, 0.08) 0%, rgba(250, 249, 247, 0) 60%),
+                radial-gradient(circle at 80% 80%, rgba(255, 202, 152, 0.1) 0%, rgba(250, 249, 247, 0) 50%);
+  }
+</style>
+</head>
+<body class="relative min-h-[884px] w-full overflow-hidden flex flex-col justify-center items-center bg-background">
+
+<!-- Ambient Background -->
+<div class="absolute inset-0 ambient-bg animate-pulse-slow pointer-events-none z-0"></div>
+
+<main class="relative z-10 flex flex-col items-center justify-center w-full max-w-md mx-auto px-container-padding text-center">
+
+  <!-- Verified Avatar -->
+  <div class="relative mb-stack-gap-lg animate-float-up" style="animation-delay: 0.1s; opacity: 0;">
+    <img id="match-avatar" class="w-32 h-32 rounded-full object-cover shadow-[0_12px_40px_rgba(92,4,39,0.12)] border-4 border-surface-container-lowest" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80" alt="Eleanor"/>
+    <div class="absolute bottom-0 right-0 bg-surface-container-lowest rounded-full p-1 shadow-sm flex items-center justify-center">
+      <span class="material-symbols-outlined text-secondary-container text-[24px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+    </div>
+  </div>
+
+  <!-- Typography -->
+  <div class="mb-section-margin animate-float-up" style="animation-delay: 0.2s; opacity: 0;">
+    <h1 class="font-display text-display text-on-surface mb-stack-gap-sm font-bold">It's official!</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px] mx-auto" id="success-text">
+      You and Eleanor are now connected on Instagram.
+    </p>
+  </div>
+
+  <!-- Copyable Handle Card -->
+  <div class="w-full animate-float-up" style="animation-delay: 0.3s; opacity: 0;">
+    <button onclick="copyHandle()" class="w-full flex items-center justify-between bg-surface-container-lowest border border-secondary-container/60 rounded-[1.5rem] px-6 py-5 mb-section-margin shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:scale-[0.98] active:scale-95 transition-all duration-300 ease-in-out group">
+      <span class="font-title-md text-title-md text-on-surface font-semibold tracking-tight group-hover:text-primary transition-colors" id="insta-handle-text">@eleanor_arch</span>
+      <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center group-hover:bg-primary-container/10 transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" id="copy-icon">content_copy</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Actions -->
+  <div class="w-full flex flex-col gap-4 animate-float-up" style="animation-delay: 0.4s; opacity: 0;">
+    <button onclick="openInstagramApp()" class="w-full bg-primary text-on-primary rounded-full py-4 font-button text-button shadow-[0_8px_30px_rgba(92,4,39,0.2)] hover:opacity-90 active:scale-[0.98] transition-all duration-200">
+      Open Instagram
+    </button>
+    <button onclick="location.href='/unimatch/discover.html'" class="w-full bg-transparent border-[1.5px] border-transparent text-primary rounded-full py-4 font-button text-button hover:bg-primary/5 active:scale-[0.98] transition-all duration-200">
+      Back to Discovery
+    </button>
+  </div>
+</main>
+
+<script>
+  function copyHandle() {
+    const handle = document.getElementById('insta-handle-text').textContent;
+    navigator.clipboard.writeText(handle);
+    const icon = document.getElementById('copy-icon');
+    icon.textContent = 'check';
+    setTimeout(() => { icon.textContent = 'content_copy'; }, 2000);
+  }
+
+  function openInstagramApp() {
+    const handle = document.getElementById('insta-handle-text').textContent.replace('@', '');
+    window.open(`https://instagram.com/${handle}`, '_blank');
+  }
+</script>
+</body></html>

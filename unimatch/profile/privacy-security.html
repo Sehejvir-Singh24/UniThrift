@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Privacy & Security - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#5c0427", "background": "#faf9f7", "on-background": "#1a1c1b",
+          "on-surface": "#1a1c1b", "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4", "error": "#ba1a1a"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "stack-gap-lg": "32px", "section-margin": "48px", "stack-gap-md": "20px", "stack-gap-sm": "12px", "container-padding": "24px" },
+        fontFamily: { "headline-lg": ["Inter"], "label-caps": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"], "body-lg": ["Inter"] },
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+
+<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md px-container-padding h-16 flex items-center gap-4">
+  <button onclick="location.href='/unimatch/profile/my-profile.html'" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low text-on-surface">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Privacy & Security</h1>
+</header>
+
+<main class="flex-grow pt-24 pb-32 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-6">
+
+  <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+    Manage how others interact with you and what information is visible on your profile. Changes are saved automatically.
+  </p>
+
+  <!-- Visibility Section -->
+  <div class="space-y-3">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Visibility</h2>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30 space-y-5">
+      <div class="flex items-center justify-between">
+        <div class="flex gap-3 items-start pr-4">
+          <span class="material-symbols-outlined text-on-surface-variant mt-0.5">lock</span>
+          <div>
+            <h3 class="font-title-md text-title-md text-on-surface font-semibold">Private Profile</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Only approved connections can see your full profile details and posts.</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+
+      <div class="h-px bg-outline-variant/30 w-full"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex gap-3 items-start pr-4">
+          <span class="material-symbols-outlined text-on-surface-variant mt-0.5">school</span>
+          <div>
+            <h3 class="font-title-md text-title-md text-on-surface font-semibold">Show Major</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Display your academic major on your public profile card.</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connections Section -->
+  <div class="space-y-3">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Connections</h2>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex gap-3 items-start pr-4">
+          <span class="material-symbols-outlined text-on-surface-variant mt-0.5">photo_camera</span>
+          <div>
+            <h3 class="font-title-md text-title-md text-on-surface font-semibold">Allow Instagram Requests</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Let matches request your Instagram handle directly through chat.</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+
+      <div class="h-px bg-outline-variant/30 w-full"></div>
+
+      <a href="#" onclick="alert('0 Blocked Users')" class="flex items-center justify-between py-1 hover:opacity-80 transition-opacity">
+        <div class="flex gap-3 items-center">
+          <span class="material-symbols-outlined text-on-surface-variant">block</span>
+          <span class="font-title-md text-title-md text-on-surface font-medium">Blocked Users</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-on-surface-variant font-medium">0</span>
+          <span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+        </div>
+      </a>
+
+      <div class="h-px bg-outline-variant/30 w-full"></div>
+
+      <a href="#" onclick="alert('No Report History')" class="flex items-center justify-between py-1 hover:opacity-80 transition-opacity">
+        <div class="flex gap-3 items-center">
+          <span class="material-symbols-outlined text-on-surface-variant">flag</span>
+          <span class="font-title-md text-title-md text-on-surface font-medium">Report History</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Account Actions -->
+  <div class="space-y-3 mt-4">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-error font-semibold px-1">Account Actions</h2>
+    <button onclick="handleDeleteAccount()" class="w-full bg-surface-container-lowest border border-error/20 text-error rounded-2xl p-5 shadow-sm font-semibold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors">
+      <span class="material-symbols-outlined">delete_forever</span>
+      Delete Account
+    </button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  async function handleDeleteAccount() {
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      alert("Account deletion request submitted.");
+      await logout();
+      window.location.href = '/unimatch/welcome.html';
+    }
+  }
+</script>
+</body></html>

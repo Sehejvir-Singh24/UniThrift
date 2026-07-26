@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notifications - UniMatch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#5c0427", "background": "#faf9f7", "on-background": "#1a1c1b",
+          "on-surface": "#1a1c1b", "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4"
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        spacing: { "stack-gap-lg": "32px", "section-margin": "48px", "stack-gap-md": "20px", "stack-gap-sm": "12px", "container-padding": "24px" },
+        fontFamily: { "headline-lg": ["Inter"], "label-caps": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"], "body-lg": ["Inter"] },
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
+  .toggle-checkbox:checked { right: 0; border-color: #5c0427; background-color: #5c0427; }
+  .toggle-checkbox:checked + .toggle-label { background-color: #7a1f3d; }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+
+<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md px-container-padding h-16 flex items-center gap-4">
+  <button onclick="location.href='/unimatch/profile/my-profile.html'" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low text-on-surface">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Notifications</h1>
+</header>
+
+<main class="flex-grow pt-24 pb-32 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-6">
+
+  <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+    Manage how and when UniMatch connects with you. We prioritize quiet, intentional alerts over constant noise.
+  </p>
+
+  <!-- Connections & Matches -->
+  <div class="space-y-3">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Connections & Matches</h2>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30 space-y-5">
+      <div class="flex items-center justify-between">
+        <div class="pr-4">
+          <h3 class="font-title-md text-title-md text-on-surface font-semibold">New Connections</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Get notified when someone accepts your connection request or sends you a new one.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+
+      <div class="h-px bg-outline-variant/30 w-full"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="pr-4">
+          <h3 class="font-title-md text-title-md text-on-surface font-semibold">Icebreaker Requests</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Alerts for direct, thoughtful conversation starters from prospective matches.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Integrations -->
+  <div class="space-y-3">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Social Integrations</h2>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30">
+      <div class="flex items-center justify-between">
+        <div class="pr-4">
+          <h3 class="font-title-md text-title-md text-on-surface font-semibold">Instagram Exchanges</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Notifications when a mutual match requests to exchange Instagram handles.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- System & Community -->
+  <div class="space-y-3">
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">System & Community</h2>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30">
+      <div class="flex items-center justify-between">
+        <div class="pr-4">
+          <h3 class="font-title-md text-title-md text-on-surface font-semibold">App Updates & Announcements</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Occasional updates about new features, community guidelines, and campus events.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-center font-body-md text-xs text-on-surface-variant mt-6">Changes are saved automatically.</p>
+</main>
+</body></html>

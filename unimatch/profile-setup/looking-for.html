@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>UniMatch - Looking For</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-surface": "#1a1c1b", "surface-container": "#efeeec", "on-surface-variant": "#554245",
+          "primary": "#5c0427", "outline-variant": "#dac0c4", "secondary-container": "#ffca98",
+          "on-background": "#1a1c1b", "on-primary": "#ffffff", "surface": "#faf9f7",
+          "background": "#faf9f7", "primary-container": "#7a1f3d", "primary-fixed": "#ffd9df",
+          "surface-container-lowest": "#ffffff", "outline": "#887275",
+        },
+        "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        "spacing": {
+          "stack-gap-md": "20px", "unit": "4px", "section-margin": "48px",
+          "stack-gap-sm": "12px", "stack-gap-lg": "32px", "container-padding": "24px"
+        },
+        "fontFamily": { "button": ["Inter"], "body-lg": ["Inter"], "title-md": ["Inter"], "headline-lg-mobile": ["Inter"], "display": ["Inter"], "body-md": ["Inter"] },
+        "fontSize": {
+          "button": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+          "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+          "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+          "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "display": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+          "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); }
+  .goal-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .goal-card.selected { border-color: #ffca98; background-color: rgba(255, 202, 152, 0.05); transform: scale(0.98); }
+  .goal-card.selected .check-icon { opacity: 1; transform: scale(1); }
+  .check-icon { opacity: 0; transform: scale(0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-container-padding py-stack-gap-sm">
+  <button onclick="history.back()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out p-2 -ml-2 rounded-full focus:outline-none">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <div class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold tracking-tight">UniMatch</div>
+  <button class="text-primary hover:opacity-80 transition-opacity active:scale-95 font-button text-button focus:outline-none rounded-full px-2">Help</button>
+</header>
+
+<main class="flex-grow pt-[88px] pb-32 px-container-padding md:px-[max(24px,calc((100vw-600px)/2))] flex flex-col">
+  <div class="mt-stack-gap-lg mb-stack-gap-md text-left">
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-unit">Your goals</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant">Select what you're looking for to help us find the right connections.</p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mt-stack-gap-md">
+    <!-- Friends -->
+    <button data-goal="Friends" class="goal-card col-span-1 bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] focus:outline-none text-left group" onclick="toggleSelection(this)">
+      <div class="absolute top-4 right-4 text-secondary-container check-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-fixed/50 transition-colors">
+        <span class="material-symbols-outlined text-[32px]">group</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface text-center">Friends</span>
+    </button>
+
+    <!-- Coffee Buddy -->
+    <button data-goal="Coffee Buddy" class="goal-card col-span-1 bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] focus:outline-none text-left group" onclick="toggleSelection(this)">
+      <div class="absolute top-4 right-4 text-secondary-container check-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-fixed/50 transition-colors">
+        <span class="material-symbols-outlined text-[32px]">local_cafe</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface text-center">Coffee Buddy</span>
+    </button>
+
+    <!-- Study Partner (Full Width) -->
+    <button data-goal="Study Partner" class="goal-card col-span-2 bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 flex flex-row items-center justify-start gap-6 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] focus:outline-none text-left group" onclick="toggleSelection(this)">
+      <div class="absolute top-1/2 -translate-y-1/2 right-6 text-secondary-container check-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-surface-container flex shrink-0 items-center justify-center text-primary group-hover:bg-primary-fixed/50 transition-colors">
+        <span class="material-symbols-outlined text-[32px]">menu_book</span>
+      </div>
+      <div class="flex flex-col pr-8">
+        <span class="font-title-md text-title-md text-on-surface">Study Partner</span>
+        <span class="font-body-md text-body-md text-on-surface-variant mt-1">Find focus and motivation together.</span>
+      </div>
+    </button>
+
+    <!-- Event Buddy -->
+    <button data-goal="Event Buddy" class="goal-card col-span-1 bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] focus:outline-none text-left group" onclick="toggleSelection(this)">
+      <div class="absolute top-4 right-4 text-secondary-container check-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-fixed/50 transition-colors">
+        <span class="material-symbols-outlined text-[32px]">celebration</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface text-center">Event Buddy</span>
+    </button>
+
+    <!-- Dating -->
+    <button data-goal="Dating" class="goal-card col-span-1 bg-surface-container-lowest border-2 border-transparent rounded-[24px] p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] focus:outline-none text-left group" onclick="toggleSelection(this)">
+      <div class="absolute top-4 right-4 text-secondary-container check-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-fixed/50 transition-colors">
+        <span class="material-symbols-outlined text-[32px]">favorite</span>
+      </div>
+      <span class="font-title-md text-title-md text-on-surface text-center">Dating</span>
+    </button>
+  </div>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full p-container-padding bg-gradient-to-t from-background via-background/90 to-transparent pb-safe">
+  <div class="max-w-[600px] mx-auto">
+    <button class="w-full bg-primary text-on-primary font-button text-button py-4 rounded-full shadow-[0_8px_30px_rgba(92,4,39,0.2)] hover:opacity-90 active:scale-[0.98] transition-all duration-200 ease-in-out disabled:opacity-50 disabled:active:scale-100" disabled id="continueBtn" onclick="handleContinue()">
+      Continue
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
+<script>
+  (async () => {
+    const ok = await requireAuth();
+    if (!ok) window.location.href = '/unimatch/auth/login.html';
+
+    // Pre-select saved goals
+    const profile = await getProfile();
+    if (profile && profile.looking_for) {
+      const saved = JSON.parse(profile.looking_for || '[]');
+      document.querySelectorAll('.goal-card').forEach(card => {
+        if (saved.includes(card.dataset.goal)) {
+          card.classList.add('selected');
+          updateContinueBtn();
+        }
+      });
+    }
+  })();
+
+  function toggleSelection(element) {
+    element.classList.toggle('selected');
+    updateContinueBtn();
+  }
+
+  function updateContinueBtn() {
+    const hasSelection = document.querySelectorAll('.goal-card.selected').length > 0;
+    document.getElementById('continueBtn').disabled = !hasSelection;
+  }
+
+  async function handleContinue() {
+    const selected = [...document.querySelectorAll('.goal-card.selected')].map(c => c.dataset.goal);
+    const btn = document.getElementById('continueBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const { data: { session } } = await supabase.auth.getSession();
+    await supabase.from('profiles').update({ looking_for: JSON.stringify(selected) }).eq('id', session.user.id);
+    window.location.href = '/unimatch/profile-setup/interests.html';
+  }
+</script>
+</body></html>
