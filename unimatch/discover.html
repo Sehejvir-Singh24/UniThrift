@@ -123,7 +123,7 @@
         <button onclick="prevPhoto(event)" style="position:absolute;top:0;bottom:0;left:0;width:40%;z-index:20;background:transparent;border:none;cursor:pointer;" aria-label="Previous photo"></button>
         <button onclick="nextPhoto(event)" style="position:absolute;top:0;bottom:0;right:0;width:60%;z-index:20;background:transparent;border:none;cursor:pointer;" aria-label="Next photo"></button>
 
-        <img id="card-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.18s ease;" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80" alt="Student profile photo"/>
+        <img id="card-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.18s ease;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23f0d0d8'><rect width='100' height='100'/></svg>" alt="Student profile photo"/>
 
         <!-- Gradient overlay -->
         <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,2,4,0.72) 0%, rgba(10,2,4,0.1) 50%, transparent 100%);z-index:10;pointer-events:none;"></div>
@@ -136,15 +136,15 @@
         <!-- Name, major, university overlay -->
         <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;z-index:20;">
           <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:4px;">
-            <h2 id="card-name-age" style="font-size:26px;font-weight:700;color:white;margin:0;line-height:1.1;letter-spacing:-0.01em;">Eleanor, 21</h2>
+            <h2 id="card-name-age" style="font-size:26px;font-weight:700;color:white;margin:0;line-height:1.1;letter-spacing:-0.01em;">Loading Profiles...</h2>
           </div>
           <p id="card-major-year" style="font-size:14px;color:rgba(255,255,255,0.88);display:flex;align-items:center;gap:5px;margin:2px 0;">
             <span class="material-symbols-outlined" style="font-size:15px;font-variation-settings:'FILL' 1;">school</span>
-            Architecture, 3rd Year
+            Finding students...
           </p>
           <p id="card-university" style="font-size:13px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;margin:0;">
             <span class="material-symbols-outlined" style="font-size:14px;">location_on</span>
-            Stanford University
+            UniMatch Community
           </p>
         </div>
       </div>
@@ -157,20 +157,17 @@
           <div style="display:flex;align-items:center;gap:8px;">
             <span id="card-goal-badge" class="um-badge">
               <span class="material-symbols-outlined" style="font-size:13px;font-variation-settings:'FILL' 1;">visibility</span>
-              <span id="card-goal-text">STUDY PARTNER</span>
+              <span id="card-goal-text">CONNECTING</span>
             </span>
           </div>
           <p id="card-bio" style="font-size:14px;color:#4A1520;line-height:1.5;margin:0;">
-            Coffee enthusiast and late-night studio dweller. Always looking for someone to review floor plans and debate brutalism over an iced latte.
+            Searching for verified student profiles near you...
           </p>
         </div>
 
         <!-- Interest chips -->
         <div id="card-interests" style="display:flex;flex-wrap:wrap;gap:7px;border-top:1px solid var(--um-border);padding-top:10px;">
-          <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">brush</span> Design</span>
-          <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">local_cafe</span> Coffee</span>
-          <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">museum</span> Museums</span>
-          <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">photo_camera</span> Photography</span>
+          <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">sync</span> Loading...</span>
         </div>
       </div>
     </article>
