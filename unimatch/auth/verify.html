@@ -131,25 +131,27 @@
         </p>
       </div>
 
-      <div class="relative">
-        <input
-          id="verify-email-input"
-          type="email"
-          placeholder="student@college.ac.in"
-          class="w-full h-[48px] px-4 pr-10 rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[14px] focus:outline-none focus:border-um-primary transition-colors placeholder:text-um-outline"
-        />
-        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-um-outline text-[18px]">mail</span>
-      </div>
+      <div id="email-input-container" class="flex flex-col gap-3">
+        <div class="relative">
+          <input
+            id="verify-email-input"
+            type="email"
+            placeholder="student@college.ac.in"
+            class="w-full h-[48px] px-4 pr-10 rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[14px] focus:outline-none focus:border-um-primary transition-colors placeholder:text-um-outline"
+          />
+          <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-um-outline text-[18px]">mail</span>
+        </div>
 
-      <button
-        id="email-verify-btn"
-        onclick="handleEmailVerify()"
-        class="w-full h-[48px] bg-um-primary text-um-on-primary text-[15px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-        style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
-      >
-        <span id="email-verify-btn-text">Send Verification Link</span>
-        <span class="material-symbols-outlined text-[18px]">send</span>
-      </button>
+        <button
+          id="email-verify-btn"
+          onclick="handleEmailVerify()"
+          class="w-full h-[48px] bg-um-primary text-um-on-primary text-[15px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
+        >
+          <span id="email-verify-btn-text">Send Verification Link</span>
+          <span class="material-symbols-outlined text-[18px]">send</span>
+        </button>
+      </div>
 
       <!-- Email sent state -->
       <div id="email-sent-state" class="hidden flex-col items-center gap-2 py-2 text-center">
@@ -157,7 +159,7 @@
           <span class="material-symbols-outlined text-um-primary text-[22px]" style="font-variation-settings:'FILL' 1;">mark_email_read</span>
         </div>
         <p class="font-semibold text-um-on-surface text-[14px]">Check your inbox</p>
-        <p class="text-[12px] text-um-on-surface-variant">We sent a verification link to your email.</p>
+        <p class="text-[12px] text-um-on-surface-variant">We sent a verification link to <strong id="sent-email-display" class="text-um-primary"></strong>.</p>
         <button onclick="resetEmailPanel()" class="text-um-primary text-[12px] font-semibold underline mt-1">Use another email</button>
       </div>
     </div>
@@ -258,26 +260,42 @@
 
       const btn = document.getElementById('email-verify-btn');
       const btnText = document.getElementById('email-verify-btn-text');
-      btn.classList.add('opacity-60', 'pointer-events-none');
+      btn.disabled = true;
       btnText.textContent = 'Sending...';
 
-      const { data: { session } } = await supabase.auth.getSession();
-      await supabase.from('profiles').update({
-        unimatch_verify_email: email,
-        unimatch_verification_status: 'pending'
-      }).eq('id', session.user.id);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("Authentication required.");
 
-      btn.parentElement.classList.add('hidden');
-      document.getElementById('email-sent-state').classList.remove('hidden');
-      document.getElementById('email-sent-state').classList.add('flex');
-      clearError();
+        const { error: updateErr } = await supabase.from('profiles').update({
+          unimatch_verify_email: email,
+          unimatch_verification_status: 'pending'
+        }).eq('id', session.user.id);
+
+        if (updateErr) throw updateErr;
+
+        document.getElementById('email-input-container').classList.add('hidden');
+        document.getElementById('email-sent-state').classList.remove('hidden');
+        document.getElementById('email-sent-state').classList.add('flex');
+        document.getElementById('sent-email-display').textContent = email;
+        clearError();
+
+        setTimeout(() => {
+          window.location.href = '/unimatch/auth/pending.html';
+        }, 1800);
+      } catch (err) {
+        showError('Verification error: ' + err.message);
+        btn.disabled = false;
+        btnText.textContent = 'Send Verification Link';
+      }
     }
 
     function resetEmailPanel() {
-      document.getElementById('email-verify-btn').parentElement.classList.remove('hidden');
+      document.getElementById('email-input-container').classList.remove('hidden');
       document.getElementById('email-sent-state').classList.add('hidden');
       document.getElementById('email-sent-state').classList.remove('flex');
-      document.getElementById('email-verify-btn').classList.remove('opacity-60', 'pointer-events-none');
+      const btn = document.getElementById('email-verify-btn');
+      btn.disabled = false;
       document.getElementById('email-verify-btn-text').textContent = 'Send Verification Link';
       document.getElementById('verify-email-input').value = '';
     }
