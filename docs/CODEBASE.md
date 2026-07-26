@@ -1,92 +1,95 @@
 # UniThrift Codebase Architecture
 
-This document serves as a guide to the structure of the UniThrift codebase, outlining how files connect, where data is managed, and how different features interact across the platform.
+This document serves as the authoritative guide to the structure of the UniThrift codebase, outlining how files connect, where data is managed, how authentication & onboarding routing function, and how every module operates across the platform.
 
 ---
 
-## Directory Structure Overview
+## Directory Structure & File Map
 
-- **`/` (Root)**: Core gateway portal (`index.html`) and splash screen (`splash.html`).
-- **`/auth`**: UniThrift onboarding, authentication, profile setup, and ID verification views.
-- **`/marketplace`**: Buying and selling flows, offer review pages, item detail view, and security deposit reservation.
-- **`/roommates`**: Simplified flatmate discovery directory board (`flatmates.html`) and requirement creation/editing (`roommate_need_flat.html`).
-- **`/pghostels`**: PG and Hostel discovery features.
-- **`/unimatch`**: Campus social and dating sub-application with sunset cloud theme, non-scrollable discovery feed, and mutual Instagram exchange flow.
-  - **`/unimatch/auth`**: UniMatch auth, verification, and Instagram handle setup.
-  - **`/unimatch/profile-setup`**: 5-step UniMatch profile builder (Basic Info, Intents, Interests, Photos, Review).
-  - **`/unimatch/profile`**: User profile view and edit screens (`my-profile.html`, `edit-profile.html`).
-- **`/core`**: Offers dashboard, activity notifications, meetup status/chat, and general user settings.
-- **`/scripts`**: Central JavaScript logic and API helper files (`supabase.js`).
-- **`/docs`**: Comprehensive project documentation (`CONTEXT.md`, `JOURNEY.md`, `CODEBASE.md`, `ALGORITHM.md`).
-- **`/db`**: Database configuration, schema scripts, and SQL migrations.
+- **`/` (Root)**
+  - `index.html`: Dual-ecosystem gateway portal. Sessions checks route logged-in users directly to `/marketplace/marketplace.html` or `/unimatch/discover.html`.
+  - `splash.html`: Animated brand entry screen.
+
+- **`/auth` (UniThrift Authentication & Onboarding)**
+  - `login.html`: Dual-mode (Sign In / Sign Up) authentication supporting Email/Password and Google OAuth (`signInWithGoogle`). Features Role Selector (Buyer / Seller) for new account sign-ups.
+  - `profile_setup.html`: Step 2 onboarding collecting `full_name`, `phone_number`, `year_of_study`, `college`, and `enrollment_number` (optional for 1st-year students). Integrates **Cropper.js** for mandatory square avatar cropping before registration.
+  - `id_verification.html`: Step 3 onboarding for uploading student ID cards. Updates `is_verified = true` in Supabase.
+  - `pending_verification.html`: Waiting room screen while ID verification is processed.
+
+- **`/marketplace` (UniThrift Marketplace & Transactions)**
+  - `marketplace.html`: Primary product browsing grid with category filter chips, search, and platform switcher pill.
+  - `item.html`: Product details page with 25% Security Deposit reservation flow calling Razorpay Edge Function (`/functions/v1/create-razorpay-order`).
+  - `sell.html`: Form for posting items for sale with multi-photo upload to `product_images` bucket.
+  - `offer_received.html`: Dedicated seller processing screen for a received offer, enabling Accept, Reject, or Counter-offer.
+
+- **`/roommates` (Campus Flatmates Directory)**
+  - `flatmates.html`: Simplified flatmate directory board. Replaced Tinder-style swipe cards with category tabs (`All`, `Rooms Available 🏠`, `Seeking Room 🔍`), live location search, multi-photo carousel with fullscreen Lightbox viewer (`object-contain`), avatar initials fallbacks, and **Razorpay ₹39 Contact Unlock System** (public info visible, contact info blurred until unlocked).
+  - `roommate_need_flat.html`: Listing creation and editing form with intelligent edit-mode pre-filling and dynamic area chips from user's `college` profile field.
+  - `matches.html`: Flatmate matches and unlocks overview.
+
+- **`/pghostels` (PG & Hostel Discovery)**
+  - `pghostels.html`: PG and Hostel directory search and filter board.
+  - `pg_detail.html`: Detailed view for PG & Hostel accommodations with room amenities and booking inquiry forms.
+
+- **`/unimatch` (Campus Social & Dating Ecosystem)**
+  - `welcome.html`: Landing hero screen with warm gradient overlay, trust badges, and automated auth-routing script.
+  - `discover.html`: Primary full-screen discovery feed featuring interest-based ranking algorithm (`ALGORITHM.md`), gender filtering, multi-photo story progress bars, and standardized 64px action buttons in a fixed non-scrollable viewport (`top: 64px`, `bottom: 64px`, `100dvh`).
+  - `icebreaker.html`: Bento grid selector featuring mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore) required before Instagram handle exchanges.
+  - `insta-exchange-request.html` & `insta-exchange-success.html`: Privacy-first mutual agreement protocol for sharing Instagram handles.
+  - `connection-success.html`: Celebratory match notification view with direct Instagram deep-linking (`instagram://user?...`).
+  - `hidden-likes.html`: Admirers view showing blurred cards of students who liked the user.
+  - `out-of-likes.html`: Daily swipe limit screen with return countdown timer.
+  - `unimatch-theme.css`: UniMatch CSS token system (`--um-bg-gradient`, `--um-primary`, `--um-card`, HSL sunset palette `#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`).
+  - `clouds-init.js`: Auto-injecting drifting SVG cumulus cloud animation layer.
+
+- **`/unimatch/auth` (UniMatch Onboarding Subfolder)**
+  - `login.html`: UniMatch auth gate supporting Google OAuth and Email OTP.
+  - `verify.html`: Student ID Verification gate enforcement for UniMatch.
+  - `instagram.html`: Step 2 onboarding requiring Instagram handle input (`@username`).
+  - `verified.html` & `pending.html`: Verification status confirmation views.
+
+- **`/unimatch/profile-setup` (5-Step UniMatch Profile Builder)**
+  - `basic-info.html`: Step 1 - Full Name, Gender, Preferred Feed Gender, Major, Year of Study, and 150-char Bio.
+  - `looking-for.html`: Step 2 - Intent cards (Friends, Coffee Buddy, Study Partner, Event Buddy, Dating).
+  - `interests.html`: Step 3 - Searchable interest chips (Academic, Lifestyle, Hobbies, Tech & Culture).
+  - `photos.html`: Step 4 - Photo grid supporting 1 to 6 photos uploaded to `profile_photos` bucket.
+  - `review.html`: Step 5 - Interactive profile card preview before setting `unimatch_profile_complete = true`.
+
+- **`/unimatch/profile` (Profile Views & Management)**
+  - `my-profile.html`: User's own social profile dashboard.
+  - `edit-profile.html`: Profile editing interface for bio, gender preferences, interests, and photos.
+
+- **`/core` (General User Features & Negotiations)**
+  - `offers.html`: Central Offers Dashboard with tabbed panels for **Offers Received** and **Offers Sent**.
+  - `chat.html`: Meetup Status & Negotiation dashboard for proposing campus meetup location/time and revealing confirmed phone numbers.
+  - `activity.html`: Notifications feed for accepted offers, meetup updates, and match alerts.
+  - `profile.html`: General user profile and account management.
+
+- **`/admin` (Moderation Hub)**
+  - `dashboard.html`: Admin moderation panel using `getAllRoommateListingsAdmin()` to inspect all marketplace and roommate listings without swipe or college filters, including inline photo gallery for spam deletion.
+
+- **`/scripts` (JavaScript API Brain)**
+  - `supabase.js`: Central controller initializing Supabase client and exposing helper functions:
+    - Auth: `checkAuth()`, `getProfile()`, `updateProfile()`, `signInWithGoogle()`, `logout()`.
+    - Offers: `submitOffer()`, `getReceivedOffers()`, `getSentOffers()`, `updateOfferStatus()`.
+    - Roommates: `getCollegeAreas()`, `createRoommateListing()`, `getUserRoommateListing()`, `getRoommateListings()`, `likeRoommateListing()`, `getAllRoommateListingsAdmin()`.
+    - Platform Switcher: `renderPlatformSwitcher(activePlatform)` generating the green shopping bag / burgundy heart dual-segment pill.
+    - Global Avatar Sync: Listens on DOM load to sync `#header-avatar` across all pages.
+
+- **`/db` (Database Schema Scripts & Migrations)**
+  - `supabase_setup.sql`: Master definitions for `profiles` and `products` tables with RLS policies.
+  - `offers_migration.sql`: Schema and RLS policies for `offers` table.
+  - `reservation_chat_setup.sql`: Tables for `reservations` and `meetups` tracking deposit checkout and meetup negotiation state machine.
+  - `roommate_images_migration.sql`: Adds `images` (array) and `amenities` (array) to `roommate_listings` and sets up `roommate_images` storage bucket.
+  - `roommate_two_sided_migration.sql`: Adds `listing_type` (`have_flat` vs `need_flat`) and `rent` columns to `roommate_listings`.
+  - `roommate_likes_migration.sql`: Schema for `roommate_likes` swiping engine and `roommate_matches` interaction state.
+  - `unimatch_setup.sql`: Extends `profiles` schema with `gender`, `preferred_gender`, `instagram_username`, `bio`, `looking_for` (JSON), `interests` (JSON), `profile_photos` (JSON), and `unimatch_profile_complete`.
 
 ---
 
-## Authentication & Backend Connectivity
+## Technical Standards & Behavioral Guidelines
 
-- **`/scripts/supabase.js`**: The central controller for connecting the frontend UI to our Supabase database.
-  - Initializes the Supabase client.
-  - Core Auth Helpers: `checkAuth()`, `getProfile()`, `updateProfile()`, `signInWithGoogle()`, `logout()`.
-  - Marketplace Offers API: `submitOffer()`, `getReceivedOffers()`, `getSentOffers()`, `updateOfferStatus()`.
-  - Roommate Listings API: `getCollegeAreas()`, `createRoommateListing()`, `getUserRoommateListing()`, `getRoommateListings()`, `likeRoommateListing()`, `getAllRoommateListingsAdmin()`.
-  - Platform Switcher Helper: `renderPlatformSwitcher(activePlatform)` generating the green shopping bag / burgundy heart dual-segment pill.
-  - Global Header Avatar Sync: Auto-syncs `#header-avatar` across all pages with user avatar URL.
-
----
-
-## Database Schemas & Migrations (`/db`)
-
-- **`/db/supabase_setup.sql`**: Master SQL script defining core `profiles` and `products` tables with RLS policies.
-- **`/db/offers_migration.sql`**: Schema definitions and RLS policies for the `offers` table.
-- **`/db/reservation_chat_setup.sql`**: Tables for `reservations` and `meetups` handling deposit status and meetup negotiation states.
-- **`/db/roommate_images_migration.sql`**: Configures `images` (array) and `amenities` (array) columns on `roommate_listings`, plus the `roommate_images` storage bucket.
-- **`/db/roommate_two_sided_migration.sql`**: Adds `listing_type` (`have_flat` vs `need_flat`) and `rent` columns to `roommate_listings`.
-- **`/db/roommate_likes_migration.sql`**: Schema for `roommate_likes` swiping engine and `roommate_matches` tables.
-- **`/db/unimatch_setup.sql`**: Schema extending `profiles` with `gender`, `preferred_gender`, `instagram_username`, `bio`, `looking_for` (JSON), `interests` (JSON), `profile_photos` (JSON), and `unimatch_profile_complete`.
-
----
-
-## The Onboarding & Gateway Journey
-
-### 1. Gateway Portal (`/index.html`)
-- Serves as the primary entry point choice screen between **UniThrift** and **UniMatch**.
-- **Session-Aware Navigation:** For authenticated users, card clicks dynamically route directly to `/marketplace/marketplace.html` or `/unimatch/discover.html` (preventing bounce loops back to login). Displays greeting (`Hi, <name>`) and Sign Out button.
-
-### 2. UniThrift Onboarding (`/auth/`)
-- **`/auth/login.html`**: Dual-mode (Sign In / Sign Up) interface supporting Email/Password and Google OAuth.
-- **`/auth/profile_setup.html`**: Collects `full_name`, `phone_number`, `year_of_study`, `college`, and requires mandatory avatar cropping via **Cropper.js**.
-- **`/auth/id_verification.html`**: Student ID upload gate marking `is_verified = true`.
-
-### 3. UniMatch Onboarding (`/unimatch/auth/` & `/unimatch/profile-setup/`)
-- Linear onboarding flow: ID Verification (`verify.html`) -> Instagram Handle (`instagram.html`) -> 5-Step Profile Builder (`basic-info.html`, `looking-for.html`, `interests.html`, `photos.html`, `review.html`).
-
----
-
-## Core Feature Modules
-
-### 1. Simplified Flatmates Directory & Razorpay ₹39 Contact Unlock (`/roommates/flatmates.html`)
-- **Category Tabs:** Filter between `All Listings`, `Rooms Available 🏠`, and `Seeking Room 🔍`.
-- **Live Search & Location Filter:** Client-side search filtering titles, preferred areas, bio text, and college majors.
-- **Multi-Photo Carousel & Lightbox:** Interactive photo slider with prev/next arrows, thumbnail strip, and fullscreen Lightbox modal (`object-contain`).
-- **Razorpay ₹39 Contact Unlock:** Public view displays photos, price, location, and amenities chips. Host profile name/avatar, description, and contact buttons are blurred until user unlocks for ₹39 via **Razorpay Checkout SDK** (`https://checkout.razorpay.com/v1/checkout.js`). Unlocked IDs are stored in `localStorage` (`unithrift_unlocked_flatmates`). Supports `?reset=true` parameter for re-testing.
-
-### 2. UniMatch Discovery Feed & Theme System (`/unimatch/`)
-- **Theme Palette (`unimatch/unimatch-theme.css`):** Soft HSL sunset gradient (`#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`) with frosted glass UI tokens.
-- **Drifting Cloud SVG Animation (`unimatch/clouds-init.js`):** Auto-injecting drifting cloud layer across UniMatch views (excluding hero photos).
-- **Non-Scrollable Viewport (`unimatch/discover.html`):** Fixed positioning between `top: 64px` header and `bottom: 64px` bottom nav (`100dvh`, `overflow: hidden`).
-- **Feed Algorithm (`ALGORITHM.md`):** Ranks candidate student profiles based on shared interest tag counts while filtering out self and non-preferred genders.
-- **Mutual Instagram Exchange (`insta-exchange-request.html`, `connection-success.html`):** Mutual consent protocol for sharing Instagram handles with direct deep-linking (`instagram://user?...`).
-
-### 3. Marketplace & Offers Engine (`/marketplace/`)
-- **`/marketplace/marketplace.html`**: Primary product browsing feed with category chips and search.
-- **`/marketplace/item.html`**: Product details page with 25% Security Deposit reservation modal calling Razorpay Edge Function (`/functions/v1/create-razorpay-order`).
-- **`/core/offers.html` & `/marketplace/offer_received.html`**: Offers review dashboard with Accept, Counter, and Reject actions.
-- **`/core/chat.html`**: Meetup Negotiation dashboard for location/time proposals and confirmed phone number reveals.
-
----
-
-## Technical Guidelines & UI Rules
-- **Typography:** Geist font family across UniThrift; Dancing Script + DM Sans across UniMatch.
-- **Iconography:** Material Symbols Outlined (`font-variation-settings: 'FILL' 1` for active state icons).
-- **Viewport Layouts:** Maintain explicit `position: fixed` and `z-index: 50` on headers/navbars without applying `position: relative` globally to `body > *`.
-- **Photo Modals:** Use uncropped lightbox containers (`object-contain`) to prevent cutting off student heads or room ceilings.
+1. **Mobile Layout Integrity:** Never apply global `min-height` calculations or global `position: relative` to `body > *` as it breaks `position: fixed` headers and navigation bars.
+2. **PostgREST Joins:** Always disambiguate foreign key joins on `profiles` (e.g., `profiles!seller_id(full_name)` or `profiles!user_id(...)`) to prevent API errors.
+3. **Photo Viewers:** Always use uncropped Lightbox containers (`object-contain`) for photo viewing so student heads or room ceilings are never clipped.
+4. **Monetization Privacy:** On `flatmates.html`, public details (photos, rent, location, amenities chips) are always visible; contact details (name, avatar, description, call/chat buttons) are blurred until unlocked via **Razorpay Checkout SDK** (`amount: 3900`).
