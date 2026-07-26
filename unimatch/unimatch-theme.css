@@ -180,12 +180,12 @@ body {
 .um-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 14px;
+  gap: 4px;
+  padding: 4px 10px;
   background: var(--um-primary-dim);
   color: var(--um-primary);
   border-radius: var(--um-radius-full);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
   border: 1px solid rgba(192, 48, 74, 0.15);
@@ -241,12 +241,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  padding: 12px 0 4px;
+  gap: 20px;
+  padding: 6px 0 2px;
   flex-shrink: 0;
 }
 .um-btn-pass {
-  width: 64px; height: 64px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
@@ -262,7 +262,7 @@ body {
 .um-btn-pass:active { transform: scale(0.94); }
 
 .um-btn-like {
-  width: 64px; height: 64px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--um-primary) 0%, var(--cloud-mauve) 100%);
   box-shadow: 0 8px 28px rgba(192, 48, 74, 0.4);
