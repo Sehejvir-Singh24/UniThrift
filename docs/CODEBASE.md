@@ -33,18 +33,18 @@ This document serves as the authoritative guide to the structure of the UniThrif
 
 - **`/unimatch` (Campus Social & Dating Ecosystem)**
   - `welcome.html`: Landing hero screen with warm gradient overlay, trust badges, and automated auth-routing script.
-  - `discover.html`: Primary full-screen discovery feed featuring interest-based ranking algorithm (`ALGORITHM.md`), gender filtering, multi-photo story progress bars, and standardized 64px action buttons in a fixed non-scrollable viewport (`top: 64px`, `bottom: 64px`, `100dvh`).
+  - `discover.html`: Primary full-screen discovery feed querying real database profiles (`unimatch_profile_complete = true`) with parallel `Promise.all` queries, locked ₹29 Instagram handle popups, mobile-proportioned cards (guaranteed 55% photo height), and neutral skeleton loading state.
   - `icebreaker.html`: Bento grid selector featuring mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore) required before Instagram handle exchanges.
   - `insta-exchange-request.html` & `insta-exchange-success.html`: Privacy-first mutual agreement protocol for sharing Instagram handles.
   - `connection-success.html`: Celebratory match notification view with direct Instagram deep-linking (`instagram://user?...`).
-  - `hidden-likes.html`: Admirers view showing blurred cards of students who liked the user.
+  - `hidden-likes.html`: Admirers & Mutual Matches directory featuring ₹29 ONE-TIME admirer profile unblur and locked Instagram handles (`@•••••••••`).
   - `out-of-likes.html`: Daily swipe limit screen with return countdown timer.
   - `unimatch-theme.css`: UniMatch CSS token system (`--um-bg-gradient`, `--um-primary`, `--um-card`, HSL sunset palette `#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`).
   - `clouds-init.js`: Auto-injecting drifting SVG cumulus cloud animation layer.
 
 - **`/unimatch/auth` (UniMatch Onboarding Subfolder)**
   - `login.html`: UniMatch auth gate supporting Google OAuth and Email OTP.
-  - `verify.html`: Student ID Verification gate enforcement for UniMatch.
+  - `verify.html`: Student ID Verification gate enforcement for UniMatch with Base64 DataURL fallback for RLS policies.
   - `instagram.html`: Step 2 onboarding requiring Instagram handle input (`@username`).
   - `verified.html` & `pending.html`: Verification status confirmation views.
 
@@ -58,6 +58,7 @@ This document serves as the authoritative guide to the structure of the UniThrif
 - **`/unimatch/profile` (Profile Views & Management)**
   - `my-profile.html`: User's own social profile dashboard.
   - `edit-profile.html`: Profile editing interface for bio, gender preferences, interests, and photos.
+  - `notifications.html`: Anonymous activity feed displaying real student likes and mutual matches.
 
 - **`/core` (General User Features & Negotiations)**
   - `offers.html`: Central Offers Dashboard with tabbed panels for **Offers Received** and **Offers Sent**.
@@ -66,11 +67,12 @@ This document serves as the authoritative guide to the structure of the UniThrif
   - `profile.html`: General user profile and account management.
 
 - **`/admin` (Moderation Hub)**
-  - `dashboard.html`: Admin moderation panel using `getAllRoommateListingsAdmin()` to inspect all marketplace and roommate listings without swipe or college filters, including inline photo gallery for spam deletion.
+  - `dashboard.html`: Admin moderation panel featuring **ID Verifications Tab** (live pending counter badge, fullscreen ID card lightbox inspection, UniMatch details, one-click Approve/Reject handlers), Marketplace listings, Flatmate postings, PG/Hostels, and Registered Users.
 
 - **`/scripts` (JavaScript API Brain)**
   - `supabase.js`: Central controller initializing Supabase client and exposing helper functions:
-    - Auth: `checkAuth()`, `getProfile()`, `updateProfile()`, `signInWithGoogle()`, `logout()`.
+    - Auth: `checkAuth()`, `getProfile()` (fast cache-first `sessionStorage` profile retrieval with background revalidation), `updateProfile()`, `signInWithGoogle()`, `logout()`.
+    - Verification Admin: `getPendingVerifications()`, `approveVerification()`, `rejectVerification()`.
     - Offers: `submitOffer()`, `getReceivedOffers()`, `getSentOffers()`, `updateOfferStatus()`.
     - Roommates: `getCollegeAreas()`, `createRoommateListing()`, `getUserRoommateListing()`, `getRoommateListings()`, `likeRoommateListing()`, `getAllRoommateListingsAdmin()`.
     - Platform Switcher: `renderPlatformSwitcher(activePlatform)` generating the green shopping bag / burgundy heart dual-segment pill.

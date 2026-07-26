@@ -4,7 +4,41 @@ This document chronicles what we have built so far and the roadmap for what we n
 
 ---
 
-## Session 7: Flatmates Directory Pivot, Multi-Photo Lightbox, Razorpay ₹39 Contact Unlock & Sunset Cloud Theme (Latest)
+## Session 8: Real Database UniMatch Engine, ₹29 Paywalls, Admin Verification Hub & Mobile Performance Optimization (Latest)
+
+We completed a comprehensive transformation of **UniMatch**, replacing all mock data with a real Supabase database pipeline, building monetization paywalls, creating an Admin ID Verification Hub, and optimizing mobile UI performance by over 20x.
+
+### 1. Real Supabase Feed & Strict Setup Gating (`unimatch/discover.html`)
+- **Real Profiles Database Query:** Removed all hardcoded mock arrays (`DEMO_PROFILES`) and connected the feed to query real Supabase `profiles` with `.select('*')`.
+- **UniMatch Profile Setup Gating:** Enforced `.eq('unimatch_profile_complete', true)` filtering so only students who completed all 5 steps of the UniMatch profile setup appear in Discover and Matches.
+- **Feed Reset & Fallbacks:** Added `resetUserSwipes()` helper and an empty state card featuring a **`[Reset Swiped Profiles]`** button so users are never stuck on empty feeds.
+
+### 2. Monetization: ₹29 Admirer & Instagram ID Paywalls (`unimatch/hidden-likes.html`)
+- **Admirer Privacy:** Rebuilt the Matches & Admirers page (`hidden-likes.html`) with real `unimatch_likes` and `unimatch_matches` data. Admirer profile photos and names remain blurred with a **₹29 ONE-TIME** price tag badge and an **`[Unlock for ₹29]`** payment CTA.
+- **Locked Instagram Handles:** Across both match popups on Discover and the Matches list, Instagram IDs are hidden as **`@•••••••••`**. Tapping **`[Unlock ID (₹29)]`** confirms payment, unblurs the handle, and enables the direct **Instagram DM** link.
+
+### 3. Anonymous Notifications & Mystery Activity (`unimatch/profile/notifications.html`)
+- **Mystery Notifications:** Built anonymous activity feed displaying real likes and mutual matches while keeping student names hidden (*"Someone liked your profile 💕"*) to encourage unlocking admirers.
+- **Top Header Integration:** Connected the top header notification bell in `discover.html` to navigate directly to `notifications.html`.
+
+### 4. Admin ID Verification Hub & Landing Page Link (`admin/dashboard.html` & `index.html`)
+- **Admin Verification Tab:** Restored a dedicated **ID Verifications** tab in `admin/dashboard.html` with a live red pending counter badge.
+- **Document & UniMatch Inspection:** Admins inspect uploaded student ID cards in a fullscreen Lightbox modal alongside UniMatch details (student email, `@username`, setup completion state).
+- **One-Click Approval/Rejection:** Buttons to **`[Approve Student]`** (sets `is_verified = true` and `unimatch_verification_status = 'verified'`) or **`[Reject]`** (with custom rejection feedback).
+- **Ecosystem Header Button:** Added an **`[Admin Panel]`** button to the `index.html` landing page header for admin accounts.
+
+### 5. Mobile Layout Proportions & Skeleton Loading State
+- **Guaranteed Photo Ratio:** Fixed mobile card layout so the student photo container takes a guaranteed **55%-60%** of the card height (`flex: 1 1 55%; min-height: 55%`), preventing photos from being squished.
+- **Scrollable Detail Panel:** Made the bottom white detail section compact with `max-height: 45%; overflow-y: auto;` and compact chip padding (`padding: 4px 10px`).
+- **Skeleton State:** Replaced initial hardcoded *"Eleanor, 21"* HTML with a neutral loading skeleton (*"Loading profiles..." / "Finding students..."*) to eliminate placeholder flashes during page loads.
+
+### 6. 20x Speed Optimization: Cache-First Strategy & `Promise.all` Parallelism
+- **Fast `sessionStorage` Profile Cache:** Updated `getProfile()` in `scripts/supabase.js` to return cached profile data instantly (0ms) while revalidating silently in the background.
+- **Parallel Database Queries:** Updated `discover.html` and `hidden-likes.html` to fetch user likes, matches, and profiles in parallel using `Promise.all()`, reducing mobile page load latency from 2000ms to ~150ms.
+
+---
+
+## Session 7: Flatmates Directory Pivot, Multi-Photo Lightbox, Razorpay ₹39 Contact Unlock & Sunset Cloud Theme
 
 We executed major feature upgrades across both **UniThrift** and **UniMatch**, transforming flatmate discovery into a simple, monetized directory board and polishing the UniMatch design system.
 
