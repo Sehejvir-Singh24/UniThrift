@@ -148,8 +148,12 @@
       document.getElementById('preview-name').innerHTML = `${profile.full_name}${age} <span class="material-symbols-outlined text-secondary-container text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>`;
     }
 
-    // Major
-    if (profile.major) document.getElementById('preview-major').textContent = profile.major;
+    // Major & Gender Details
+    let details = [];
+    if (profile.major) details.push(profile.major);
+    if (profile.gender) details.push(profile.gender);
+    if (profile.preferred_gender) details.push(`Feed: ${profile.preferred_gender}`);
+    if (details.length > 0) document.getElementById('preview-major').textContent = details.join(' • ');
 
     // Bio
     if (profile.bio) document.getElementById('preview-bio').textContent = profile.bio;

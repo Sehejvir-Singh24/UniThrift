@@ -81,24 +81,23 @@
         <label class="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider">Full Name</label>
         <input id="edit-fullName" class="w-full bg-background border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" value="Eleanor Vance"/>
       </div>
-      <!-- Pronouns & Class Year -->
+      <!-- Gender & Feed Preference -->
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-unit">
-          <label class="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider">Pronouns</label>
-          <select id="edit-pronouns" class="w-full bg-background border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors">
-            <option>she/her</option>
-            <option>he/him</option>
-            <option>they/them</option>
+          <label class="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider">Your Gender</label>
+          <select id="edit-gender" class="w-full bg-background border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors">
+            <option value="Male">Man / Male</option>
+            <option value="Female">Woman / Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         <div class="space-y-unit">
-          <label class="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider">Class Year</label>
-          <select id="edit-year" class="w-full bg-background border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors">
-            <option value="4th Year">Senior ('24)</option>
-            <option value="3rd Year">Junior ('25)</option>
-            <option value="2nd Year">Sophomore ('26)</option>
-            <option value="1st Year">Freshman ('27)</option>
-            <option value="Graduate">Graduate</option>
+          <label class="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider">Show Me In Feed</label>
+          <select id="edit-preferred_gender" class="w-full bg-background border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors">
+            <option value="Women">Women</option>
+            <option value="Men">Men</option>
+            <option value="Everyone">Everyone</option>
           </select>
         </div>
       </div>
@@ -165,14 +164,24 @@
     if (profile) {
       if (profile.full_name) document.getElementById('edit-fullName').value = profile.full_name;
       if (profile.major) document.getElementById('edit-major').value = profile.major;
-      if (profile.year_of_study) document.getElementById('edit-year').value = profile.year_of_study;
+      if (profile.gender && document.getElementById('edit-gender')) document.getElementById('edit-gender').value = profile.gender;
+      if (profile.preferred_gender && document.getElementById('edit-preferred_gender')) document.getElementById('edit-preferred_gender').value = profile.preferred_gender;
       if (profile.bio) {
         document.getElementById('edit-bio').value = profile.bio;
         document.getElementById('edit-bio-count').textContent = `${profile.bio.length} / 300`;
       }
+      let mainPhoto = null;
       if (profile.profile_photos) {
-        const photos = JSON.parse(profile.profile_photos);
-        if (photos.length > 0) document.getElementById('edit-photo-preview').src = photos[0];
+        try {
+          const photos = typeof profile.profile_photos === 'string' ? JSON.parse(profile.profile_photos) : profile.profile_photos;
+          if (photos && photos.length > 0) mainPhoto = photos[0];
+        } catch (e) {}
+      }
+      if (!mainPhoto && profile.avatar_url) {
+        mainPhoto = profile.avatar_url;
+      }
+      if (mainPhoto && document.getElementById('edit-photo-preview')) {
+        document.getElementById('edit-photo-preview').src = mainPhoto;
       }
     }
   })();
@@ -187,7 +196,8 @@
     await supabase.from('profiles').update({
       full_name: document.getElementById('edit-fullName').value.trim(),
       major: document.getElementById('edit-major').value.trim(),
-      year_of_study: document.getElementById('edit-year').value,
+      gender: document.getElementById('edit-gender') ? document.getElementById('edit-gender').value : null,
+      preferred_gender: document.getElementById('edit-preferred_gender') ? document.getElementById('edit-preferred_gender').value : null,
       bio: document.getElementById('edit-bio').value.trim(),
     }).eq('id', session.user.id);
 

@@ -4,109 +4,124 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
   <title>UniMatch – Connect with your community</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            "um-primary": "#5c0427",
-            "um-primary-container": "#7a1f3d",
-            "um-on-primary": "#ffffff",
-            "um-surface": "#faf9f7",
-            "um-surface-container": "#efeeec",
-            "um-surface-container-low": "#f4f3f1",
-            "um-on-surface": "#1a1c1b",
-            "um-on-surface-variant": "#554245",
-            "um-outline": "#887275",
-            "um-outline-variant": "#dac0c4",
-          },
-          fontFamily: { "inter": ["Inter"] },
-        }
-      }
-    }
-  </script>
+  <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
   <style>
-    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
-    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    body {
+      font-family: var(--um-font-body);
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      overscroll-behavior: none;
+    }
     .hero-overlay {
       background: linear-gradient(
         to bottom,
-        rgba(250,249,247,0) 0%,
-        rgba(250,249,247,0.1) 30%,
-        rgba(250,249,247,0.85) 65%,
-        rgba(250,249,247,1) 85%
+        rgba(242, 196, 184, 0) 0%,
+        rgba(232, 160, 144, 0.2) 35%,
+        rgba(212, 168, 180, 0.85) 65%,
+        rgba(204, 176, 192, 1) 85%
       );
     }
+    .floating-chip {
+      position: absolute;
+      background: rgba(255, 252, 252, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 999px;
+      padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 20px rgba(140, 80, 100, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      color: var(--um-text);
+    }
+    .chip-avatar {
+      width: 28px; height: 28px; border-radius: 50%; object-fit: cover;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+    .float-anim { animation: floatUp 3.5s ease-in-out infinite; }
+    .float-anim-delay { animation: floatUp 3.5s ease-in-out infinite; animation-delay: 1.2s; }
   </style>
 </head>
-<body class="bg-um-surface text-um-on-surface min-h-screen flex flex-col pt-safe">
+<body>
 
   <!-- Header -->
-  <header class="absolute top-0 left-0 right-0 z-20 pt-safe">
-    <div class="h-14 px-6 flex items-center">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-um-primary text-[22px]" style="font-variation-settings:'FILL' 1;">school</span>
-        <span class="font-semibold text-um-primary text-[18px] tracking-tight">UniMatch</span>
-      </div>
+  <header style="position:absolute;top:0;left:0;right:0;z-index:20;padding:env(safe-area-inset-top, 0) 24px 0;">
+    <div style="height:56px;display:flex;align-items:center;justify-between;">
+      <span class="um-logo" style="display:flex;align-items:center;gap:6px;">
+        UniMatch
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--um-primary);font-variation-settings:'FILL' 1;">favorite</span>
+      </span>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <div class="relative w-full" style="height: 58vh; min-height: 300px;">
-    <!-- Campus photo -->
-    <img
-      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80&auto=format&fit=crop"
-      alt="Students connecting on campus"
-      class="absolute inset-0 w-full h-full object-cover object-top"
-    />
-    <!-- Gradient overlay fading to surface -->
-    <div class="hero-overlay absolute inset-0"></div>
+  <div style="position:relative;width:100%;height:60vh;min-height:320px;">
+    <!-- Hero photo -->
+    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80&auto=format&fit=crop"
+         alt="Students connecting on campus"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;"/>
+    <!-- Warm tinted overlay -->
+    <div class="hero-overlay" style="position:absolute;inset:0;"></div>
+    <!-- Subtle pink tint over photo top -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(255,180,200,0.18) 0%, transparent 40%);"></div>
+
+    <!-- Floating match chips (decorative) -->
+    <div class="floating-chip float-anim" style="top:20%;left:12px;">
+      <img class="chip-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&q=80" alt=""/>
+      <div>
+        <div style="font-size:11px;color:var(--um-text-muted);">New Match!</div>
+        <div style="font-size:13px;">Eleanor, 21 💕</div>
+      </div>
+    </div>
+    <div class="floating-chip float-anim-delay" style="top:35%;right:12px;">
+      <span class="material-symbols-outlined" style="color:var(--um-primary);font-size:18px;font-variation-settings:'FILL' 1;">favorite</span>
+      <span>5 Common Interests</span>
+    </div>
   </div>
 
-  <!-- Content card (flows below hero) -->
-  <div class="flex flex-col flex-1 px-6 pb-safe -mt-8 relative z-10">
-    <div class="flex flex-col gap-6">
+  <!-- Content below hero -->
+  <div style="flex:1;padding:0 24px 32px;margin-top:-40px;position:relative;z-index:10;display:flex;flex-direction:column;gap:24px;">
 
-      <!-- Text -->
-      <div class="flex flex-col gap-2">
-        <h1 class="text-[30px] font-semibold text-um-on-surface leading-tight tracking-tight">
-          Connect with your<br/>community.
-        </h1>
-        <p class="text-[15px] text-um-on-surface-variant leading-relaxed">
-          An exclusive space for verified students to discover mutual interests and build real connections.
-        </p>
-      </div>
+    <!-- Text heading -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <h1 style="font-size:32px;font-weight:700;color:var(--um-text);line-height:1.15;letter-spacing:-0.02em;margin:0;">
+        Connect with your<br/><span style="color:var(--um-primary);">community.</span>
+      </h1>
+      <p style="font-size:15px;color:var(--um-text-muted);line-height:1.6;margin:0;">
+        An exclusive space for verified students to discover mutual interests and build real connections on campus. 🎓
+      </p>
+    </div>
 
-      <!-- CTAs -->
-      <div class="flex flex-col gap-3 mt-2">
-        <a
-          href="/unimatch/auth/login.html?mode=signup"
-          id="get-started-btn"
-          class="w-full bg-um-primary text-um-on-primary text-[16px] font-semibold py-4 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-md"
-          style="box-shadow: 0 4px 20px rgba(92,4,39,0.25);"
-        >
-          Get Started
-          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </a>
+    <!-- Interest tags (visual) -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">local_cafe</span>Coffee</span>
+      <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">menu_book</span>Reading</span>
+      <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">music_note</span>Music</span>
+      <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">brush</span>Art</span>
+      <span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">fitness_center</span>Fitness</span>
+    </div>
 
-        <a
-          href="/unimatch/auth/login.html"
-          class="w-full bg-transparent border border-um-outline-variant text-um-on-surface text-[16px] font-semibold py-4 rounded-full flex items-center justify-center active:scale-[0.98] transition-transform"
-        >
-          Sign In
-        </a>
-      </div>
+    <!-- CTAs -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <a href="/unimatch/auth/login.html?mode=signup" id="get-started-btn" class="um-btn-primary" style="text-decoration:none;">
+        Get Started
+        <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>
+      </a>
+      <a href="/unimatch/auth/login.html" style="display:flex;align-items:center;justify-content:center;width:100%;padding:15px 24px;border-radius:9999px;border:1.5px solid var(--um-border);font-size:16px;font-weight:600;color:var(--um-text);text-decoration:none;background:white;transition:background 0.2s;" onmouseover="this.style.background='var(--um-primary-dim)'" onmouseout="this.style.background='white'">
+        Sign In
+      </a>
+    </div>
 
-      <!-- Trust badge -->
-      <div class="flex items-center justify-center gap-2 mt-1">
-        <span class="material-symbols-outlined text-um-outline text-[14px]" style="font-variation-settings:'FILL' 1;">verified_user</span>
-        <span class="text-[11px] font-semibold tracking-widest text-um-outline uppercase">Verified Student Access Only</span>
-      </div>
-
+    <!-- Trust badge -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:14px;color:var(--um-text-light);font-variation-settings:'FILL' 1;">verified_user</span>
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--um-text-light);text-transform:uppercase;">Verified Student Access Only</span>
     </div>
   </div>
 
@@ -114,26 +129,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
   <script>
-    // If already logged in, route to the right step
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return; // Stay on welcome
-
+      if (!session) return;
       const profile = await getProfile();
       if (!profile) return;
-
-      if (!profile.is_verified) {
-        window.location.href = '/unimatch/auth/verify.html';
-        return;
-      }
-      if (!profile.instagram_username) {
-        window.location.href = '/unimatch/auth/instagram.html';
-        return;
-      }
-      if (!profile.unimatch_profile_complete) {
-        window.location.href = '/unimatch/profile-setup/basic-info.html';
-        return;
-      }
+      if (!profile.is_verified) { window.location.href = '/unimatch/auth/verify.html'; return; }
+      if (!profile.instagram_username) { window.location.href = '/unimatch/auth/instagram.html'; return; }
+      if (!profile.unimatch_profile_complete) { window.location.href = '/unimatch/profile-setup/basic-info.html'; return; }
       window.location.href = '/unimatch/discover.html';
     })();
   </script>

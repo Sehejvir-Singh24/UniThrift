@@ -3,124 +3,106 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>UniMatch - Basic Information</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "error": "#ba1a1a",
-          "on-surface": "#1a1c1b",
-          "surface-container": "#efeeec",
-          "on-surface-variant": "#554245",
-          "primary": "#5c0427",
-          "error-container": "#ffdad6",
-          "outline-variant": "#dac0c4",
-          "secondary-container": "#ffca98",
-          "on-background": "#1a1c1b",
-          "on-primary": "#ffffff",
-          "surface": "#faf9f7",
-          "background": "#faf9f7",
-          "primary-container": "#7a1f3d",
-          "surface-container-highest": "#e3e2e0",
-          "surface-container-low": "#f4f3f1",
-          "surface-container-lowest": "#ffffff",
-          "outline": "#887275",
-        },
-        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-        spacing: {
-          "stack-gap-md": "20px", "unit": "4px", "section-margin": "48px",
-          "stack-gap-sm": "12px", "stack-gap-lg": "32px", "container-padding": "24px"
-        },
-        fontFamily: { "button": ["Inter"], "label-caps": ["Inter"], "body-lg": ["Inter"], "title-md": ["Inter"], "headline-lg-mobile": ["Inter"], "display": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"] },
-        fontSize: {
-          "button": ["16px", { lineHeight: "20px", fontWeight: "600" }],
-          "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
-          "body-lg": ["17px", { lineHeight: "26px", fontWeight: "400" }],
-          "title-md": ["20px", { lineHeight: "28px", fontWeight: "500" }],
-          "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
-          "display": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "600" }],
-          "headline-lg": ["28px", { lineHeight: "36px", letterSpacing: "-0.01em", fontWeight: "600" }],
-          "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }]
-        }
-      }
-    }
-  }
-</script>
+<link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
 <style>
-  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
-  .input-field { transition: all 0.2s ease-in-out; }
-  .input-field:focus-within { transform: scale(1.01); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-  .ambient-shadow { box-shadow: 0 4px 30px rgba(0,0,0,0.04); }
+  body { color: var(--um-text); min-height: 100dvh; font-family: var(--um-font-body); }
+  .form-card { background: rgba(255,252,252,0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 16px 18px; border: 1px solid rgba(255,255,255,0.7); transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(140,80,100,0.1); }
+  .form-card:focus-within { border-color: rgba(176,80,112,0.5); box-shadow: 0 6px 20px rgba(140,80,100,0.18); }
+  select, input, textarea { background: transparent; border: none; outline: none; width: 100%; font-family: var(--um-font-body); font-size: 15px; color: var(--um-text); }
+  select { appearance: none; cursor: pointer; }
+  input::placeholder, textarea::placeholder { color: var(--um-text-light); }
 </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased overflow-x-hidden">
+<body style="min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden;">
 
-<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-container-padding py-stack-gap-sm">
-  <div class="flex items-center gap-4">
-    <button onclick="history.back()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out p-2 -ml-2 rounded-full">
-      <span class="material-symbols-outlined text-2xl">arrow_back</span>
+<header class="um-header" style="height:64px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 20px;max-width:600px;margin:0 auto;">
+    <button onclick="history.back()" style="width:40px;height:40px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--um-primary);">
+      <span class="material-symbols-outlined" style="font-size:22px;">arrow_back</span>
     </button>
-    <h1 class="font-display text-display text-primary">UniMatch</h1>
+    <span class="um-logo" style="display:flex;align-items:center;gap:5px;">
+      UniMatch
+      <span class="material-symbols-outlined" style="font-size:16px;color:var(--um-primary);font-variation-settings:'FILL' 1;">favorite</span>
+    </span>
+    <button style="font-size:13px;font-weight:600;color:var(--um-primary);background:none;border:none;cursor:pointer;">Help</button>
   </div>
-  <button class="font-button text-button text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out">Help</button>
 </header>
 
-<main class="flex-grow pt-[100px] px-container-padding md:px-[max(24px,calc((100vw-600px)/2))] pb-section-margin flex flex-col">
-  <div class="max-w-2xl mx-auto w-full flex-grow flex flex-col">
-    <div class="mb-section-margin pt-stack-gap-lg">
-      <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background mb-unit">About you</h2>
-      <p class="font-body-lg text-body-lg text-on-surface-variant">Let's build your academic profile. This information helps us find the best study groups and connections for you.</p>
+<main style="flex:1;padding-top:80px;padding-bottom:48px;padding-left:20px;padding-right:20px;display:flex;flex-direction:column;">
+  <div style="max-width:600px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;">
+    <div style="margin-bottom:32px;padding-top:16px;">
+      <h2 style="font-size:26px;font-weight:700;color:var(--um-text);margin:0 0 8px;letter-spacing:-0.01em;">About you 💕</h2>
+      <p style="font-size:15px;color:var(--um-text-muted);line-height:1.6;margin:0;">Let's build your profile. This helps us find the best connections for you.</p>
     </div>
 
     <!-- Error banner -->
-    <div id="error-banner" class="hidden mb-4 bg-error-container text-error text-sm font-medium px-4 py-3 rounded-DEFAULT"></div>
+    <div id="error-banner" style="display:none;background:#FFDAD6;color:#BA1A1A;font-size:14px;font-weight:500;padding:12px 16px;border-radius:12px;margin-bottom:16px;"></div>
 
-    <form class="space-y-stack-gap-lg flex-grow flex flex-col" onsubmit="handleSubmit(event)">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-gap-md">
-        <!-- Full Name -->
-        <div class="col-span-1 md:col-span-2 input-field bg-surface-container-lowest rounded-DEFAULT ambient-shadow p-stack-gap-sm border border-surface-container-highest focus-within:border-primary/50 relative">
-          <label class="block font-label-caps text-label-caps text-on-surface-variant mb-unit uppercase px-1" for="fullName">Full Name</label>
-          <input class="w-full bg-transparent border-none focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant px-1 pb-1" id="fullName" name="fullName" placeholder="e.g. Eleanor Shellstrop" required type="text"/>
+    <form style="display:flex;flex-direction:column;flex:1;gap:12px;" onsubmit="handleSubmit(event)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- Full Name (full width) -->
+        <div class="form-card" style="grid-column:1/-1;">
+          <label class="um-label" for="fullName">Full Name</label>
+          <input id="fullName" name="fullName" placeholder="e.g. Eleanor Shellstrop" required type="text"/>
         </div>
         <!-- Major -->
-        <div class="col-span-1 input-field bg-surface-container-lowest rounded-DEFAULT ambient-shadow p-stack-gap-sm border border-surface-container-highest focus-within:border-primary/50 relative">
-          <label class="block font-label-caps text-label-caps text-on-surface-variant mb-unit uppercase px-1" for="major">Major</label>
-          <input class="w-full bg-transparent border-none focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant px-1 pb-1" id="major" name="major" placeholder="e.g. Computer Science" required type="text"/>
+        <div class="form-card">
+          <label class="um-label" for="major">Major</label>
+          <input id="major" name="major" placeholder="e.g. Computer Science" required type="text"/>
         </div>
         <!-- Year of Study -->
-        <div class="col-span-1 input-field bg-surface-container-lowest rounded-DEFAULT ambient-shadow p-stack-gap-sm border border-surface-container-highest focus-within:border-primary/50 relative group">
-          <label class="block font-label-caps text-label-caps text-on-surface-variant mb-unit uppercase px-1" for="year">Year of Study</label>
-          <div class="relative">
-            <select class="w-full bg-transparent border-none focus:ring-0 font-body-lg text-body-lg text-on-surface appearance-none px-1 pb-1 pr-8 cursor-pointer" id="year" name="year" required>
-              <option disabled selected value="">Select Year</option>
-              <option value="1st Year">1st Year</option>
-              <option value="2nd Year">2nd Year</option>
-              <option value="3rd Year">3rd Year</option>
-              <option value="4th Year">4th Year</option>
-              <option value="5th Year+">5th Year+</option>
-              <option value="Graduate">Graduate</option>
-            </select>
-            <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-focus-within:text-primary transition-colors">expand_more</span>
-          </div>
+        <div class="form-card" style="position:relative;">
+          <label class="um-label" for="year">Year of Study</label>
+          <select id="year" name="year" required>
+            <option disabled selected value="">Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+            <option value="5th Year+">5th Year+</option>
+            <option value="Graduate">Graduate</option>
+          </select>
+          <span class="material-symbols-outlined" style="position:absolute;right:16px;bottom:14px;font-size:20px;color:var(--um-text-light);pointer-events:none;">expand_more</span>
         </div>
-        <!-- Bio -->
-        <div class="col-span-1 md:col-span-2 input-field bg-surface-container-lowest rounded-lg ambient-shadow p-stack-gap-md border border-surface-container-highest focus-within:border-primary/50 relative">
-          <div class="flex justify-between items-end mb-unit px-1">
-            <label class="block font-label-caps text-label-caps text-on-surface-variant uppercase" for="bio">Bio</label>
-            <span class="font-label-caps text-label-caps text-outline-variant" id="charCount">0/150</span>
+        <!-- Gender -->
+        <div class="form-card" style="position:relative;">
+          <label class="um-label" for="gender">Your Gender</label>
+          <select id="gender" name="gender" required>
+            <option disabled selected value="">Select Gender</option>
+            <option value="Male">Man / Male</option>
+            <option value="Female">Woman / Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="material-symbols-outlined" style="position:absolute;right:16px;bottom:14px;font-size:20px;color:var(--um-text-light);pointer-events:none;">expand_more</span>
+        </div>
+        <!-- Show Me In Feed -->
+        <div class="form-card" style="position:relative;">
+          <label class="um-label" for="preferred_gender">Show Me In Feed</label>
+          <select id="preferred_gender" name="preferred_gender" required>
+            <option disabled selected value="">Select Preference</option>
+            <option value="Women">Women</option>
+            <option value="Men">Men</option>
+            <option value="Everyone">Everyone</option>
+          </select>
+          <span class="material-symbols-outlined" style="position:absolute;right:16px;bottom:14px;font-size:20px;color:var(--um-text-light);pointer-events:none;">expand_more</span>
+        </div>
+        <!-- Bio (full width) -->
+        <div class="form-card" style="grid-column:1/-1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label class="um-label" style="margin:0;" for="bio">Bio</label>
+            <span id="charCount" style="font-size:11px;color:var(--um-text-light);font-weight:600;">0/150</span>
           </div>
-          <textarea class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none px-1" id="bio" maxlength="150" name="bio" placeholder="Share a bit about your academic interests, study habits, or what you're looking for..." rows="4"></textarea>
+          <textarea id="bio" maxlength="150" name="bio" placeholder="Share a bit about your academic interests, study habits, or what you're looking for..." rows="4" style="resize:none;"></textarea>
         </div>
       </div>
-      <div class="flex-grow"></div>
-      <div class="pt-section-margin md:pt-stack-gap-lg pb-safe">
-        <button class="w-full bg-primary text-on-primary font-button text-button py-4 rounded-full hover:bg-primary-container hover:text-on-primary transition-all duration-300 ease-in-out active:scale-95 shadow-sm flex items-center justify-center gap-2 group" type="submit" id="continue-btn">
+      <div style="flex:1;"></div>
+      <div style="padding-top:16px;padding-bottom:env(safe-area-inset-bottom,0);">
+        <button class="um-btn-primary" type="submit" id="continue-btn">
           Continue
-          <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>
         </button>
       </div>
     </form>
@@ -141,6 +123,8 @@
       if (profile.full_name) document.getElementById('fullName').value = profile.full_name;
       if (profile.major) document.getElementById('major').value = profile.major;
       if (profile.year_of_study) document.getElementById('year').value = profile.year_of_study;
+      if (profile.gender) document.getElementById('gender').value = profile.gender;
+      if (profile.preferred_gender) document.getElementById('preferred_gender').value = profile.preferred_gender;
       if (profile.bio) {
         const bio = document.getElementById('bio');
         bio.value = profile.bio;
@@ -170,6 +154,8 @@
       full_name: document.getElementById('fullName').value.trim(),
       major: document.getElementById('major').value.trim(),
       year_of_study: document.getElementById('year').value,
+      gender: document.getElementById('gender').value,
+      preferred_gender: document.getElementById('preferred_gender').value,
       bio: document.getElementById('bio').value.trim(),
     }).eq('id', session.user.id);
 
@@ -183,4 +169,5 @@
     window.location.href = '/unimatch/profile-setup/looking-for.html';
   }
 </script>
+<script src="/unimatch/clouds-init.js"></script>
 </body></html>

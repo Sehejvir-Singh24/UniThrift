@@ -769,10 +769,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (headerAvatars.length > 0) {
     try {
       const profile = await getProfile();
-      if (profile && profile.avatar_url) {
-        headerAvatars.forEach(img => {
-          img.src = profile.avatar_url;
-        });
+      if (profile) {
+        let avatarSrc = null;
+        if (profile.profile_photos) {
+          try {
+            const photos = typeof profile.profile_photos === 'string' ? JSON.parse(profile.profile_photos) : profile.profile_photos;
+            if (photos && photos.length > 0) avatarSrc = photos[0];
+          } catch (e) {}
+        }
+        if (!avatarSrc && profile.avatar_url) {
+          avatarSrc = profile.avatar_url;
+        }
+        if (avatarSrc) {
+          headerAvatars.forEach(img => {
+            img.src = avatarSrc;
+          });
+        }
       }
     } catch (e) {
       console.warn("Auto-sync profile picture skipped:", e);
@@ -1304,6 +1316,35 @@ async function markNotificationsAsRead() {
     renderNotificationBadge(0);
   }
 }
+
+// ==========================================
+// PLATFORM SWITCHER SYSTEM (UniThrift <-> UniMatch)
+// ==========================================
+window.renderPlatformSwitcher = function(activePlatform = 'unithrift') {
+  const isThrift = activePlatform === 'unithrift';
+  const isMatch = activePlatform === 'unimatch';
+
+  return `
+    <div class="platform-switcher flex items-center bg-surface-container-high/80 dark:bg-black/30 p-1 rounded-full border border-outline-variant/30 shadow-inner backdrop-blur-md">
+      <a href="/marketplace/marketplace.html" title="Switch to UniThrift Marketplace" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${isThrift ? 'bg-[#006e2f] text-white shadow-md scale-105' : 'text-on-surface-variant hover:text-on-surface opacity-70 hover:opacity-100'}">
+        <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
+        <span>UniThrift</span>
+      </a>
+      <a href="/unimatch/discover.html" title="Switch to UniMatch Social Feed" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${isMatch ? 'bg-[#7A1F3D] text-white shadow-md scale-105' : 'text-on-surface-variant hover:text-on-surface opacity-70 hover:opacity-100'}">
+        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+        <span>UniMatch</span>
+      </a>
+    </div>
+  `;
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const slot = document.getElementById('platform-switcher-slot');
+  if (slot) {
+    const isMatchPage = window.location.pathname.includes('/unimatch/');
+    slot.innerHTML = window.renderPlatformSwitcher(isMatchPage ? 'unimatch' : 'unithrift');
+  }
+});
 
 // ==========================================
 // STORAGE SYSTEM

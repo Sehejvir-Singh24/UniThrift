@@ -164,6 +164,27 @@ Now that the UniMatch UI flows, multi-step profile builder, and frontend interac
   - Create an `id-cards` private storage bucket in Supabase.
   - Implement image upload and OCR/Admin review panel to verify student cards.
 
-### 5. Redesign Chat UI for Mobile (Stitch)
-- **Goal:** Improve the layout of the mobile meetup view with the Stitch design system.
+
+---
+
+## Session 6: Gender Options, Feed Algorithm, Multi-Photo Carousel & Platform Switcher (Latest)
+
+### 1. Gender & Preferred Feed Gender Fields
+- **Profile Onboarding & Edit:** Added `gender` (Male, Female, Non-binary, Other) and `preferred_gender` (Women, Men, Everyone) dropdown selectors to [basic-info.html](file:///d:/projects/Unithrift/unimatch/profile-setup/basic-info.html) and [edit-profile.html](file:///d:/projects/Unithrift/unimatch/profile/edit-profile.html).
+- **Database Migration:** Added `gender TEXT` and `preferred_gender TEXT` columns to `db/unimatch_setup.sql`.
+- **Review Card Preview:** Updated [review.html](file:///d:/projects/Unithrift/unimatch/profile-setup/review.html) to render major, gender, and feed preference.
+
+### 2. Interest-Based Feed Algorithm (`ALGORITHM.md`)
+- **Smart Scoring Pipeline:** Replaced fixed deck with live Supabase query algorithm in [discover.html](file:///d:/projects/Unithrift/unimatch/discover.html).
+- **Filtering & Ranking:** Excludes self, filters profiles matching the user's preferred gender, and ranks candidate profiles by common interest tag count (`+1` point per shared interest tag).
+- **Documentation:** Created [docs/ALGORITHM.md](file:///d:/projects/Unithrift/docs/ALGORITHM.md) detailing the pipeline and future v2/v3 roadmap (university boost, already-liked exclusion, mutual like boost).
+
+### 3. Multi-Photo Story Carousel
+- **Story Progress Bars:** Integrated top segment progress bars in [discover.html](file:///d:/projects/Unithrift/unimatch/discover.html) indicating total uploaded photos per profile.
+- **Left / Right Tap Navigation:** Tapping/clicking left or right side of the photo switches to previous/next photo with smooth indicator updates.
+
+### 4. Universal Platform Switcher
+- **Dual-Segment Switcher Pill:** Created `renderPlatformSwitcher(activePlatform)` in [scripts/supabase.js](file:///d:/projects/Unithrift/scripts/supabase.js) featuring UniThrift green shopping bag tag and UniMatch burgundy heart badge.
+- **Cross-Platform Navigation:** Integrated switcher slot across `index.html`, `unimatch/discover.html`, `unimatch/profile/my-profile.html`, `marketplace/marketplace.html`, and `core/dashboard.html` for 1-click platform switching.
+
 
