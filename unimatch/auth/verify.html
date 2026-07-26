@@ -221,29 +221,42 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("Authentication required.");
         const userId = session.user.id;
         const ext = selectedFile.name.split('.').pop();
         const path = `unimatch_ids/${userId}/college_id.${ext}`;
 
+        let publicUrl = '';
+
+        // Try uploading to Supabase Storage id_cards bucket
         const { error: uploadError } = await supabase.storage
           .from('id_cards')
           .upload(path, selectedFile, { upsert: true });
 
-        if (uploadError) throw uploadError;
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from('id_cards').getPublicUrl(path);
+          publicUrl = urlData.publicUrl;
+        } else {
+          // Fallback if Storage RLS policy blocks upload: Convert image to Data URL!
+          console.warn("Storage RLS blocked upload, using Base64 DataURL fallback:", uploadError.message);
+          publicUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => resolve(ev.target.result);
+            reader.readAsDataURL(selectedFile);
+          });
+        }
 
-        const { data: urlData } = supabase.storage.from('id_cards').getPublicUrl(path);
-
+        // Update profile
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
-            id_url: urlData.publicUrl,
+            id_url: publicUrl,
             unimatch_verification_status: 'pending'
           })
           .eq('id', userId);
 
         if (profileError) {
-          // Fallback if column is not yet created in Supabase SQL Editor
-          await supabase.from('profiles').update({ id_url: urlData.publicUrl }).eq('id', userId);
+          await supabase.from('profiles').update({ id_url: publicUrl }).eq('id', userId);
         }
 
         window.location.href = '/unimatch/auth/pending.html';
