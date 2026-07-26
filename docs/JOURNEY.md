@@ -2,189 +2,103 @@
 
 This document chronicles what we have built so far and the roadmap for what we need to build next to bring the UniThrift Premium Campus Ecosystem to life.
 
-## Session 4: Roommate Swipe Feature & Admin Moderation (Today)
-We successfully built out the entire Flatmate finding ecosystem, including a robust admin panel to monitor and moderate activity!
+---
 
-### 1. Roommate Swiping Ecosystem
-- **Database Schema & Matching (`db/roommate_likes_migration.sql`)**: Built the architecture for `roommate_listings` and `roommate_likes`, implementing a robust algorithm that generates a "match" only when two users mutually swipe right on each other.
-- **Dynamic Area Selection (`db/college_areas_migration.sql`)**: Replaced manual text input with dynamic location chips, pulling valid areas directly from the user's `college` profile field to ensure clean data formatting.
-- **Swipe Card UI**: Converted the simple swipe cards into immersive full-screen profiles. Flat providers now feature massive background photos of their rooms along with dynamically rendered amenities tags.
+## Session 7: Flatmates Directory Pivot, Multi-Photo Lightbox, Razorpay ₹39 Contact Unlock & Sunset Cloud Theme (Latest)
 
-### 2. Room Photos & Amenities Integration
-- **Image Compression & Uploads**: Fixed image compression pipelines allowing seekers to upload high-quality room photos directly from mobile devices without timeout errors.
-- **Post Edit Functionality**: Built a seamless "Edit Post" flow that detects an active listing and intelligently pre-fills the form with budget, gender, bio, and area data, bypassing the destructive "delete and start over" flow.
+We executed major feature upgrades across both **UniThrift** and **UniMatch**, transforming flatmate discovery into a simple, monetized directory board and polishing the UniMatch design system.
 
-### 3. Admin Dashboard Capabilities
-- **Unfiltered Monitoring**: Created a dedicated `getAllRoommateListingsAdmin()` function to allow admins to see ALL postings regardless of their own swipe activity or college filtering.
-- **Visual Moderation Tool**: Added a horizontally scrollable gallery directly inside the admin review cards, allowing moderators to instantly spot and delete spam room photos without leaving the dashboard.
-- **Dynamic Formatting**: Fixed data-rendering bugs ensuring that "Budget" vs "Rent" and auto-generated titles accurately reflect seeker vs provider intents.
+### 1. Flatmates Directory Board Pivot (`roommates/flatmates.html`)
+- **Pivoted from Swipe Deck:** Replaced the Tinder-like swipe deck with a clean, responsive listing directory board per user directive (*"we will not go with that tinder like thing anymore i want to make it quite simple now"*).
+- **Category Filter Tabs:** Added dynamic category tabs to filter between **All Listings**, **Rooms Available 🏠** (`have_flat`), and **Seeking Room 🔍** (`need_flat`).
+- **Live Search & Location Filter:** Real-time filter input searching across titles, campus areas, bio text, and college majors.
+
+### 2. Multi-Photo Carousel Gallery & Fullscreen Lightbox
+- **Interactive Photo Carousel:** For listings with multiple room images (`images` array), rendered a photo slider with prev/next navigation arrows (`<` and `>`), photo counter badge (`1 / 3`), and a thumbnail preview strip.
+- **Fullscreen Lightbox Viewer:** Tapping **"🔍 View Fullscreen"** (or the photo) opens a high-resolution Lightbox modal with `object-contain` for zero image cropping.
+- **Avatar & Tag Cleanups:** Added gradient initials fallback (`[SS]`, `[VS]`) to prevent broken profile avatar icons, and filtered out empty hyphen tags (`✓ -`).
+
+### 3. Monetization: Razorpay ₹39 Contact Unlock System
+- **Privacy Model:**
+  - **Always Public:** Room photos, title, rent/budget badge, location, and amenities chips (`✓ WiFi`, `✓ AC`, `✓ Laundry`).
+  - **Blurred & Hidden:** Host profile name & avatar (rendered as `"Verified Student 🔒"`), full bio description, and direct contact buttons.
+- **Razorpay Checkout Integration:** Tapping **"🔒 Unlock Contact Details — ₹39"** opens the official **Razorpay Checkout SDK Modal** (`amount: 3900` paise = ₹39).
+- **Instant Unblur & Reveal:** Upon successful payment, host profile unblurs and reveals direct **WhatsApp Chat** (`https://wa.me/...`) and **Call** (`tel:...`) action buttons.
+- **Persistence & Reset:** Unlocked listings are saved in `localStorage` (`unithrift_unlocked_flatmates`) and database. Added `?reset=true` parameter support to re-lock listings for testing anytime.
+
+### 4. UniMatch Sunset Cloud Theme & Non-Scrollable Discovery Feed
+- **Theme Palette (`unimatch/unimatch-theme.css`):** Built custom HSL sunset gradient (`#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`) with frosted glass cards.
+- **Drifting Cloud SVG Layer (`unimatch/clouds-init.js`):** Auto-injects 10 blurred SVG cumulus clouds drifting across the sky with keyframe animations.
+- **Non-Scrollable Viewport (`discover.html`):** Refactored layout to use fixed positioning between `top: 64px` header and `bottom: 64px` bottom nav, removing body scrollbars for a clean `100dvh` mobile experience.
+- **Standardized Action Buttons:** Standardized Pass and Like action buttons to 64px × 64px.
+- **Hero Photo Protection:** Enforced rule to exclude cloud overlays over faces on hero landing photos (`welcome.html`).
+
+### 5. Portal Gateway Routing Fix (`index.html`)
+- Fixed hardcoded `/auth/login.html` href on portal choice cards for authenticated users.
+- Logged-in users are dynamically routed straight to `/marketplace/marketplace.html` (UniThrift) or `/unimatch/discover.html` (UniMatch).
 
 ---
 
-## Session 2: Make an Offer, Google OAuth & Onboarding Cropper (Yesterday)
-We made massive progress, expanding the app's features from simple static mockups into a fully connected, secure, and responsive campus marketplace! Here is a recap of everything that was accomplished and integrated:
+## Session 6: Gender Options, Feed Algorithm, Multi-Photo Carousel & Platform Switcher
 
-### 1. Mobile UI Responsiveness & Layout Fixes
-- Removed global `min-height` calculations which were causing layout shifting and "bouncing" scroll bugs on mobile devices.
-- Standardized vertical space offsets (`pb-[140px]`) across all 25+ layout templates to prevent floating navbar layouts from overlapping form inputs (like the Phone Number field during profile setup) and keyboard overlays.
+### 1. Gender & Preferred Feed Gender Fields
+- **Profile Onboarding & Edit:** Added `gender` (Male, Female, Non-binary, Other) and `preferred_gender` (Women, Men, Everyone) dropdown selectors to [basic-info.html](file:///d:/projects/Unithrift/unimatch/profile-setup/basic-info.html) and [edit-profile.html](file:///d:/projects/Unithrift/unimatch/profile/edit-profile.html).
+- **Database Migration:** Added `gender TEXT` and `preferred_gender TEXT` columns to `db/unimatch_setup.sql`.
 
-### 2. PostgREST Join Disambiguation Bugfix
-- Fixed a database join bug in `scripts/supabase.js` that occurred when introducing the `buyer_id` foreign key. Disambiguated all queries joining with the `profiles` table by explicitly using `profiles!seller_id(full_name)` instead of the ambiguous `profiles(full_name)`. This restored marketplace visibility for all posted items.
+### 2. Interest-Based Feed Algorithm (`ALGORITHM.md`)
+- **Smart Scoring Pipeline:** Replaced fixed deck with live Supabase query algorithm in [discover.html](file:///d:/projects/Unithrift/unimatch/discover.html).
+- **Filtering & Ranking:** Excludes self, filters profiles matching the user's preferred gender, and ranks candidate profiles by common interest tag count (`+1` point per shared interest tag).
 
-### 3. Fully Working "Make an Offer" Feature
-- **Database Schema (`db/offers_migration.sql`):** Created the SQL schema defining the `offers` table and set up secure Row Level Security (RLS) policies allowing buyers to submit and sellers to review and manage offers.
-- **Offer Submission (`marketplace/item.html`):** Configured the make-an-offer modal to collect custom prices and messaging, executing an API call to save it to Supabase. Configured owner protection to prevent users from making offers on their own listings.
-- **Offers Dashboard (`core/offers.html`):** Designed and coded a central hub with tabbed sections for **Offers Received** and **Offers Sent**.
-- **Interactive Review Flow (`marketplace/offer_received.html`):** Made this screen dynamic, letting sellers Accept, Reject, or Counter offers. Accepting an offer updates the product's status to `Sold` and records the `buyer_id` in the products table.
-
-### 4. Google OAuth Authentication Integration
-- **Google Sign-In Button (`auth/login.html`):** Added a beautiful, branded Google login button with smooth transitions and redirect loaders.
-- **Supabase Integration (`scripts/supabase.js`):** Programmed the `signInWithGoogle()` callback to route through Supabase's secure OAuth flow.
-- **Smart redirectional onboarding:** Configured `auth/profile_setup.html` so that returning users who log in via Google/Email instantly bypass the details forms and route straight to their current onboarding step (Home, ID Upload, or Pending Verification).
-
-### 5. Onboarding Cropper.js Integration & Global Avatar Sync
-- **Mandatory Registration Cropping (`auth/profile_setup.html`):** Integrated **Cropper.js** to allow users to select, crop, and preview their avatar right at registration. Enforced that an avatar must be cropped before registering.
-- **Global Header Avatar Sync:** Wrote a python script to inject `id="header-avatar"` onto all profile navigation elements across 20 files. Configured a central listener in `supabase.js` to automatically fetch and update the header icon's image source with the user's real avatar URL upon page load.
-
-### 6. Functional Logout
-- Implemented `logout()` helper in `supabase.js` to clear session cookies/cache and bounce the user back to the login page. Bound it to the Log Out button on the profile page.
+### 3. Universal Platform Switcher
+- **Dual-Segment Switcher Pill:** Created `renderPlatformSwitcher(activePlatform)` in [scripts/supabase.js](file:///d:/projects/Unithrift/scripts/supabase.js) featuring UniThrift green shopping bag tag and UniMatch burgundy heart badge.
+- **Cross-Platform Navigation:** Integrated switcher slot across `index.html`, `unimatch/discover.html`, `unimatch/profile/my-profile.html`, `marketplace/marketplace.html`, and `core/dashboard.html`.
 
 ---
 
-## Session 3: Security Deposit, Meetup Negotiation & Contact Reveal (Latest)
-- **Security Deposit Checkout:** Implemented a new checkout model where buyers only pay a 25% security deposit to reserve an item, leaving the remaining 75% for in-person settlement.
-- **Meetup Negotiation Flow:** Instead of free-form chat, introduced a structured meetup planner. Buyers propose a campus location and time, and sellers can accept or send a counter-offer.
-- **Phone Number Reveal System:** Replaced the planned in-app messaging system with a more secure and efficient Phone Number Reveal. Once a meetup is confirmed, both parties' phone numbers are revealed with one-tap Call and WhatsApp action buttons.
-- **Database Schema Updates:** Added `reservations` and `meetups` tables to handle the deposit status and negotiation states securely.
+## Session 5: UniMatch Expansion & Multi-Step Student Discovery Ecosystem
+
+### 1. Dual Ecosystem Gateway Landing Page (`index.html`)
+- **Portal Interface:** Transformed `index.html` into a portal screen where users select between **UniThrift** (Sustainable campus marketplace) and **UniMatch** (Exclusive student community).
+- **Dynamic Header Auth State:** Integrated Supabase Auth session checks (`supabase.auth.getSession()`) in `index.html` to display a personalized welcome badge (`Hi, <name>`) and Sign Out button for authenticated users.
+
+### 2. Smart Onboarding & Instagram Verification Journey
+- **Auth Guard & Routing (`welcome.html` & `auth/login.html`):** Integrated Google OAuth and Email OTP login flows.
+- **5-Step Profile Builder:** Basic Info, Intent Selection, Searchable Interests, Photo Grid Upload (up to 6 photos), and Live Preview.
+
+---
+
+## Session 4: Roommate Swipe Feature & Admin Moderation
+- **Database Schema & Matching (`db/roommate_likes_migration.sql`)**: Built `roommate_listings` and `roommate_likes` schema.
+- **Dynamic Area Selection (`db/college_areas_migration.sql`)**: Replaced manual text input with dynamic location chips pulling valid areas from user's `college` profile field.
+- **Admin Dashboard Moderation (`admin/dashboard.html`)**: Added inline image gallery and `getAllRoommateListingsAdmin()` endpoint for spam moderation.
+
+---
+
+## Session 3: Security Deposit, Meetup Negotiation & Contact Reveal
+- **Security Deposit Checkout:** Buyers pay a 25% security deposit to reserve an item, leaving the remaining 75% for in-person settlement.
+- **Meetup Negotiation Flow:** Structured planner where buyers propose campus location and time.
+- **Phone Number Reveal System:** Confirmed meetups reveal phone numbers with one-tap Call and WhatsApp action buttons.
+
+---
+
+## Session 2: Make an Offer, Google OAuth & Onboarding Cropper
+- **Fully Working "Make an Offer" Feature (`db/offers_migration.sql` & `core/offers.html`):** Buyers send custom offers, sellers accept, counter, or reject.
+- **Google OAuth Authentication Integration (`auth/login.html` & `scripts/supabase.js`):** Supported Google Sign-In with onboarding state checks.
+- **Cropper.js Avatar Cropping (`auth/profile_setup.html`):** Mandatory square image cropping at registration.
 
 ---
 
 ## Session 1: Core Onboarding & Authentication
-We built out the core onboarding and user authentication flow:
-
-### 1. Authentication Strategy Pivot
-- Moved away from Magic Links and implemented **Email & Password Authentication** to bypass Supabase sandbox email rate limits.
-- Configured Supabase to handle the new login flow flawlessly.
-
-### 2. Dynamic Login & Sign Up Flow
-- Integrated the new premium Stitch design for the login page.
-- Branded the login page back to **UniThrift**.
-- Built a dynamic toggle between "Sign In" and "Create Account".
-- Successfully integrated the **Role Selector (Buy / Sell)** that only appears when a user is creating a brand new account.
-
-### 3. Advanced Profile Setup
-- Added a brand new step to the onboarding flow (`profile_setup.html`).
-- Updated the Supabase `profiles` schema to track:
-  - `full_name`
-  - `phone_number`
-  - `enrollment_number`
-  - `year_of_study`
-- Wrote dynamic Javascript validation (e.g., making the Enrollment Number optional *only* for 1st Year students).
-
-### 4. ID Verification Redesign
-- Completely replaced the old verification page with the new Stitch **ID Verification - Dynamic Upload** design (`id_verification.html`).
-- Fixed desktop overflow bugs and perfectly positioned the image remove button.
-- Tied the "Upload & Continue" button to Supabase so it officially marks the user's `is_verified` status as `true` in the database.
-
-### 5. Seamless Routing Architecture
-- Built smart, secure routing across the app.
-- If a user tries to access `index.html` without finishing their profile, they are bounced back to `profile_setup.html`.
-- If they finish their profile but haven't verified their ID, they are bounced to `id_verification.html`.
-
----
-
-## Session 5: UniMatch Expansion & Multi-Step Student Discovery Ecosystem (Latest)
-We expanded the platform from a marketplace into a full-scale dual ecosystem by creating **UniMatch**—an exclusive social and dating environment tailored for verified campus students.
-
-### 1. Dual Ecosystem Gateway Landing Page (`index.html`)
-- **Portal Interface:** Transformed `index.html` into a portal screen where users select between **UniThrift** (Sustainable campus marketplace) and **UniMatch** (Exclusive student community).
-- **Dynamic Header Auth State:** Integrated Supabase Auth session checks (`supabase.auth.getSession()`) in `index.html` to display a personalized welcome badge (`Hi, <name>`) and Sign Out button for authenticated users, or a direct Sign In button for guests.
-
-### 2. Deep Maroon Visual System & 18+ Interface Templates
-- Established the UniMatch visual system using curated HSL color tokens (`#5c0427` maroon, `#7a1f3d` container, `#faf9f7` surface).
-- Built out full page flows across `/unimatch/`, `/unimatch/auth/`, `/unimatch/profile-setup/`, and `/unimatch/profile/`.
-
-### 3. Smart Onboarding & Instagram Verification Journey
-- **Auth Guard & Routing (`welcome.html` & `auth/login.html`):** Integrated Google OAuth and Email OTP login flows. Implemented linear onboarding routing checks:
-  1. Verification Check (`/unimatch/auth/verify.html`)
-  2. Instagram Setup (`/unimatch/auth/instagram.html`)
-  3. Multi-Step Profile Setup (`/unimatch/profile-setup/basic-info.html`)
-  4. Active Discovery (`/unimatch/discover.html`)
-- **5-Step Profile Builder:**
-  - **Basic Info (`basic-info.html`):** Major, Year of Study, and live character counter (150 max) for Bio.
-  - **Intent Selection (`looking-for.html`):** Choice cards for Friends, Coffee Buddy, Study Partner, Event Buddy, and Dating.
-  - **Searchable Interests (`interests.html`):** Categorized chip selectors for Academic, Lifestyle, Hobbies, and Tech & Culture.
-  - **Photo Grid Upload (`photos.html`):** Supports uploading up to 6 profile pictures directly to Supabase Public Storage (`profile_photos` bucket).
-  - **Live Preview (`review.html`):** Interactive card preview with edit shortcuts before setting `unimatch_profile_complete = true`.
-
-### 4. Interactive Social Dynamics & Mutual Consent Protocol
-- **Full-Screen Swiping Deck (`discover.html`):** Implemented card stack rendering with verified student badges, interest chips, remaining daily likes counter, and "12 Admirers" hidden likes indicator.
-- **Icebreaker Challenge (`icebreaker.html`):** Created a Bento Grid selector for mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore).
-- **Privacy-First Instagram Exchange (`insta-exchange-request.html`, `insta-exchange-success.html`, `connection-success.html`):** Built a mutual agreement protocol so Instagram handles remain private until both users agree to share, featuring one-tap deep links (`instagram://user?...`).
-
-### 5. Supabase Connectivity Analysis & Current Gap Audit
-- **Connected & Functional:**
-  - Supabase Auth session management and Google/OTP sign-in.
-  - User profile attributes in `profiles` table: `full_name`, `major`, `year_of_study`, `bio`, `instagram_username`, `looking_for` (JSON), `interests` (JSON), `profile_photos` (JSON), and `unimatch_profile_complete`.
-- **Not Yet Connected (Pending Integration):**
-  - `discover.html` profile deck currently relies on local mock array `DISCOVERY_PROFILES`.
-  - Daily likes counter (`remainingLikes = 5`) is stored in frontend JavaScript memory.
-  - Swiping actions (`handleConnect()`, `handlePass()`) do not yet write to a backend `unimatch_likes` table.
-  - Icebreaker responses and Instagram exchange confirmations do not yet persist in a backend `unimatch_matches` table.
+- **Email & Password Authentication:** Configured Supabase Auth with dynamic role selection (Buyer / Seller).
+- **Profile Setup & ID Verification (`auth/profile_setup.html` & `auth/id_verification.html`):** Linear onboarding gating unverified users.
 
 ---
 
 ## What We Need To Do Next (Future Roadmap)
 
-Now that the UniMatch UI flows, multi-step profile builder, and frontend interaction screens are fully built, here is what we need to tackle next:
-
-### 1. Execute UniMatch Supabase Database Migration (`db/unimatch_setup.sql`)
-- **Goal:** Link all UniMatch frontend screens directly to live Supabase PostgreSQL tables.
-- **Tasks:**
-  - Create migration script extending `profiles` schema with `instagram_username`, `major`, `bio`, `looking_for`, `interests`, `profile_photos`, and `unimatch_profile_complete`.
-  - Create `unimatch_likes` table (`liker_id`, `liked_id`, `action`, `created_at`).
-  - Create `unimatch_matches` table (`user1_id`, `user2_id`, `icebreaker_completed`, `insta_shared_user1`, `insta_shared_user2`).
-  - Configure Row Level Security (RLS) policies for secure swiping and match visibility.
-
-### 2. Wire `discover.html` & Interaction Screens to Live Database Queries
-- Replace static `DISCOVERY_PROFILES` with a dynamic query fetching unswiped student profiles from Supabase.
-- Store likes in `unimatch_likes` on swipe right, calculate real-time mutual matches, and trigger match popups dynamically.
-- Fetch real admirer profiles for `hidden-likes.html` and persist icebreaker completion states in `unimatch_matches`.
-
-### 3. In-App Notifications
-- **Goal:** Notify buyers/sellers when their offers are accepted, rejected, or countered, and notify UniMatch users of new mutual matches.
-- **Tasks:**
-  - Create a `notifications` table in Supabase.
-  - Set up a dashboard notification bell in the header that queries this table.
-  - Trigger notification records when offers are sent, countered, or responded to.
-
-### 4. College Verification Enhancements (ID Verification Upload)
-- **Goal:** Set up secure, private image file storage for ID verification.
-- **Tasks:**
-  - Create an `id-cards` private storage bucket in Supabase.
-  - Implement image upload and OCR/Admin review panel to verify student cards.
-
-
----
-
-## Session 6: Gender Options, Feed Algorithm, Multi-Photo Carousel & Platform Switcher (Latest)
-
-### 1. Gender & Preferred Feed Gender Fields
-- **Profile Onboarding & Edit:** Added `gender` (Male, Female, Non-binary, Other) and `preferred_gender` (Women, Men, Everyone) dropdown selectors to [basic-info.html](file:///d:/projects/Unithrift/unimatch/profile-setup/basic-info.html) and [edit-profile.html](file:///d:/projects/Unithrift/unimatch/profile/edit-profile.html).
-- **Database Migration:** Added `gender TEXT` and `preferred_gender TEXT` columns to `db/unimatch_setup.sql`.
-- **Review Card Preview:** Updated [review.html](file:///d:/projects/Unithrift/unimatch/profile-setup/review.html) to render major, gender, and feed preference.
-
-### 2. Interest-Based Feed Algorithm (`ALGORITHM.md`)
-- **Smart Scoring Pipeline:** Replaced fixed deck with live Supabase query algorithm in [discover.html](file:///d:/projects/Unithrift/unimatch/discover.html).
-- **Filtering & Ranking:** Excludes self, filters profiles matching the user's preferred gender, and ranks candidate profiles by common interest tag count (`+1` point per shared interest tag).
-- **Documentation:** Created [docs/ALGORITHM.md](file:///d:/projects/Unithrift/docs/ALGORITHM.md) detailing the pipeline and future v2/v3 roadmap (university boost, already-liked exclusion, mutual like boost).
-
-### 3. Multi-Photo Story Carousel
-- **Story Progress Bars:** Integrated top segment progress bars in [discover.html](file:///d:/projects/Unithrift/unimatch/discover.html) indicating total uploaded photos per profile.
-- **Left / Right Tap Navigation:** Tapping/clicking left or right side of the photo switches to previous/next photo with smooth indicator updates.
-
-### 4. Universal Platform Switcher
-- **Dual-Segment Switcher Pill:** Created `renderPlatformSwitcher(activePlatform)` in [scripts/supabase.js](file:///d:/projects/Unithrift/scripts/supabase.js) featuring UniThrift green shopping bag tag and UniMatch burgundy heart badge.
-- **Cross-Platform Navigation:** Integrated switcher slot across `index.html`, `unimatch/discover.html`, `unimatch/profile/my-profile.html`, `marketplace/marketplace.html`, and `core/dashboard.html` for 1-click platform switching.
-
-
+1. **Backend Monetization Logging (`roommate_unlocks` Table)**
+   - Log Razorpay payment IDs (`razorpay_payment_id`), timestamps, and user IDs in Supabase to track total revenue per listing.
+2. **Push Notifications for Roommate Contacts & UniMatch Likes**
+   - Notify users when their room listing gets unlocked or when someone likes their profile on UniMatch.
+3. **PG / Hostel Booking Inquiries Integration (`pghostels/pghostels.html`)**
+   - Apply the simple listing directory and contact inquiry model to the PG/Hostel discovery board.

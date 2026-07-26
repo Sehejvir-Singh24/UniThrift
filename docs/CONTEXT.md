@@ -1,36 +1,50 @@
 # UniThrift - Project Context
 
 ## What is UniThrift?
-UniThrift is an exclusive, premium student marketplace designed for safe and frictionless on-campus trading. Unlike traditional open marketplaces, it enforces student verification (enrollment ID and ID card checks) to ensure a secure, closed-loop environment where buyers and sellers can trust each other.
+UniThrift is an exclusive, premium student marketplace and social ecosystem designed for safe and frictionless on-campus trading, room sharing, and student networking. Unlike traditional open marketplaces, it enforces student verification (enrollment ID and ID card checks) to ensure a secure, closed-loop environment where verified students can trust each other.
 
-The platform is designed to be mobile-first with a high-end, dynamic UI (featuring glassmorphism, vibrant colors, and micro-animations) built on top of a robust backend architecture (Supabase).
+The platform is designed mobile-first with a high-end, dynamic UI featuring glassmorphism, vibrant colors, curated theme palettes, drifting cloud micro-animations, and responsive layouts built on top of a robust backend architecture (Supabase).
+
+---
 
 ## Core Concepts & Mechanics
 
-### 1. The Security Deposit & Meetup Model
+### 1. The Security Deposit & Meetup Model (Marketplace)
 The platform does NOT handle full payments, selling of products directly, or shipping. Instead, it facilitates safe physical meetups on campus through a Security Deposit model.
-- **Reserving an Item:** Instead of paying full price online, buyers pay a 25% Security Deposit to reserve an item.
+- **Reserving an Item:** Buyers pay a 25% Security Deposit to reserve an item.
 - **Meetup Negotiation:** Upon reservation, the buyer proposes a time and on-campus location (e.g., Canteen, Library, Nescafe, Ground, Stage). The seller can either accept or counter-offer.
 - **Phone Number Reveal:** Once both parties agree on the meetup details, the system officially marks it as "Confirmed". At this moment, it securely reveals their phone numbers via large Call and WhatsApp buttons so they can coordinate the physical exchange.
 - **Final Settlement:** The remaining 75% of the item price is paid directly to the seller in-person during the meetup.
 - **Completion & Reviews:** After the meetup is successfully completed and the balance settled, the transaction is marked as completed in the app, and both parties can leave a 5-star review for each other.
 
-### 2. Trust and Safety (Student Only)
+### 2. Trust and Safety (Student Only Verification)
 - Registration requires a valid student enrollment number and a mandatory ID card upload.
-- The platform uses strict Role-Based Access Control: Unverified users are restricted (they can browse, but cannot make offers, buy/reserve, or list items).
+- Strict Role-Based Access Control: Unverified users are restricted (they can browse, but cannot make offers, buy/reserve, list items, or view unlocked contact details).
 - All transactions are tracked, and users build reputation through post-meetup reviews.
 
 ### 3. Offers System
 - Buyers can send custom price offers on listings before reserving.
-- Sellers have a dedicated dashboard (`core/offers.html`) to review received offers and can effortlessly Accept, Counter, or Reject them.
+- Sellers have a dedicated dashboard (`core/offers.html`) to review received offers and can accept, counter, or reject them.
 
-### 4. UniMatch Social Ecosystem
+### 4. Simplified Flatmates Directory & Razorpay ₹39 Contact Unlock
+- **Directory Pivot (`roommates/flatmates.html`):** Moved away from Tinder-style swiping deck for finding flatmates in favor of a clean, responsive listing directory board.
+- **Category Filter Tabs:** Toggle between `All Listings`, `Rooms Available 🏠` (`have_flat`), and `Seeking Room 🔍` (`need_flat`).
+- **Privacy & Public Info:** Room photos gallery, title, location, price/rent badge, and amenities/preferences chips (`✓ WiFi`, `✓ AC`, `✓ Laundry`) are **always visible** publicly.
+- **Blurred Contact Details:** Host/seeker name, profile avatar (rendered as `"Verified Student 🔒"`), full bio description, and contact links are **blurred and locked** by default.
+- **Razorpay ₹39 Instant Unlock:** Users tap **"🔒 Unlock Contact Details — ₹39"** to launch the official **Razorpay Checkout SDK Modal** (`amount: 3900`). Upon payment completion, host details instantly unblur, revealing direct **WhatsApp Chat** (`https://wa.me/...`) and **Call** (`tel:...`) buttons.
+- **Multi-Photo Carousel & Fullscreen Lightbox:** Includes an interactive photo slider with thumbnail strip and fullscreen image viewer (`object-contain`) with zero cropping.
+
+### 5. UniMatch Social & Dating Ecosystem
 - **Exclusive Campus Networking:** Tailored sub-app allowing verified students to connect based on shared intents (Study Partner, Friends, Coffee Buddy, Event Companion, Dating).
-- **Deep Maroon Theme:** Distinct visual identity using maroon accents (`#5c0427`, `#7a1f3d`).
+- **Sunset Cloud Theme (`unimatch/unimatch-theme.css` & `unimatch/clouds-init.js`):** Warm sunset gradient background (`#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`) with 10 soft SVG cumulus clouds drifting across the screen.
+- **Non-Scrollable Discovery Feed:** `discover.html` features a fixed non-scrollable viewport (`top: 64px`, `bottom: 64px`, `100dvh`, `overflow: hidden`) fitting cards perfectly between the header and bottom nav with standardized 64px action buttons.
+- **Interest-Based Ranking Algorithm:** Ranks student profiles based on shared interest tag counts (`+1` point per common tag) while excluding self and non-preferred genders.
 - **Privacy-First Instagram Consent:** Instagram handles remain hidden until both users swipe right, complete an icebreaker, and mutually grant consent.
 
-## Tech Stack
-- **Frontend:** Vanilla HTML/JS, Tailwind CSS (via CDN).
-- **Backend/Database:** Supabase (PostgreSQL, Auth, Storage).
-- **Design Aesthetic:** Premium, modern, glassmorphism interfaces, smooth state transitions, and tailored typography (Geist font, Material Symbols).
+---
 
+## Tech Stack
+- **Frontend:** Vanilla HTML/JS, Tailwind CSS (via CDN), Geist Font, Material Symbols, Cropper.js, Razorpay Checkout SDK.
+- **Backend / Database:** Supabase (PostgreSQL, Auth, Storage, Edge Functions).
+- **Payments:** Razorpay Payment Gateway integration (`/functions/v1/create-razorpay-order`).
+- **Design Aesthetic:** Premium glassmorphic interfaces, sunset cloud gradients, uncropped photo lightboxes, micro-animations, and responsive viewports.
