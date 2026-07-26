@@ -38,6 +38,12 @@ CREATE POLICY "Users can insert their own likes"
   TO authenticated
   WITH CHECK ( auth.uid() = liker_id );
 
+DROP POLICY IF EXISTS "Users can delete their own likes" ON public.unimatch_likes;
+CREATE POLICY "Users can delete their own likes"
+  ON public.unimatch_likes FOR DELETE
+  TO authenticated
+  USING ( auth.uid() = liker_id );
+
 -- 3. Create unimatch_matches table for mutual matches
 CREATE TABLE IF NOT EXISTS public.unimatch_matches (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -64,6 +70,12 @@ CREATE POLICY "Users can update their matches"
   ON public.unimatch_matches FOR UPDATE
   TO authenticated
   USING ( auth.uid() = user1_id OR auth.uid() = user2_id );
+
+DROP POLICY IF EXISTS "Users can insert their matches" ON public.unimatch_matches;
+CREATE POLICY "Users can insert their matches"
+  ON public.unimatch_matches FOR INSERT
+  TO authenticated
+  WITH CHECK ( auth.uid() = user1_id OR auth.uid() = user2_id );
 
 -- 4. Create storage bucket for profile photos (if not existing)
 INSERT INTO storage.buckets (id, name, public)

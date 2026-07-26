@@ -71,12 +71,12 @@
         <img id="profile-avatar" alt="Profile Photo" style="width:100%;height:100%;object-fit:cover;" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80"/>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-        <h2 id="profile-name" style="font-size:22px;font-weight:700;color:var(--um-text);margin:0;">Eleanor Vance</h2>
+        <h2 id="profile-name" style="font-size:22px;font-weight:700;color:var(--um-text);margin:0;">Student</h2>
         <span class="um-verified">
           <span class="material-symbols-outlined" style="font-size:13px;font-variation-settings:'FILL' 1;">verified</span>
         </span>
       </div>
-      <p id="profile-subtext" style="font-size:14px;color:var(--um-text-muted);margin:4px 0 0;">Architecture • Oxford University</p>
+      <p id="profile-subtext" style="font-size:14px;color:var(--um-text-muted);margin:4px 0 0;">GGSIPU Student</p>
 
       <!-- Quick stats row -->
       <div style="display:flex;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--um-border);width:100%;justify-content:center;">
@@ -132,7 +132,7 @@
         <span style="font-size:15px;font-weight:500;color:var(--um-text);">Instagram</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
-        <span id="profile-insta-handle" style="font-size:13px;color:var(--um-text-muted);">@eleanor_arch</span>
+        <span id="profile-insta-handle" style="font-size:13px;color:var(--um-text-muted);">Not connected</span>
         <span class="material-symbols-outlined" style="font-size:18px;color:var(--um-text-light);">chevron_right</span>
       </div>
     </a>
@@ -186,9 +186,9 @@
       <span class="material-symbols-outlined" style="font-size:22px;">chat_bubble</span>
       <span>Messages</span>
     </button>
-    <button class="um-nav-item" onclick="alert('Events coming soon!')">
-      <span class="material-symbols-outlined" style="font-size:22px;">event_available</span>
-      <span>Events</span>
+    <button class="um-nav-item" onclick="location.href='/unimatch/hidden-likes.html'">
+      <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;">favorite</span>
+      <span>Matches</span>
     </button>
     <button class="um-nav-item active">
       <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;">account_circle</span>
@@ -201,15 +201,23 @@
 <script src="/scripts/supabase.js"></script>
 <script>
   (async () => {
-    const ok = await requireAuth();
-    if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
-    const profile = await getProfile();
+    const profile = await requireUniMatchAuth();
+    if (!profile) return;
     if (profile) {
       if (profile.full_name) document.getElementById('profile-name').textContent = profile.full_name;
-      if (profile.major) document.getElementById('profile-subtext').textContent = `${profile.major}${profile.year_of_study ? ' • ' + profile.year_of_study : ''}`;
+
+      const parts = [];
+      if (profile.major) parts.push(profile.major);
+      const col = profile.college || profile.university;
+      if (col) parts.push(col);
+      if (profile.year_of_study) parts.push(profile.year_of_study);
+
+      const subtext = parts.length > 0 ? parts.join(' • ') : 'GGSIPU Student';
+      document.getElementById('profile-subtext').textContent = subtext;
+
       const insta = profile.instagram_username || profile.instagram_handle;
-      if (insta && document.getElementById('profile-insta-handle')) {
-        document.getElementById('profile-insta-handle').textContent = `@${insta.replace('@','')}`;
+      if (document.getElementById('profile-insta-handle')) {
+        document.getElementById('profile-insta-handle').textContent = insta ? `@${insta.replace('@','')}` : 'Not connected';
       }
       let mainPhoto = null;
       if (profile.profile_photos) {

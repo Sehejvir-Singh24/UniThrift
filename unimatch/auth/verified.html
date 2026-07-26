@@ -96,6 +96,13 @@
         const firstName = profile.full_name.split(' ')[0];
         document.getElementById('headline').textContent = `You're in, ${firstName}!`;
       }
+      // Stamp UniMatch-specific verification status
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await supabase.from('profiles')
+          .update({ unimatch_verification_status: 'verified' })
+          .eq('id', session.user.id);
+      }
     })();
   </script>
 </body>

@@ -125,6 +125,12 @@
 
       const tagsContainer = document.getElementById('preview-tags');
       tagsContainer.innerHTML = '';
+      if (draftData.preferred_gender) {
+          const prefSpan = document.createElement('span');
+          prefSpan.className = 'bg-primary/20 text-primary font-bold text-xs px-3 py-1 rounded-full flex items-center gap-1';
+          prefSpan.innerHTML = `👤 Preferred Gender: ${draftData.preferred_gender}`;
+          tagsContainer.appendChild(prefSpan);
+      }
       if (draftData.tags && draftData.tags.length > 0) {
           draftData.tags.forEach(tag => {
               const span = document.createElement('span');

@@ -1,113 +1,266 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Notifications - UniMatch</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "primary": "#5c0427", "background": "#faf9f7", "on-background": "#1a1c1b",
-          "on-surface": "#1a1c1b", "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff",
-          "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4"
-        },
-        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-        spacing: { "stack-gap-lg": "32px", "section-margin": "48px", "stack-gap-md": "20px", "stack-gap-sm": "12px", "container-padding": "24px" },
-        fontFamily: { "headline-lg": ["Inter"], "label-caps": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"], "body-lg": ["Inter"] },
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Notifications - UniMatch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "um-primary": "#5c0427",
+            "um-primary-container": "#7a1f3d",
+            "um-surface": "#faf9f7",
+            "um-surface-container": "#efeeec",
+            "um-on-surface": "#1a1c1b",
+            "um-on-surface-variant": "#554245",
+            "um-outline-variant": "#dac0c4",
+          }
+        }
       }
     }
-  }
-</script>
-<style>
-  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
-  .toggle-checkbox:checked { right: 0; border-color: #5c0427; background-color: #5c0427; }
-  .toggle-checkbox:checked + .toggle-label { background-color: #7a1f3d; }
-</style>
+  </script>
+  <style>
+    body { background-color: var(--um-bg); font-family: 'Inter', sans-serif; min-height: 100vh; overscroll-behavior: none; }
+    .card-shadow { box-shadow: 0 8px 24px rgba(92, 4, 39, 0.06); }
+    .tab-btn.active { color: #5c0427; border-bottom: 2px solid #5c0427; font-weight: 700; }
+  </style>
 </head>
-<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<body class="bg-um-surface text-um-on-surface min-h-screen flex flex-col antialiased pb-24">
 
-<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md px-container-padding h-16 flex items-center gap-4">
-  <button onclick="location.href='/unimatch/profile/my-profile.html'" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low text-on-surface">
-    <span class="material-symbols-outlined">arrow_back</span>
-  </button>
-  <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Notifications</h1>
-</header>
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-um-outline-variant/30 h-14 px-4 flex items-center justify-between">
+    <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-um-surface-container active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-um-on-surface-variant text-[22px]">arrow_back</span>
+    </button>
+    <h1 class="font-bold text-um-primary text-[17px]">Notifications</h1>
+    <div class="w-10"></div>
+  </header>
 
-<main class="flex-grow pt-24 pb-32 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-6">
-
-  <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-    Manage how and when UniMatch connects with you. We prioritize quiet, intentional alerts over constant noise.
-  </p>
-
-  <!-- Connections & Matches -->
-  <div class="space-y-3">
-    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Connections & Matches</h2>
-    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30 space-y-5">
-      <div class="flex items-center justify-between">
-        <div class="pr-4">
-          <h3 class="font-title-md text-title-md text-on-surface font-semibold">New Connections</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Get notified when someone accepts your connection request or sends you a new one.</p>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer" checked>
-          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
-      </div>
-
-      <div class="h-px bg-outline-variant/30 w-full"></div>
-
-      <div class="flex items-center justify-between">
-        <div class="pr-4">
-          <h3 class="font-title-md text-title-md text-on-surface font-semibold">Icebreaker Requests</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Alerts for direct, thoughtful conversation starters from prospective matches.</p>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer" checked>
-          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
-      </div>
+  <!-- Tabs Navigation -->
+  <div class="pt-16 px-4 max-w-lg mx-auto w-full">
+    <div class="flex border-b border-um-outline-variant/30 bg-white rounded-t-2xl px-2 pt-2">
+      <button id="tab-activity" onclick="switchTab('activity')" class="tab-btn active flex-1 py-3 text-center text-sm font-medium text-um-on-surface-variant transition-colors">
+        Activity 💕
+      </button>
+      <button id="tab-settings" onclick="switchTab('settings')" class="tab-btn flex-1 py-3 text-center text-sm font-medium text-um-on-surface-variant transition-colors">
+        Preferences ⚙️
+      </button>
     </div>
   </div>
 
-  <!-- Social Integrations -->
-  <div class="space-y-3">
-    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Social Integrations</h2>
-    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30">
-      <div class="flex items-center justify-between">
-        <div class="pr-4">
-          <h3 class="font-title-md text-title-md text-on-surface font-semibold">Instagram Exchanges</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Notifications when a mutual match requests to exchange Instagram handles.</p>
+  <!-- Main Content Canvas -->
+  <main class="flex-grow px-4 max-w-lg mx-auto w-full pt-4">
+
+    <!-- Activity Tab Content -->
+    <div id="content-activity" class="flex flex-col gap-3">
+      <div id="notifications-list" class="flex flex-col gap-3">
+        <!-- Dynamic notifications will render here -->
+        <div class="p-6 text-center text-xs text-um-on-surface-variant bg-white rounded-2xl animate-pulse">
+          Loading your recent notifications...
         </div>
-        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer" checked>
-          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
       </div>
     </div>
-  </div>
 
-  <!-- System & Community -->
-  <div class="space-y-3">
-    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">System & Community</h2>
-    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30">
-      <div class="flex items-center justify-between">
-        <div class="pr-4">
-          <h3 class="font-title-md text-title-md text-on-surface font-semibold">App Updates & Announcements</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Occasional updates about new features, community guidelines, and campus events.</p>
+    <!-- Settings Tab Content (Hidden by default) -->
+    <div id="content-settings" class="hidden flex flex-col gap-5">
+      <p class="text-xs text-um-on-surface-variant leading-relaxed px-1">
+        Manage how and when UniMatch connects with you. We prioritize quiet, intentional alerts over constant noise.
+      </p>
+
+      <!-- Connections & Matches -->
+      <div class="space-y-2">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-um-primary px-1">Connections & Matches</h2>
+        <div class="bg-white rounded-2xl p-4 card-shadow border border-um-outline-variant/30 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="pr-4">
+              <h3 class="text-sm font-bold text-um-on-surface">New Admirer Alerts</h3>
+              <p class="text-xs text-um-on-surface-variant mt-0.5">Get notified immediately when someone likes your profile.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+              <input type="checkbox" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-um-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-um-primary"></div>
+            </label>
+          </div>
+
+          <div class="h-px bg-um-outline-variant/30 w-full"></div>
+
+          <div class="flex items-center justify-between">
+            <div class="pr-4">
+              <h3 class="text-sm font-bold text-um-on-surface">Mutual Match Alerts</h3>
+              <p class="text-xs text-um-on-surface-variant mt-0.5">Instant alerts when you and another student both like each other.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+              <input type="checkbox" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-um-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-um-primary"></div>
+            </label>
+          </div>
         </div>
-        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer">
-          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
+      </div>
+
+      <!-- Social Integrations -->
+      <div class="space-y-2">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-um-primary px-1">Instagram Handle Exchanges</h2>
+        <div class="bg-white rounded-2xl p-4 card-shadow border border-um-outline-variant/30">
+          <div class="flex items-center justify-between">
+            <div class="pr-4">
+              <h3 class="text-sm font-bold text-um-on-surface">Instagram Notifications</h3>
+              <p class="text-xs text-um-on-surface-variant mt-0.5">Alerts when a mutual match shares their Instagram handle with you.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+              <input type="checkbox" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-um-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-um-primary"></div>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <p class="text-center font-body-md text-xs text-on-surface-variant mt-6">Changes are saved automatically.</p>
-</main>
-</body></html>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="um-bottom-nav">
+    <div class="um-bottom-nav-content">
+      <button class="um-nav-item" onclick="location.href='/unimatch/discover.html'">
+        <span class="material-symbols-outlined" style="font-size:22px;">explore</span>
+        <span>Discover</span>
+      </button>
+      <button class="um-nav-item" onclick="location.href='/unimatch/profile/notifications.html'">
+        <span class="material-symbols-outlined" style="font-size:22px;">chat_bubble</span>
+        <span>Messages</span>
+      </button>
+      <button class="um-nav-item" onclick="location.href='/unimatch/hidden-likes.html'">
+        <span class="material-symbols-outlined" style="font-size:22px;">favorite</span>
+        <span>Matches</span>
+      </button>
+      <button class="um-nav-item" onclick="location.href='/unimatch/profile/my-profile.html'">
+        <span class="material-symbols-outlined" style="font-size:22px;">account_circle</span>
+        <span>Profile</span>
+      </button>
+    </div>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/supabase.js"></script>
+  <script>
+    function switchTab(tab) {
+      document.getElementById('tab-activity').classList.toggle('active', tab === 'activity');
+      document.getElementById('tab-settings').classList.toggle('active', tab === 'settings');
+
+      document.getElementById('content-activity').classList.toggle('hidden', tab !== 'activity');
+      document.getElementById('content-settings').classList.toggle('hidden', tab !== 'settings');
+    }
+
+    (async () => {
+      const profile = await requireUniMatchAuth();
+      if (!profile) return;
+
+      // Fetch real likes received (admirers)
+      const { data: likesReceived } = await supabase
+        .from('unimatch_likes')
+        .select('liker_id, created_at')
+        .eq('liked_user_id', profile.id)
+        .eq('action', 'like');
+
+      // Fetch mutual matches
+      const { data: matches } = await supabase
+        .from('unimatch_matches')
+        .select('*')
+        .or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`);
+
+      const realLikes = likesReceived || [];
+      const realMatches = matches || [];
+
+      // Collect sender profile IDs
+      const likerIds = realLikes.map(l => l.liker_id);
+      const matchPartnerIds = realMatches.map(m => m.user1_id === profile.id ? m.user2_id : m.user1_id);
+      const allIds = [...new Set([...likerIds, ...matchPartnerIds])];
+
+      let profileMap = {};
+      if (allIds.length > 0) {
+        const { data: profilesList } = await supabase
+          .from('profiles')
+          .select('id, full_name, college, major, profile_photos, avatar_url, instagram_username')
+          .in('id', allIds);
+        if (profilesList) {
+          profilesList.forEach(p => { profileMap[p.id] = p; });
+        }
+      }
+
+      renderActivityFeed(realLikes, realMatches, profile.id, profileMap);
+    })();
+
+    function renderActivityFeed(likes, matches, myId, profileMap) {
+      const container = document.getElementById('notifications-list');
+
+      let items = [];
+
+      // Add Welcome Notification
+      items.push({
+        type: 'welcome',
+        title: 'Welcome to UniMatch! ✨',
+        desc: 'Your profile is active and verified. Discover fellow students near your college.',
+        time: 'Just now',
+        icon: 'verified',
+        link: '/unimatch/discover.html'
+      });
+
+      // Add Like Notifications (Anonymous name to protect mystery)
+      likes.forEach(l => {
+        const p = profileMap[l.liker_id] || {};
+        const photo = (p.profile_photos && p.profile_photos.length > 0) ? (typeof p.profile_photos === 'string' ? JSON.parse(p.profile_photos)[0] : p.profile_photos[0]) : (p.avatar_url || '');
+
+        items.push({
+          type: 'like',
+          title: `Someone liked your profile 💕`,
+          desc: 'Someone from campus liked your profile. Tap to reveal for ₹29!',
+          photo: '', // Don't reveal photo in notification feed
+          icon: 'favorite',
+          link: '/unimatch/hidden-likes.html'
+        });
+      });
+
+      // Add Mutual Match Notifications
+      matches.forEach(m => {
+        items.push({
+          type: 'match',
+          title: `You have a new mutual match! 🎉`,
+          desc: 'You both liked each other! Tap to see your match & Instagram.',
+          photo: '',
+          icon: 'celebration',
+          link: '/unimatch/hidden-likes.html'
+        });
+      });
+
+      container.innerHTML = items.map(item => `
+        <div onclick="location.href='${item.link}'" class="bg-white rounded-2xl p-4 card-shadow border border-um-outline-variant/30 flex items-center justify-between cursor-pointer hover:border-um-primary/40 active:scale-[0.99] transition-all">
+          <div class="flex items-center gap-3.5">
+            <div class="relative">
+              ${item.photo ? `
+                <img src="${item.photo}" class="w-12 h-12 rounded-full object-cover border border-um-outline-variant/50" alt=""/>
+              ` : `
+                <div class="w-12 h-12 rounded-full bg-um-primary/10 flex items-center justify-center text-um-primary">
+                  <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+                </div>
+              `}
+              <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-um-primary text-white flex items-center justify-center border-2 border-white">
+                <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+              </div>
+            </div>
+            <div>
+              <h4 class="font-bold text-um-on-surface text-sm leading-tight">${item.title}</h4>
+              <p class="text-xs text-um-on-surface-variant mt-0.5">${item.desc}</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-um-on-surface-variant text-[18px]">chevron_right</span>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

@@ -82,9 +82,20 @@
   </button>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/scripts/supabase.js"></script>
 <script>
+  let currentUserId = null;
+
+  (async () => {
+    const profile = await requireUniMatchAuth();
+    if (!profile) return;
+    currentUserId = profile.id;
+  })();
+
   function handlePurchase() {
-    alert("Payment successful! 5 Likes added to your daily limit.");
+    addExtraLikes(currentUserId, 5);
+    alert("Payment successful! 5 Extra Likes added to your daily balance.");
     window.location.href = '/unimatch/discover.html';
   }
 </script>

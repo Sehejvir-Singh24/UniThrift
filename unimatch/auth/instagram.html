@@ -89,6 +89,15 @@
     <!-- Error -->
     <div id="error-banner" class="hidden bg-um-error-container text-um-error text-[13px] font-medium px-4 py-3 rounded-2xl"></div>
 
+    <!-- UniThrift crossover banner (shown dynamically) -->
+    <div id="crossover-banner" class="hidden bg-um-surface-container-lowest rounded-2xl p-4 border border-um-outline-variant/40 flex items-start gap-3">
+      <span class="material-symbols-outlined text-[20px]" style="color:#5c0427;flex-shrink:0;margin-top:1px;font-variation-settings:'FILL' 1;">check_circle</span>
+      <div>
+        <p class="font-semibold text-um-on-surface text-[14px] mb-0.5">Already verified via UniThrift</p>
+        <p class="text-[13px] text-um-on-surface-variant leading-relaxed">Your student verification carries over. Just link your Instagram and fill in your UniMatch profile to start discovering — it's separate from your marketplace account.</p>
+      </div>
+    </div>
+
     <!-- Input -->
     <div class="flex flex-col gap-2">
       <label class="text-[12px] font-semibold text-um-on-surface-variant uppercase tracking-widest">Your Instagram Handle</label>
@@ -175,6 +184,12 @@
       if (!profile.is_verified) {
         window.location.href = '/unimatch/auth/verify.html';
         return;
+      }
+
+      // Detect UniThrift crossover: verified via UniThrift but no UniMatch profile yet
+      if (profile.is_verified && !profile.unimatch_profile_complete) {
+        const banner = document.getElementById('crossover-banner');
+        if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
       }
 
       // Pre-fill if already set

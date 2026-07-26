@@ -51,6 +51,169 @@ async function requireAuth() {
   return true;
 }
 
+// Helper: Require UniMatch Authentication & Completed Setup
+// Validates session, verification status (shared with UniThrift), instagram handle, and unimatch profile completion.
+async function requireUniMatchAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = '/unimatch/welcome.html';
+    return null;
+  }
+  const profile = await getProfile();
+  if (!profile) {
+    window.location.href = '/unimatch/auth/login.html';
+    return null;
+  }
+  if (!profile.is_verified) {
+    window.location.href = '/unimatch/auth/verify.html';
+    return null;
+  }
+  if (!profile.instagram_username) {
+    window.location.href = '/unimatch/auth/instagram.html';
+    return null;
+  }
+  if (!profile.unimatch_profile_complete) {
+    window.location.href = '/unimatch/profile-setup/basic-info.html';
+    return null;
+  }
+  return profile;
+}
+
+// Helper: Record UniMatch Like or Pass & Check Mutual Match
+// Returns { isMatch: boolean, matchedProfile?: object }
+async function recordUniMatchAction(targetUserId, action) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return { isMatch: false };
+
+  const likerId = session.user.id;
+  if (!targetUserId || targetUserId === likerId) return { isMatch: false };
+
+  // 1. Record the action in unimatch_likes (upsert)
+  try {
+    await supabase
+      .from('unimatch_likes')
+      .upsert({
+        liker_id: likerId,
+        liked_user_id: targetUserId,
+        action: action
+      }, { onConflict: 'liker_id,liked_user_id' });
+  } catch (err) {
+    console.warn("Could not save action to unimatch_likes:", err);
+  }
+
+  // If action is pass, no match is possible
+  if (action !== 'like') {
+    return { isMatch: false };
+  }
+
+  // 2. Check if the target user has ALREADY liked current user
+  try {
+    const { data: otherLike } = await supabase
+      .from('unimatch_likes')
+      .select('*')
+      .eq('liker_id', targetUserId)
+      .eq('liked_user_id', likerId)
+      .eq('action', 'like')
+      .maybeSingle();
+
+    if (otherLike) {
+      // MUTUAL MATCH! Create entry in unimatch_matches
+      const user1 = likerId < targetUserId ? likerId : targetUserId;
+      const user2 = likerId < targetUserId ? targetUserId : likerId;
+
+      await supabase
+        .from('unimatch_matches')
+        .upsert({
+          user1_id: user1,
+          user2_id: user2
+        }, { onConflict: 'user1_id,user2_id' });
+
+      // Fetch matched user's profile details
+      const { data: matchedProfile } = await supabase
+        .from('profiles')
+        .select('full_name, instagram_username, avatar_url')
+        .eq('id', targetUserId)
+        .maybeSingle();
+
+      return {
+        isMatch: true,
+        matchedProfile: matchedProfile || null
+      };
+    }
+  } catch (err) {
+    console.warn("Error checking mutual match:", err);
+  }
+
+  return { isMatch: false };
+}
+
+// Helper: 24-Hour Daily Free Likes Manager
+const DAILY_FREE_LIKES = 5;
+const RESET_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 Hours
+
+function getDailyLikesInfo(userId) {
+  const uid = userId || 'guest';
+  const key = `unimatch_likes_${uid}`;
+  const now = Date.now();
+
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (now - data.last_reset >= RESET_INTERVAL_MS) {
+        const resetData = { remaining: DAILY_FREE_LIKES, last_reset: now };
+        localStorage.setItem(key, JSON.stringify(resetData));
+        return resetData;
+      }
+      return data;
+    }
+  } catch (e) {}
+
+  const initData = { remaining: DAILY_FREE_LIKES, last_reset: now };
+  try {
+    localStorage.setItem(key, JSON.stringify(initData));
+  } catch (e) {}
+  return initData;
+}
+
+function consumeDailyLike(userId) {
+  const info = getDailyLikesInfo(userId);
+  if (info.remaining <= 0) {
+    return { success: false, remaining: 0 };
+  }
+  info.remaining -= 1;
+  const uid = userId || 'guest';
+  const key = `unimatch_likes_${uid}`;
+  try {
+    localStorage.setItem(key, JSON.stringify(info));
+  } catch (e) {}
+  return { success: true, remaining: info.remaining };
+}
+
+function addExtraLikes(userId, count = 5) {
+  const info = getDailyLikesInfo(userId);
+  info.remaining += count;
+  const uid = userId || 'guest';
+  const key = `unimatch_likes_${uid}`;
+  try {
+    localStorage.setItem(key, JSON.stringify(info));
+  } catch (e) {}
+  return info.remaining;
+}
+
+// Helper: Reset all swipes for current user (allows re-swiping during testing)
+async function resetUserSwipes(userId) {
+  if (!userId) return;
+  try {
+    await supabase
+      .from('unimatch_likes')
+      .delete()
+      .eq('liker_id', userId);
+  } catch (e) {
+    console.error("Error resetting swipes:", e);
+  }
+}
+
 // Helper: Check Authentication (non-redirecting)
 // Returns true if a session exists, false otherwise.
 // Use this on guest-browsable pages instead of requireAuth().

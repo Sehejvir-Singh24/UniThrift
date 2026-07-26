@@ -34,7 +34,17 @@
   <div style="max-width:600px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;">
     <div style="margin-bottom:32px;padding-top:16px;">
       <h2 style="font-size:26px;font-weight:700;color:var(--um-text);margin:0 0 8px;letter-spacing:-0.01em;">About you 💕</h2>
-      <p style="font-size:15px;color:var(--um-text-muted);line-height:1.6;margin:0;">Let's build your profile. This helps us find the best connections for you.</p>
+      <p style="font-size:15px;color:var(--um-text-muted);line-height:1.6;margin:0;">Let's build your UniMatch profile. This helps us find the best connections for you.</p>
+    </div>
+
+    <!-- UniThrift crossover banner (shown if switching from UniThrift) -->
+    <div id="crossover-banner" style="display:none;background:linear-gradient(135deg,rgba(92,4,39,0.07),rgba(176,80,112,0.1));border:1px solid rgba(92,4,39,0.15);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;">
+      <span class="material-symbols-outlined" style="font-size:20px;color:var(--um-primary);flex-shrink:0;margin-top:1px;font-variation-settings:'FILL' 1;">info</span>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--um-primary);margin:0 0 2px;">Switching from UniThrift</p>
+        <p style="font-size:12px;color:var(--um-text-muted);margin:0;line-height:1.5;">We've pre-filled your name & college year from your UniThrift account. Please review and complete the UniMatch-specific fields below — they stay separate from your marketplace profile.</p>
+      </div>
+    </div>
     </div>
 
     <!-- Error banner -->
@@ -120,9 +130,20 @@
     // Pre-fill from existing profile
     const profile = await getProfile();
     if (profile) {
+      // Detect UniThrift crossover: already verified but no UniMatch-specific fields
+      const hasUniThriftData = profile.full_name || profile.year_of_study;
+      const hasFreshUniMatchData = profile.bio || profile.gender || profile.preferred_gender || profile.major;
+      if (hasUniThriftData && !hasFreshUniMatchData) {
+        const banner = document.getElementById('crossover-banner');
+        if (banner) banner.style.display = 'flex';
+      }
+
+      // Pre-fill shared fields (name, college/major, year carry over naturally)
       if (profile.full_name) document.getElementById('fullName').value = profile.full_name;
-      if (profile.major) document.getElementById('major').value = profile.major;
+      const majorVal = profile.major || profile.college || profile.university || '';
+      if (majorVal) document.getElementById('major').value = majorVal;
       if (profile.year_of_study) document.getElementById('year').value = profile.year_of_study;
+      // UniMatch-specific fields — only pre-fill if already set via UniMatch setup
       if (profile.gender) document.getElementById('gender').value = profile.gender;
       if (profile.preferred_gender) document.getElementById('preferred_gender').value = profile.preferred_gender;
       if (profile.bio) {

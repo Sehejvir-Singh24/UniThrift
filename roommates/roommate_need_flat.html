@@ -138,13 +138,28 @@
 <div class="space-y-stack-sm">
 <label class="font-label-caps text-label-caps text-on-surface-variant">PREFERRED GENDER</label>
 <div class="flex bg-surface-container p-1 rounded-xl">
-<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm bg-surface text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition-all">Any</button>
-<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Boys</button>
-<button class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Girls</button>
+<button type="button" class="flex-1 py-2 rounded-lg font-body-sm text-body-sm bg-surface text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition-all">Any</button>
+<button type="button" class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Boys</button>
+<button type="button" class="flex-1 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-all">Girls</button>
+</div>
+<div class="mt-2 p-3 bg-surface-container/70 rounded-xl flex items-start gap-2 border border-outline-variant/30 text-xs text-on-surface-variant">
+  <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">info</span>
+  <span><strong>Visibility Rule:</strong> If you select <em>Girls</em> or <em>Boys</em>, your post will only be shown to students of that gender. Selecting <em>Any</em> displays your post to everyone.</span>
 </div>
 </div>
 </div>
 </section>
+
+<!-- Terms & Privacy Agreement -->
+<section class="p-4 bg-primary/5 rounded-2xl border border-primary/20 space-y-2">
+  <label class="flex items-start gap-3 cursor-pointer select-none">
+    <input type="checkbox" id="terms-checkbox" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary mt-0.5 accent-[#006e2f]"/>
+    <span class="text-xs text-on-surface leading-snug">
+      I agree to the <strong>Terms & Conditions</strong>. I understand and consent that my contact details (phone/WhatsApp) will be shared with verified students who pay the ₹39 unlock fee to connect with me.
+    </span>
+  </label>
+</section>
+
 </div>
 <!-- Footer -->
 <div class="sticky bottom-0 w-full p-container-padding-mobile bg-surface/90 backdrop-blur-[12px] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] pb-safe">
@@ -227,6 +242,7 @@
   });
 
   // Segmented Control Logic
+  let _selectedGender = 'Any';
   const genderBtns = document.querySelectorAll('#flatmate-options .flex > button');
   genderBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -236,6 +252,7 @@
       });
       btn.classList.add('bg-surface', 'shadow-[0_2px_8px_rgba(0,0,0,0.05)]', 'text-on-surface');
       btn.classList.remove('text-on-surface-variant');
+      _selectedGender = btn.textContent.trim();
     });
   });
 
@@ -305,6 +322,12 @@
   }
 
   async function saveRoommateRequirementsAndContinue() {
+      const termsCheckbox = document.getElementById('terms-checkbox');
+      if (!termsCheckbox || !termsCheckbox.checked) {
+          alert("Please accept the Terms & Conditions regarding contact sharing before posting your requirement.");
+          return;
+      }
+
       const budgetOrRent = parseFloat(slider.value);
       const listingType = document.getElementById('listing-type').value;
       
@@ -376,7 +399,8 @@
           amenities: listingType === 'have_flat' ? amenities : [],
           images: uploadedImageUrls,
           room_type: roomType,
-          move_in_date: moveInDate || null
+          move_in_date: moveInDate || null,
+          preferred_gender: _selectedGender || 'Any'
       };
       
       sessionStorage.setItem('roommate_draft', JSON.stringify(roommateDraft));

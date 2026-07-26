@@ -83,7 +83,7 @@
     </div>
 
     <!-- Notification Bell -->
-    <button class="um-header-icon-btn" title="Notifications">
+    <button onclick="location.href='/unimatch/profile/notifications.html'" class="um-header-icon-btn" title="Notifications" style="position:relative;">
       <span class="material-symbols-outlined" style="font-size:22px;">notifications</span>
       <span style="position:absolute;top:9px;right:9px;width:7px;height:7px;background:var(--um-primary);border-radius:50%;"></span>
     </button>
@@ -100,10 +100,6 @@
     <button onclick="location.href='/unimatch/out-of-likes.html'" class="um-pill">
       <span class="material-symbols-outlined" style="font-size:15px;font-variation-settings:'FILL' 1;">favorite</span>
       <span id="likes-count">5 Likes Remaining</span>
-    </button>
-    <button onclick="location.href='/unimatch/hidden-likes.html'" class="um-pill" style="background:var(--um-primary-dim);border-color:rgba(192,48,74,0.25);">
-      <span class="material-symbols-outlined" style="font-size:15px;font-variation-settings:'FILL' 1;">visibility</span>
-      <span>12 Admirers</span>
     </button>
   </div>
 
@@ -178,6 +174,26 @@
         </div>
       </div>
     </article>
+
+    <!-- Empty state card (shown when no real profiles remain) -->
+    <div id="empty-state-card" style="display:none;position:absolute;inset:0;background:rgba(255,252,252,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:28px;border:1px solid rgba(255,255,255,0.8);box-shadow:0 12px 40px var(--um-shadow-card);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:16px;z-index:20;">
+      <div style="width:80px;height:80px;border-radius:50%;background:var(--um-primary-dim);display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" style="font-size:40px;color:var(--um-primary);font-variation-settings:'FILL' 1;">person_search</span>
+      </div>
+      <div>
+        <h3 style="font-size:22px;font-weight:700;color:var(--um-text);margin:0 0 6px;">You're all caught up! 🎉</h3>
+        <p id="empty-state-msg" style="font-size:14px;color:var(--um-text-muted);margin:0;line-height:1.5;">You have swiped through all available student profiles in your feed.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:240px;margin-top:8px;">
+        <button onclick="handleResetSwipes()" class="um-btn-primary" style="padding:12px 20px;font-size:14px;">
+          <span class="material-symbols-outlined" style="font-size:18px;">restart_alt</span>
+          Reset Swiped Profiles
+        </button>
+        <button onclick="location.reload()" style="background:transparent;border:1.5px solid var(--um-border);border-radius:999px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--um-text);cursor:pointer;">
+          Refresh Feed
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ─── Action Buttons ─── -->
@@ -207,10 +223,10 @@
       <span class="material-symbols-outlined" style="font-size:22px;">chat_bubble</span>
       <span>Messages</span>
     </button>
-    <!-- Events -->
-    <button class="um-nav-item" onclick="alert('Events coming soon!')">
-      <span class="material-symbols-outlined" style="font-size:22px;">event_available</span>
-      <span>Events</span>
+    <!-- Matches -->
+    <button class="um-nav-item" onclick="location.href='/unimatch/hidden-likes.html'">
+      <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;">favorite</span>
+      <span>Matches</span>
     </button>
     <!-- Profile -->
     <button class="um-nav-item" onclick="location.href='/unimatch/profile/my-profile.html'">
@@ -233,57 +249,34 @@
       <h3 style="font-size:26px;font-weight:700;color:var(--um-primary);margin:0 0 6px;font-family:var(--um-font-logo);">It's a Match! 💕</h3>
       <p style="font-size:13px;color:var(--um-text-muted);margin:0;">You and <strong id="match-student-name" style="color:var(--um-text);">Eleanor</strong> both connected!</p>
     </div>
-    <!-- Instagram reveal -->
-    <div style="width:100%;background:var(--um-bg-alt);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--um-border);">
-      <span style="font-size:12px;color:var(--um-text-muted);">Instagram:</span>
-      <span id="match-student-insta" style="font-size:13px;font-weight:700;color:var(--um-primary);">@eleanor_arch</span>
+    <!-- Instagram Locked / Unlocked Container -->
+    <div id="insta-locked-box" style="width:100%;background:var(--um-bg-alt);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--um-border);align-items:center;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        <span style="font-size:12px;color:var(--um-text-muted);font-weight:500;">Instagram ID:</span>
+        <span id="match-student-insta-blurred" style="font-size:14px;font-weight:700;color:var(--um-primary);letter-spacing:1px;">@•••••••••</span>
+      </div>
+      <div style="font-size:11px;color:var(--um-text-muted);">Pay ₹29 to reveal Instagram handle & DM</div>
     </div>
-    <button onclick="closeMatchModal()" class="um-btn-primary">
+
+    <!-- Unlock Button (Initial State) -->
+    <button id="unlock-insta-btn" onclick="handleUnlockMatchInsta()" class="um-btn-primary" style="width:100%;">
+      <span class="material-symbols-outlined" style="font-size:18px;">lock_open</span>
+      Unlock Instagram for ₹29
+    </button>
+
+    <!-- Send DM Button (Hidden until ₹29 is paid) -->
+    <a id="send-dm-btn" href="#" target="_blank" class="um-btn-primary" style="display:none;width:100%;text-decoration:none;align-items:center;justify-content:center;gap:6px;">
       <span class="material-symbols-outlined" style="font-size:18px;">send</span>
       Send DM on Instagram
-    </button>
-    <button onclick="closeMatchModal()" style="background:transparent;border:none;font-size:13px;color:var(--um-text-light);cursor:pointer;font-family:var(--um-font-body);">Keep Discovering ✨</button>
+    </a>
+
+    <button onclick="closeMatchModal()" style="background:transparent;border:none;font-size:13px;color:var(--um-text-light);cursor:pointer;font-family:var(--um-font-body);margin-top:2px;">Keep Discovering ✨</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
 <script>
-  // Fallback demo profiles (shown only while Supabase loads or no real users exist)
-  const DEMO_PROFILES = [
-    {
-      name: "Eleanor", age: 21, major: "Architecture", year: "3rd Year", university: "Stanford University",
-      goal: "STUDY PARTNER", instagram: "eleanor_arch",
-      bio: "Coffee enthusiast and late-night studio dweller. Always looking for someone to review floor plans and debate brutalism over an iced latte. ✨",
-      interests: ["Design", "Coffee", "Museums", "Photography"],
-      photos: [
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80",
-        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=780&q=80",
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=780&q=80"
-      ]
-    },
-    {
-      name: "Marcus", age: 22, major: "Computer Science", year: "4th Year", university: "UC Berkeley",
-      goal: "COFFEE BUDDY", instagram: "marcus_dev",
-      bio: "Building AI agents and brewing pour-over coffees. Hit me up if you want to brainstorm startup ideas!",
-      interests: ["AI / ML", "Startups", "Coffee Shops", "Open Source"],
-      photos: [
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=780&q=80",
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=780&q=80"
-      ]
-    },
-    {
-      name: "Chloe", age: 20, major: "Literature", year: "2nd Year", university: "Columbia University",
-      goal: "FRIENDS", instagram: "chloe_reads",
-      bio: "Passionate about modern fiction, film photography, and finding quiet reading spots on campus.",
-      interests: ["Literature", "Film", "Creative Writing", "Thrifting"],
-      photos: [
-        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=780&q=80",
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80"
-      ]
-    }
-  ];
-
   let DISCOVERY_PROFILES = [];
   let cardIndex = 0;
   let photoIndex = 0;
@@ -314,13 +307,28 @@
     return score;
   }
 
+  function isGenderMatch(candidateGender, preferredGender) {
+    if (!preferredGender || preferredGender === 'Everyone' || preferredGender === 'Any') return true;
+    if (!candidateGender) return true;
+
+    const pref = preferredGender.toLowerCase().trim();
+    const cand = candidateGender.toLowerCase().trim();
+
+    if (pref.includes('women') || pref.includes('female')) {
+      return cand.includes('female') || cand.includes('woman') || cand.includes('women');
+    }
+    if (pref.includes('men') || pref.includes('male')) {
+      return cand.includes('male') || cand.includes('man') || cand.includes('men');
+    }
+    return true;
+  }
+
   function buildFeedProfiles(candidates, myProfile) {
     const myInterests = (() => { try { return typeof myProfile.interests === 'string' ? JSON.parse(myProfile.interests) : (myProfile.interests || []); } catch { return []; } })();
     const myPreferredGender = myProfile.preferred_gender || 'Everyone';
-    let filtered = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete);
-    if (myPreferredGender !== 'Everyone') {
-      const gf = filtered.filter(c => c.gender === myPreferredGender || !c.gender);
-      if (gf.length > 0) filtered = gf;
+    let filtered = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true && isGenderMatch(c.gender, myPreferredGender));
+    if (filtered.length === 0 && candidates.length > 0) {
+      filtered = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true);
     }
     const scored = filtered.map(c => ({ ...c, _score: scoreProfile(c, myInterests) }));
     scored.sort((a, b) => b._score - a._score);
@@ -328,46 +336,103 @@
       const photos = (() => { try { const arr = typeof c.profile_photos === 'string' ? JSON.parse(c.profile_photos) : (c.profile_photos || []); return arr.length > 0 ? arr : (c.avatar_url ? [c.avatar_url] : []); } catch { return c.avatar_url ? [c.avatar_url] : []; } })();
       const interests = (() => { try { return typeof c.interests === 'string' ? JSON.parse(c.interests) : (c.interests || []); } catch { return []; } })();
       const lookingFor = (() => { try { const arr = typeof c.looking_for === 'string' ? JSON.parse(c.looking_for) : (c.looking_for || []); return arr[0] || ''; } catch { return ''; } })();
-      return { id: c.id, name: c.full_name || 'Student', age: c.age || null, major: c.major || '', year: c.year_of_study || '', university: c.university || '', gender: c.gender || '', goal: lookingFor.toUpperCase(), instagram: c.instagram_username || '', bio: c.bio || '', interests, photos: photos.length > 0 ? photos : ['https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80'], _score: c._score };
+      return { id: c.id, name: c.full_name || 'Student', age: c.age || null, major: c.major || c.college || '', year: c.year_of_study || '', university: c.university || c.college || 'GGSIPU', gender: c.gender || '', goal: lookingFor.toUpperCase(), instagram: c.instagram_username || '', bio: c.bio || '', interests, photos: photos.length > 0 ? photos : ['https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80'], _score: c._score };
     });
   }
 
+  let currentUserId = null;
+
   (async () => {
-    const ok = await requireAuth();
-    if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
-    const myProfile = await getProfile();
+    const myProfile = await requireUniMatchAuth();
+    if (!myProfile) return;
+    currentUserId = myProfile.id;
+
+    // Load persistent 24-hour daily likes balance
+    const likesInfo = getDailyLikesInfo(currentUserId);
+    remainingLikes = likesInfo.remaining;
+    document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+
+    // Fetch user's past likes/passes to exclude already swiped profiles
+    let alreadySwiped = new Set();
+    try {
+      const { data: myLikes } = await supabase
+        .from('unimatch_likes')
+        .select('liked_user_id')
+        .eq('liker_id', myProfile.id);
+      if (myLikes) {
+        myLikes.forEach(l => alreadySwiped.add(l.liked_user_id));
+      }
+    } catch (e) {}
+
+    // Fetch real student profiles strictly from Supabase database (only completed UniMatch profiles)
     const { data: candidates, error } = await supabase
       .from('profiles')
-      .select('id, full_name, major, bio, age, year_of_study, university, gender, preferred_gender, interests, looking_for, profile_photos, avatar_url, instagram_username, unimatch_profile_complete')
+      .select('*')
       .eq('unimatch_profile_complete', true);
-    if (!error && candidates && candidates.length > 1) {
-      DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {});
+
+    if (error) {
+      console.warn("Could not fetch profiles from Supabase:", error);
     }
-    if (DISCOVERY_PROFILES.length === 0) DISCOVERY_PROFILES = DEMO_PROFILES;
+
+    if (!error && candidates && candidates.length > 0) {
+      const otherCandidates = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true);
+      const unswiped = otherCandidates.filter(c => !alreadySwiped.has(c.id));
+
+      if (unswiped.length > 0) {
+        DISCOVERY_PROFILES = buildFeedProfiles(unswiped, myProfile || {});
+      } else if (otherCandidates.length > 0) {
+        // Fallback: show other completed candidates if all have been swiped
+        DISCOVERY_PROFILES = buildFeedProfiles(otherCandidates, myProfile || {});
+      }
+    }
+
     renderCard(0);
   })();
 
+  async function handleResetSwipes() {
+    if (currentUserId) {
+      await resetUserSwipes(currentUserId);
+      location.reload();
+    }
+  }
+
   function renderCard(idx) {
-    const p = DISCOVERY_PROFILES[idx % DISCOVERY_PROFILES.length];
+    const card = document.getElementById('active-card');
+    const emptyState = document.getElementById('empty-state-card');
+    const actionBtns = document.querySelector('.um-action-buttons');
+
+    if (!DISCOVERY_PROFILES || DISCOVERY_PROFILES.length === 0 || idx >= DISCOVERY_PROFILES.length) {
+      if (card) card.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
+      if (actionBtns) actionBtns.style.display = 'none';
+      return;
+    }
+
+    if (card) card.style.display = 'flex';
+    if (emptyState) emptyState.style.display = 'none';
+    if (actionBtns) actionBtns.style.display = 'flex';
+
+    const p = DISCOVERY_PROFILES[idx];
     photoIndex = 0;
     renderPhoto();
     document.getElementById('card-name-age').textContent = `${p.name}${p.age ? ', ' + p.age : ''}`;
     document.getElementById('card-major-year').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px;font-variation-settings:'FILL' 1;">school</span> ${p.major}${p.year ? ', ' + p.year : ''}`;
     document.getElementById('card-university').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">location_on</span> ${p.university}`;
     document.getElementById('card-goal-text').textContent = p.goal || 'CONNECTING';
-    document.getElementById('card-bio').textContent = p.bio;
-    document.getElementById('card-interests').innerHTML = p.interests.map(i =>
-      `<span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">${getInterestIcon(i)}</span>${i}</span>`
+    document.getElementById('card-bio').textContent = p.bio || 'Verified student on UniMatch.';
+    document.getElementById('card-interests').innerHTML = (p.interests || []).map(i =>
+      `<span class="um-chip"><span class="material-symbols-outlined" style="font-size:13px;">${getInterestIcon(i)}</span>${escapeHTML(i)}</span>`
     ).join('');
-    // Animate card in
-    const card = document.getElementById('active-card');
+
     card.classList.remove('card-swipe-enter');
     void card.offsetWidth;
     card.classList.add('card-swipe-enter');
   }
 
   function renderPhoto() {
-    const p = DISCOVERY_PROFILES[cardIndex % DISCOVERY_PROFILES.length];
+    if (!DISCOVERY_PROFILES || DISCOVERY_PROFILES.length === 0) return;
+    const p = DISCOVERY_PROFILES[cardIndex];
+    if (!p) return;
     const photos = p.photos || (p.photo ? [p.photo] : []);
     if (photos.length === 0) return;
     if (photoIndex < 0) photoIndex = 0;
@@ -385,7 +450,8 @@
 
   function nextPhoto(e) {
     if (e) e.stopPropagation();
-    const p = DISCOVERY_PROFILES[cardIndex % DISCOVERY_PROFILES.length];
+    const p = DISCOVERY_PROFILES[cardIndex];
+    if (!p) return;
     const photos = p.photos || (p.photo ? [p.photo] : []);
     if (photoIndex < photos.length - 1) { photoIndex++; renderPhoto(); }
   }
@@ -395,7 +461,11 @@
     if (photoIndex > 0) { photoIndex--; renderPhoto(); }
   }
 
-  function handlePass() {
+  async function handlePass() {
+    const p = DISCOVERY_PROFILES[cardIndex];
+    if (p && p.id) {
+      recordUniMatchAction(p.id, 'pass').catch(() => {});
+    }
     const card = document.getElementById('active-card');
     card.classList.add('card-pass-out');
     setTimeout(() => {
@@ -405,19 +475,63 @@
     }, 260);
   }
 
-  function handleConnect() {
-    if (remainingLikes <= 0) { window.location.href = '/unimatch/out-of-likes.html'; return; }
-    remainingLikes--;
+  let currentMatchedInsta = '';
+
+  async function handleConnect() {
+    const likesInfo = getDailyLikesInfo(currentUserId);
+    if (likesInfo.remaining <= 0) {
+      window.location.href = '/unimatch/out-of-likes.html';
+      return;
+    }
+
+    const consumed = consumeDailyLike(currentUserId);
+    if (!consumed.success) {
+      window.location.href = '/unimatch/out-of-likes.html';
+      return;
+    }
+
+    remainingLikes = consumed.remaining;
     document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
-    const p = DISCOVERY_PROFILES[cardIndex % DISCOVERY_PROFILES.length];
-    document.getElementById('match-student-name').textContent = p.name;
-    document.getElementById('match-student-insta').textContent = `@${p.instagram || p.name.toLowerCase().replace(' ','_')}`;
-    const modal = document.getElementById('match-modal');
-    modal.style.display = 'flex';
-    // Card animation
+    
+    const p = DISCOVERY_PROFILES[cardIndex];
     const card = document.getElementById('active-card');
     card.classList.add('card-like-out');
-    setTimeout(() => card.classList.remove('card-like-out'), 260);
+
+    // Save like and check if MUTUAL match
+    let res = { isMatch: false };
+    if (p && p.id) {
+      res = await recordUniMatchAction(p.id, 'like');
+    }
+
+    setTimeout(() => {
+      card.classList.remove('card-like-out');
+      if (res && res.isMatch) {
+        // MUTUAL MATCH! Show match modal (Instagram locked behind ₹29)
+        const name = (res.matchedProfile && res.matchedProfile.full_name) || p.name;
+        currentMatchedInsta = (res.matchedProfile && res.matchedProfile.instagram_username) || p.instagram || name.toLowerCase().replace(' ','_');
+        
+        document.getElementById('match-student-name').textContent = name;
+        document.getElementById('match-student-insta-blurred').textContent = '@•••••••••';
+        document.getElementById('unlock-insta-btn').style.display = 'flex';
+        document.getElementById('send-dm-btn').style.display = 'none';
+        document.getElementById('match-modal').style.display = 'flex';
+      } else {
+        // Just a one-way like: advance to next card (no match pop-up)
+        cardIndex++;
+        renderCard(cardIndex);
+      }
+    }, 260);
+  }
+
+  async function handleUnlockMatchInsta() {
+    const handleClean = currentMatchedInsta.replace('@','');
+    const confirmPay = confirm(`Unlock Instagram Handle for ₹29?\n\nProceed with payment to view handle (@${handleClean}) & send a DM.`);
+    if (!confirmPay) return;
+
+    document.getElementById('match-student-insta-blurred').textContent = `@${handleClean}`;
+    document.getElementById('send-dm-btn').href = `https://instagram.com/${handleClean}`;
+    document.getElementById('unlock-insta-btn').style.display = 'none';
+    document.getElementById('send-dm-btn').style.display = 'flex';
   }
 
   function closeMatchModal() {

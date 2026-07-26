@@ -364,11 +364,20 @@
     return `<div class="${sizeClass} bg-gradient-to-br from-primary to-primary-container text-white font-bold flex items-center justify-center text-xs select-none">${initials}</div>`;
   }
 
+  let _userGender = null;
+
   async function loadListings() {
     try {
+      if (_isLoggedIn) {
+        const profile = await getProfile();
+        if (profile && profile.gender) {
+          _userGender = profile.gender.trim().toLowerCase();
+        }
+      }
+
       const { data, error } = await supabase
         .from('roommate_listings')
-        .select('*, profiles!user_id(full_name, avatar_url, college, year_of_study, phone_number)')
+        .select('*, profiles!user_id(full_name, avatar_url, college, year_of_study, phone_number, gender)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -402,6 +411,20 @@
 
     _filteredListings = _allListings.filter(item => {
       if (_activeFilter !== 'all' && item.listing_type !== _activeFilter) return false;
+
+      // Gender preference filtering
+      if (item.preferred_gender) {
+        const pref = item.preferred_gender.trim().toLowerCase();
+        if (pref === 'girls' || pref === 'female' || pref === 'women') {
+          if (_userGender && !['female', 'girls', 'woman', 'women'].includes(_userGender)) {
+            return false;
+          }
+        } else if (pref === 'boys' || pref === 'male' || pref === 'men') {
+          if (_userGender && !['male', 'boys', 'man', 'men'].includes(_userGender)) {
+            return false;
+          }
+        }
+      }
 
       if (search) {
         const title = (item.title || '').toLowerCase();
