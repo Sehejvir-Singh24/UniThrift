@@ -22,10 +22,28 @@ window.escapeHTML = function(str) {
   }[tag] || tag));
 };
 
-// Helper: Get Current User Profile
-async function getProfile() {
+// Helper: Get Current User Profile (Cache-First for ultra-fast mobile navigation)
+let _cachedProfile = null;
+
+async function getProfile(forceRefresh = false) {
+  if (!forceRefresh) {
+    if (_cachedProfile) return _cachedProfile;
+    try {
+      const stored = sessionStorage.getItem('unimatch_cached_profile');
+      if (stored) {
+        _cachedProfile = JSON.parse(stored);
+        refreshProfileInBackground();
+        return _cachedProfile;
+      }
+    } catch (e) {}
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
+  if (!session) {
+    _cachedProfile = null;
+    try { sessionStorage.removeItem('unimatch_cached_profile'); } catch (e) {}
+    return null;
+  }
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -37,7 +55,27 @@ async function getProfile() {
     console.error("Error fetching profile:", error);
     return null;
   }
+
+  _cachedProfile = profile;
+  try { sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(profile)); } catch (e) {}
   return profile;
+}
+
+async function refreshProfileInBackground() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      _cachedProfile = profile;
+      sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(profile));
+    }
+  } catch (e) {}
 }
 
 // Helper: Require Authentication

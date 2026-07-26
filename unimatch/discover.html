@@ -349,23 +349,25 @@
     remainingLikes = likesInfo.remaining;
     document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
 
-    // Fetch user's past likes/passes to exclude already swiped profiles
+    // Fetch user's past likes and student candidate profiles in PARALLEL for max speed
     let alreadySwiped = new Set();
-    try {
-      const { data: myLikes } = await supabase
-        .from('unimatch_likes')
-        .select('liked_user_id')
-        .eq('liker_id', myProfile.id);
-      if (myLikes) {
-        myLikes.forEach(l => alreadySwiped.add(l.liked_user_id));
-      }
-    } catch (e) {}
+    let candidates = [];
+    let error = null;
 
-    // Fetch real student profiles strictly from Supabase database (only completed UniMatch profiles)
-    const { data: candidates, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('unimatch_profile_complete', true);
+    try {
+      const [likesRes, candidatesRes] = await Promise.all([
+        supabase.from('unimatch_likes').select('liked_user_id').eq('liker_id', myProfile.id),
+        supabase.from('profiles').select('*').eq('unimatch_profile_complete', true)
+      ]);
+
+      if (likesRes && likesRes.data) {
+        likesRes.data.forEach(l => alreadySwiped.add(l.liked_user_id));
+      }
+      candidates = (candidatesRes && candidatesRes.data) || [];
+      error = candidatesRes && candidatesRes.error;
+    } catch (e) {
+      console.warn("Parallel fetch error:", e);
+    }
 
     if (error) {
       console.warn("Could not fetch profiles from Supabase:", error);

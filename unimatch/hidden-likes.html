@@ -155,21 +155,14 @@
       const profile = await requireUniMatchAuth();
       if (!profile) return;
 
-      // 1. Fetch real likes received (admirers)
-      const { data: likesReceived } = await supabase
-        .from('unimatch_likes')
-        .select('liker_id, action, created_at')
-        .eq('liked_user_id', profile.id)
-        .eq('action', 'like');
+      // 1 & 2. Fetch admirers and mutual matches in PARALLEL for max speed
+      const [likesRes, matchesRes] = await Promise.all([
+        supabase.from('unimatch_likes').select('liker_id, action, created_at').eq('liked_user_id', profile.id).eq('action', 'like'),
+        supabase.from('unimatch_matches').select('*').or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`)
+      ]);
 
-      // 2. Fetch mutual matches
-      const { data: matchesData } = await supabase
-        .from('unimatch_matches')
-        .select('*')
-        .or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`);
-
-      const realLikes = likesReceived || [];
-      const realMatches = matchesData || [];
+      const realLikes = (likesRes && likesRes.data) || [];
+      const realMatches = (matchesRes && matchesRes.data) || [];
 
       // Collect IDs to fetch profile info
       const admirerIds = realLikes.map(l => l.liker_id);
