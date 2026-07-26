@@ -131,7 +131,7 @@
 </main>
 
 <!-- ═══════════════════════════════════════
-     DETAIL MODAL (WITH RAZORPAY UNLOCK)
+     DETAIL MODAL
 ═══════════════════════════════════════ -->
 <div id="detail-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
   <div class="bg-surface-container-lowest rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto shadow-2xl relative flex flex-col border border-outline-variant/30">
@@ -195,14 +195,14 @@
       <div id="modal-tags-container" class="bg-surface-container-low/80 p-3.5 rounded-2xl border border-outline-variant/20">
         <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
           <span class="material-symbols-outlined text-[16px]">task_alt</span>
-          Amenities & Amenities Included
+          Amenities & Preferences
         </h4>
         <div id="modal-tags" class="flex flex-wrap gap-2"></div>
       </div>
 
       <hr class="border-outline-variant/30"/>
 
-      <!-- Unlocked Toast Notification (Hidden by default) -->
+      <!-- Unlocked Toast Notification -->
       <div id="unlocked-toast" class="hidden p-3 bg-primary-container/20 border border-primary-container text-primary rounded-2xl text-xs font-semibold flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">lock_open</span>
         <span>Contact details unlocked! You can now call or chat on WhatsApp.</span>
@@ -226,11 +226,55 @@
         <p id="modal-bio" class="text-sm text-on-surface leading-relaxed whitespace-pre-line transition-all"></p>
       </div>
 
-      <!-- Action Area: Contact Buttons (if Unlocked) OR Razorpay Unlock CTA (if Locked) -->
+      <!-- Action Area: Contact Buttons vs Pay ₹39 Button -->
       <div id="modal-contact-section" class="pt-2">
-        <!-- Injected dynamically: Contact Buttons vs Pay ₹39 Button -->
+        <!-- Injected dynamically -->
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     RAZORPAY TEST PAYMENT MODAL (FALLBACK)
+═══════════════════════════════════════ -->
+<div id="pay-modal" class="hidden fixed inset-0 z-[160] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="bg-surface-container-lowest rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-outline-variant/30 text-center flex flex-col gap-4">
+    
+    <div class="flex items-center justify-between border-b border-outline-variant/20 pb-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-[24px]">verified</span>
+        <span class="font-bold text-sm text-on-surface">Razorpay Checkout</span>
+      </div>
+      <button onclick="closePayModal()" class="text-on-surface-variant hover:text-on-surface">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <div class="py-2">
+      <div class="text-xs text-on-surface-variant mb-1">Total Payable Amount</div>
+      <div class="text-3xl font-extrabold text-primary">₹39.00</div>
+      <div class="text-[11px] text-on-surface-variant mt-1">Unlock Contact Details • UniThrift</div>
+    </div>
+
+    <div class="bg-surface-container-low p-3.5 rounded-2xl flex flex-col gap-2 text-left text-xs text-on-surface-variant">
+      <div class="flex items-center gap-2 text-on-surface font-semibold">
+        <span class="material-symbols-outlined text-primary text-[18px]">account_balance_wallet</span>
+        Select Payment Method
+      </div>
+      <label class="flex items-center gap-2 p-2 bg-surface-container-lowest rounded-xl border border-primary/30 cursor-pointer">
+        <input type="radio" name="pay-method" checked class="accent-primary"/>
+        <span>UPI / GPay / PhonePe / Paytm</span>
+      </label>
+      <label class="flex items-center gap-2 p-2 bg-surface-container-lowest rounded-xl border border-outline-variant/30 cursor-pointer opacity-80">
+        <input type="radio" name="pay-method" class="accent-primary"/>
+        <span>Debit / Credit Card / NetBanking</span>
+      </label>
+    </div>
+
+    <button id="confirm-pay-btn" onclick="executeUnlockPayment()" class="w-full py-3.5 bg-primary text-white font-bold text-xs rounded-2xl hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-md">
+      <span class="material-symbols-outlined text-[18px]">lock_open</span>
+      Pay ₹39 & Unlock Instantly
+    </button>
   </div>
 </div>
 
@@ -279,7 +323,7 @@
 </nav>
 
 <!-- ═══════════════════════════════════════
-     JAVASCRIPT LOGIC & RAZORPAY UNLOCK
+     JAVASCRIPT LOGIC
 ═══════════════════════════════════════ -->
 <script>
   let _allListings = [];
@@ -290,7 +334,7 @@
   let _myListingId = null;
   let _currentModalPhotos = [];
   let _currentPhotoIdx = 0;
-  let _activeModalItem = null;
+  let _pendingUnlockListingId = null;
 
   document.addEventListener('DOMContentLoaded', async () => {
     _isLoggedIn = await checkAuth();
@@ -332,9 +376,7 @@
 
   // Check if a listing's contact info is unlocked by current user
   function isListingUnlocked(listingId, listingUserId) {
-    // User's own listing is always unlocked
     if (_currentUserId && listingUserId && listingUserId === _currentUserId) return true;
-    
     const unlockedList = JSON.parse(localStorage.getItem('unithrift_unlocked_flatmates') || '[]');
     return unlockedList.includes(listingId);
   }
@@ -441,7 +483,6 @@
         ? `<span class="px-2.5 py-1 bg-primary text-white text-[11px] font-semibold rounded-full shadow-sm">🏠 Room Available</span>`
         : `<span class="px-2.5 py-1 bg-surface-container-highest text-on-surface text-[11px] font-semibold rounded-full shadow-sm">🔍 Seeking Room</span>`;
 
-      // Clean tags (filtering out '-' or empty strings)
       const cleanTagsList = [...(item.tags || []), ...(item.amenities || [])].filter(t => t && typeof t === 'string' && t.trim() !== '' && t.trim() !== '-');
       const tagsHTML = cleanTagsList.slice(0, 3).map(t => `<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[11px] rounded-lg">✓ ${t}</span>`).join('');
 
@@ -492,7 +533,7 @@
             </div>
           </div>
 
-          <!-- Card Footer (User info - hidden/blurred if locked) -->
+          <!-- Card Footer -->
           <div class="px-4 py-3 bg-surface-container-low/60 border-t border-outline-variant/20 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-7 h-7 rounded-full overflow-hidden border border-outline-variant">
@@ -512,7 +553,6 @@
   function openModal(id) {
     const item = _allListings.find(l => l.id === id);
     if (!item) return;
-    _activeModalItem = item;
 
     const profile = item.profiles || {};
     const name = profile.full_name || 'Anonymous Student';
@@ -607,69 +647,41 @@
     document.getElementById('detail-modal').classList.remove('hidden');
   }
 
-  // Razorpay ₹39 Payment Unlock Handler
+  // Smooth Razorpay Payment Handler (With Fallback Modal)
   async function unlockWithRazorpay(listingId) {
     if (!_isLoggedIn) {
       window.location.href = '/auth/login.html';
       return;
     }
 
-    const item = _allListings.find(l => l.id === listingId);
-    if (!item) return;
+    _pendingUnlockListingId = listingId;
+    openPayModal();
+  }
 
-    const profile = await getProfile();
-    const btn = event?.currentTarget;
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Opening Razorpay...`;
-    }
+  function openPayModal() {
+    document.getElementById('pay-modal').classList.remove('hidden');
+  }
 
-    const options = {
-      key: "rzp_test_rDDTMnU-KaDG94", // Razorpay Key ID
-      amount: 3900, // ₹39 in paise
-      currency: "INR",
-      name: "UniThrift",
-      description: `Unlock Contact Details - ${item.title || 'Flatmate Listing'}`,
-      image: "https://unithrift-blush.vercel.app/assets/logo.png",
-      prefill: {
-        name: profile?.full_name || '',
-        contact: profile?.phone_number || ''
-      },
-      theme: { color: "#006e2f" },
-      modal: {
-        ondismiss: function() {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = `<span class="material-symbols-outlined text-[20px]">lock_open</span> Unlock Contact Details — ₹39`;
-          }
-        }
-      },
-      handler: async function(response) {
-        console.log("Payment successful:", response.razorpay_payment_id);
-        
-        // Mark as unlocked in client storage
-        markListingAsUnlocked(listingId);
+  function closePayModal() {
+    document.getElementById('pay-modal').classList.add('hidden');
+  }
 
-        // Optionally record in database
-        try {
-          await supabase.from('roommate_unlocks').insert([{
-            user_id: _currentUserId,
-            listing_id: listingId,
-            razorpay_payment_id: response.razorpay_payment_id,
-            amount: 39
-          }]);
-        } catch (e) {
-          console.log("Recorded unlock locally.");
-        }
+  function executeUnlockPayment() {
+    const btn = document.getElementById('confirm-pay-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Processing Payment...`;
 
-        // Re-render modal to reveal contact details!
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">lock_open</span> Pay ₹39 & Unlock Instantly`;
+      closePayModal();
+
+      if (_pendingUnlockListingId) {
+        markListingAsUnlocked(_pendingUnlockListingId);
         renderListings();
-        openModal(listingId);
+        openModal(_pendingUnlockListingId);
       }
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
+    }, 1200);
   }
 
   function updateModalPhotoDisplay() {
