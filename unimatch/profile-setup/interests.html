@@ -1,144 +1,192 @@
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>UniMatch - Select Interests</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        "colors": {
-          "on-surface": "#1a1c1b", "surface-container": "#efeeec", "on-surface-variant": "#554245",
-          "primary": "#5c0427", "outline-variant": "#dac0c4", "on-background": "#1a1c1b",
-          "on-primary": "#ffffff", "surface": "#faf9f7", "background": "#faf9f7",
-          "primary-container": "#7a1f3d", "surface-container-lowest": "#ffffff", "outline": "#887275",
-        },
-        "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-        "spacing": { "stack-gap-md": "20px", "unit": "4px", "section-margin": "48px", "stack-gap-sm": "12px", "stack-gap-lg": "32px", "container-padding": "24px" },
-        "fontFamily": { "button": ["Inter"], "label-caps": ["Inter"], "body-lg": ["Inter"], "title-md": ["Inter"], "headline-lg-mobile": ["Inter"], "display": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"] },
-        "fontSize": {
-          "button": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
-          "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
-          "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
-          "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
-          "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-          "display": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
-          "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-          "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniMatch - Select Interests</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-surface": "#1a1c1b", "surface-container": "#efeeec", "on-surface-variant": "#554245",
+            "primary": "#5c0427", "outline-variant": "#dac0c4", "on-background": "#1a1c1b",
+            "on-primary": "#ffffff", "surface": "#faf9f7", "background": "#faf9f7",
+            "primary-container": "#7a1f3d", "surface-container-lowest": "#ffffff", "outline": "#887275",
+          },
+          borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+          fontFamily: { "sans": ["Inter", "sans-serif"] }
         }
       }
     }
-  }
-</script>
-<style>
-  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
-  .chip { transition: all 0.2s ease-in-out; cursor: pointer; }
-  .chip:active { transform: scale(0.98); }
-  .chip.selected { background-color: #7a1f3d; color: #ff8ba8; border-color: #7a1f3d; }
-  .chip.unselected { background-color: transparent; color: #1a1c1b; border: 1px solid #dac0c4; }
-  .chip.unselected:hover { border-color: #5c0427; }
-  .search-input:focus { border-color: #5c0427; outline: none; box-shadow: 0 0 0 1px #5c0427; }
-</style>
+  </script>
+  <style>
+    body { background-color: #faf9f7; color: #1a1c1b; min-height: 100vh; font-family: 'Inter', sans-serif; overscroll-behavior: none; }
+    .chip { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; user-select: none; }
+    .chip:active { transform: scale(0.96); }
+    .chip.selected { background-color: #5c0427; color: #ffffff; border-color: #5c0427; box-shadow: 0 4px 14px rgba(92, 4, 39, 0.25); }
+    .chip.unselected { background-color: #ffffff; color: #1a1c1b; border: 1px solid #dac0c4; }
+    .chip.unselected:hover { border-color: #5c0427; background-color: #fcfbfa; }
+    .search-input:focus { border-color: #5c0427; outline: none; box-shadow: 0 0 0 2px rgba(92, 4, 39, 0.15); }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col font-body-lg text-body-lg antialiased">
+<body class="min-h-screen flex flex-col antialiased">
 
-<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl">
-  <div class="flex justify-between items-center px-container-padding py-stack-gap-sm">
-    <button aria-label="Go back" onclick="history.back()" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-200 ease-in-out flex items-center justify-center p-2 -ml-2">
-      <span class="material-symbols-outlined text-2xl">arrow_back</span>
+<!-- Top Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30">
+  <div class="flex justify-between items-center px-4 sm:px-6 py-3 max-w-3xl mx-auto">
+    <button aria-label="Go back" onclick="history.back()" class="w-10 h-10 rounded-full bg-surface-container/60 hover:bg-surface-container active:scale-95 transition-all flex items-center justify-center text-on-surface-variant">
+      <span class="material-symbols-outlined text-[22px]">arrow_back</span>
     </button>
-    <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary text-center flex-1">UniMatch</h1>
-    <button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 font-button text-button p-2 -mr-2">Help</button>
+    <h1 class="font-bold text-xl text-primary text-center tracking-tight">UniMatch</h1>
+    <div class="w-10"></div>
   </div>
 </header>
 
-<main class="flex-grow pt-24 px-container-padding pb-32 md:pb-48 md:max-w-3xl md:mx-auto md:w-full">
-  <div class="mb-section-margin">
-    <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-unit text-center md:text-left">What do you love?</h2>
-    <p class="text-on-surface-variant text-center md:text-left">Select a few interests to help us find better connections for you.</p>
+<main class="flex-grow pt-20 px-4 sm:px-6 pb-32 max-w-3xl mx-auto w-full">
+  <!-- Title Section -->
+  <div class="my-5 text-center sm:text-left">
+    <h2 class="text-[26px] sm:text-[32px] font-bold text-on-surface leading-tight tracking-tight">What do you love?</h2>
+    <p class="text-[14px] text-on-surface-variant mt-1">Select your favorite interests to get better student connections & icebreakers.</p>
   </div>
 
-  <!-- Search -->
-  <div class="relative mb-section-margin">
-    <span class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-on-surface-variant">search</span>
-    <input id="search-input" class="search-input w-full bg-surface-container-lowest border border-outline-variant rounded-full py-3 pl-12 pr-4 text-on-surface placeholder-on-surface-variant transition-colors" placeholder="Search interests..." type="text" oninput="filterInterests()"/>
+  <!-- Search Input -->
+  <div class="relative mb-6">
+    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+    <input id="search-input" class="search-input w-full bg-surface-container-lowest border border-outline-variant rounded-2xl py-3.5 pl-12 pr-4 text-[14px] text-on-surface placeholder:text-on-surface-variant/70 transition-all" placeholder="Search interests (e.g. Gaming, Chai, Music)..." type="text" oninput="filterInterests()"/>
   </div>
 
-  <!-- Categories -->
-  <div class="space-y-stack-gap-lg" id="categories-container">
-    <!-- Academic -->
+  <!-- Selected Counter Badge -->
+  <div class="flex items-center justify-between mb-4 px-1">
+    <span class="text-[12px] font-semibold uppercase tracking-wider text-on-surface-variant">Popular Interests</span>
+    <span id="selected-count" class="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">0 selected</span>
+  </div>
+
+  <!-- Categories Container -->
+  <div class="space-y-7" id="categories-container">
+    
+    <!-- 🎓 Academic & Majors -->
     <div class="category-block">
-      <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm">Academic</h3>
-      <div class="flex flex-wrap gap-3">
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Computer Science</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Literature</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Philosophy</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Engineering</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Mathematics</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">History</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Biology</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Psychology</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Economics</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Law</button>
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">🎓 Academic & Majors</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Computer Science" onclick="toggleChip(this)">💻 Computer Science</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Engineering" onclick="toggleChip(this)">⚙️ Engineering</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Literature" onclick="toggleChip(this)">📚 Literature</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Philosophy" onclick="toggleChip(this)">🏛️ Philosophy</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Mathematics" onclick="toggleChip(this)">📐 Mathematics</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="History" onclick="toggleChip(this)">📜 History</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Biology" onclick="toggleChip(this)">🧬 Biology</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Psychology" onclick="toggleChip(this)">🧠 Psychology</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Economics" onclick="toggleChip(this)">📈 Economics</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Law" onclick="toggleChip(this)">⚖️ Law</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Architecture" onclick="toggleChip(this)">🏛️ Architecture</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Fine Arts" onclick="toggleChip(this)">🎨 Fine Arts</button>
       </div>
     </div>
 
-    <!-- Lifestyle -->
+    <!-- ☕ Campus Vibe & Food -->
     <div class="category-block">
-      <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm">Lifestyle</h3>
-      <div class="flex flex-wrap gap-3">
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Coffee Shops</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Yoga</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Minimalism</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Travel</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Museums</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Thrifting</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Cooking</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Fitness</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Meditation</button>
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">☕ Campus Vibe & Food</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Late Night Chai" onclick="toggleChip(this)">🫖 Late Night Chai</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Coffee Shops" onclick="toggleChip(this)">☕ Coffee Shops</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Campus Canteen" onclick="toggleChip(this)">🍟 Campus Canteen</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Street Food" onclick="toggleChip(this)">🍕 Street Food</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Baking & Sweets" onclick="toggleChip(this)">🍰 Baking & Sweets</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Thrifting" onclick="toggleChip(this)">👗 Thrifting</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Cooking" onclick="toggleChip(this)">🍳 Cooking</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Hostel Life" onclick="toggleChip(this)">🏢 Hostel Life</button>
       </div>
     </div>
 
-    <!-- Hobbies -->
+    <!-- ⚽ Sports & Fitness -->
     <div class="category-block">
-      <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm">Hobbies</h3>
-      <div class="flex flex-wrap gap-3">
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Photography</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Reading</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Creative Writing</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Chess</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Painting</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Film</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Podcasts</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Music</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Gaming</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Dance</button>
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">⚽ Sports & Fitness</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Cricket" onclick="toggleChip(this)">🏏 Cricket</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Football" onclick="toggleChip(this)">⚽ Football</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Gym & Fitness" onclick="toggleChip(this)">🏋️ Gym & Fitness</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Yoga & Pilates" onclick="toggleChip(this)">🧘 Yoga & Pilates</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Badminton" onclick="toggleChip(this)">🎾 Badminton</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Table Tennis" onclick="toggleChip(this)">🏓 Table Tennis</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Running" onclick="toggleChip(this)">🏃 Running</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Swimming" onclick="toggleChip(this)">🏊 Swimming</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Hiking & Camping" onclick="toggleChip(this)">⛺ Hiking & Camping</button>
       </div>
     </div>
 
-    <!-- Tech -->
+    <!-- 🎮 Gaming & E-Sports -->
     <div class="category-block">
-      <h3 class="font-title-md text-title-md text-on-surface mb-stack-gap-sm">Tech & Culture</h3>
-      <div class="flex flex-wrap gap-3">
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Startups</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">AI / ML</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Design</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Open Source</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Debate</button>
-        <button class="chip unselected rounded-full px-5 py-2 font-button text-button" onclick="toggleChip(this)">Hackathons</button>
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">🎮 Gaming & E-Sports</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Valorant" onclick="toggleChip(this)">🎯 Valorant</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="FIFA / EA FC" onclick="toggleChip(this)">🎮 FIFA / EA FC</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Chess" onclick="toggleChip(this)">♟️ Chess</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Anime & Manga" onclick="toggleChip(this)">⛩️ Anime & Manga</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Cosplay" onclick="toggleChip(this)">🎭 Cosplay</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Board Games" onclick="toggleChip(this)">🎲 Board Games</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="PC Building" onclick="toggleChip(this)">🖥️ PC Building</button>
       </div>
     </div>
+
+    <!-- 🎧 Music & Entertainment -->
+    <div class="category-block">
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">🎧 Music & Entertainment</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Indie Pop" onclick="toggleChip(this)">🎸 Indie Pop</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Hip Hop & Rap" onclick="toggleChip(this)">🎧 Hip Hop & Rap</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="K-Pop & K-Dramas" onclick="toggleChip(this)">🇰🇷 K-Pop & K-Dramas</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Stand-up Comedy" onclick="toggleChip(this)">😂 Stand-up Comedy</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Concerts & Fests" onclick="toggleChip(this)">🎉 Concerts & Fests</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Podcasts" onclick="toggleChip(this)">🎙️ Podcasts</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Marvel & DC" onclick="toggleChip(this)">🦸‍♂️ Marvel & DC</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Film & Movies" onclick="toggleChip(this)">🎬 Film & Movies</button>
+      </div>
+    </div>
+
+    <!-- 🚀 Creative & Tech -->
+    <div class="category-block">
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">🚀 Creative & Tech</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="AI / ML" onclick="toggleChip(this)">🤖 AI / ML</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Startups" onclick="toggleChip(this)">💡 Startups</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Design" onclick="toggleChip(this)">🎨 UI/UX Design</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Photography" onclick="toggleChip(this)">📷 Photography</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Content Creation" onclick="toggleChip(this)">📱 Content Creation</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Open Source" onclick="toggleChip(this)">💻 Open Source</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Hackathons" onclick="toggleChip(this)">⚡ Hackathons</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Debate" onclick="toggleChip(this)">🗣️ Debate</button>
+      </div>
+    </div>
+
+    <!-- ✈️ Lifestyle & Leisure -->
+    <div class="category-block">
+      <h3 class="font-bold text-[15px] text-on-surface mb-3 flex items-center gap-1.5">✈️ Lifestyle & Leisure</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Travel" onclick="toggleChip(this)">✈️ Travel</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Road Trips" onclick="toggleChip(this)">🛵 Road Trips</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Museums" onclick="toggleChip(this)">🏛️ Museums</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Reading" onclick="toggleChip(this)">📖 Reading</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Meditation" onclick="toggleChip(this)">🧘 Meditation</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Pets & Dogs" onclick="toggleChip(this)">🐶 Pets & Dogs</button>
+        <button class="chip unselected rounded-full px-4 py-2 text-[14px] font-medium" data-interest="Stargazing" onclick="toggleChip(this)">🌌 Stargazing</button>
+      </div>
+    </div>
+
   </div>
 </main>
 
-<div class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.04)] px-container-padding py-stack-gap-md z-40">
-  <div class="md:max-w-3xl md:mx-auto">
-    <button id="continueBtn" onclick="handleContinue()" class="w-full md:w-auto bg-primary text-on-primary rounded-full py-4 px-8 font-button text-button shadow-[0_8px_30px_rgba(92,4,39,0.15)] hover:bg-primary/90 transition-colors active:scale-95 duration-200 ease-in-out">
-      Continue
+<!-- Fixed Footer Button -->
+<div class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-2xl border-t border-outline-variant/30 px-4 sm:px-6 py-4 z-40">
+  <div class="max-w-3xl mx-auto flex items-center justify-between">
+    <span class="text-[13px] font-medium text-on-surface-variant hidden sm:inline">Select at least 1 interest to continue</span>
+    <button id="continueBtn" onclick="handleContinue()" class="w-full sm:w-auto bg-primary text-on-primary rounded-full py-3.5 px-8 font-bold text-[15px] shadow-md hover:bg-primary/90 active:scale-98 transition-all flex items-center justify-center gap-2">
+      <span>Continue</span>
+      <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
     </button>
   </div>
 </div>
@@ -152,14 +200,21 @@
 
     const profile = await getProfile();
     if (profile && profile.interests) {
-      const saved = JSON.parse(profile.interests || '[]');
+      let saved = [];
+      try {
+        saved = JSON.parse(profile.interests);
+      } catch (e) {
+        saved = (profile.interests || '').split(',').map(s => s.trim());
+      }
       document.querySelectorAll('.chip').forEach(chip => {
-        if (saved.includes(chip.textContent.trim())) {
+        const val = chip.dataset.interest || chip.textContent.trim();
+        if (saved.includes(val) || saved.some(s => chip.textContent.includes(s))) {
           chip.classList.remove('unselected');
           chip.classList.add('selected');
         }
       });
     }
+    updateSelectedCount();
   })();
 
   function toggleChip(chip) {
@@ -170,12 +225,20 @@
       chip.classList.remove('unselected');
       chip.classList.add('selected');
     }
+    updateSelectedCount();
+  }
+
+  function updateSelectedCount() {
+    const count = document.querySelectorAll('.chip.selected').length;
+    document.getElementById('selected-count').textContent = `${count} selected`;
   }
 
   function filterInterests() {
-    const query = document.getElementById('search-input').value.toLowerCase();
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
     document.querySelectorAll('.chip').forEach(chip => {
-      const match = chip.textContent.toLowerCase().includes(query);
+      const text = chip.textContent.toLowerCase();
+      const val = (chip.dataset.interest || '').toLowerCase();
+      const match = text.includes(query) || val.includes(query);
       chip.style.display = match ? '' : 'none';
     });
     document.querySelectorAll('.category-block').forEach(block => {
@@ -185,16 +248,28 @@
   }
 
   async function handleContinue() {
-    const selected = [...document.querySelectorAll('.chip.selected')].map(c => c.textContent.trim());
-    if (selected.length === 0) return;
+    const selected = [...document.querySelectorAll('.chip.selected')].map(c => c.dataset.interest || c.textContent.trim());
+    if (selected.length === 0) {
+      alert("Please select at least 1 interest to personalize your feed.");
+      return;
+    }
 
     const btn = document.getElementById('continueBtn');
-    btn.textContent = 'Saving...';
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Saving...`;
     btn.disabled = true;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    await supabase.from('profiles').update({ interests: JSON.stringify(selected) }).eq('id', session.user.id);
-    window.location.href = '/unimatch/profile-setup/photos.html';
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await supabase.from('profiles').update({ interests: JSON.stringify(selected) }).eq('id', session.user.id);
+      }
+      window.location.href = '/unimatch/profile-setup/photos.html';
+    } catch (err) {
+      console.error("Error saving interests:", err);
+      btn.innerHTML = `<span>Continue</span> <span class="material-symbols-outlined text-[18px]">arrow_forward</span>`;
+      btn.disabled = false;
+    }
   }
 </script>
-</body></html>
+</body>
+</html>
