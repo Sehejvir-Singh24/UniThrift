@@ -369,19 +369,14 @@
       console.warn("Parallel fetch error:", e);
     }
 
-    if (error) {
-      console.warn("Could not fetch profiles from Supabase:", error);
-    }
-
     if (!error && candidates && candidates.length > 0) {
       const otherCandidates = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true);
       const unswiped = otherCandidates.filter(c => !alreadySwiped.has(c.id));
 
       if (unswiped.length > 0) {
         DISCOVERY_PROFILES = buildFeedProfiles(unswiped, myProfile || {});
-      } else if (otherCandidates.length > 0) {
-        // Fallback: show other completed candidates if all have been swiped
-        DISCOVERY_PROFILES = buildFeedProfiles(otherCandidates, myProfile || {});
+      } else {
+        DISCOVERY_PROFILES = [];
       }
     }
 
