@@ -144,8 +144,6 @@ async function recordUniMatchAction(targetUserId, action) {
     return { isMatch: false };
   }
 
-  }
-
   // 2. Check if the target user has ALREADY liked current user
   try {
     const { data: otherLike } = await supabase
