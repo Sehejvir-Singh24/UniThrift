@@ -190,7 +190,9 @@
                 const profile = await getProfile();
                 
                 setTimeout(() => { 
-                    if(profile && profile.role === 'seller' && !profile.is_verified && profile.verification_status !== 'pending') {
+                    if (!profile || !profile.full_name || !profile.phone_number || !profile.college) {
+                        window.location.href = '/auth/profile_setup.html';
+                    } else if (!profile.is_verified && profile.verification_status !== 'pending') {
                         window.location.href = '/auth/id_verification.html';
                     } else {
                         window.location.href = '/index.html'; 

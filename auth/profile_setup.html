@@ -259,17 +259,14 @@
                     year_of_study: selectedYear,
                     college: college,
                     father_name: fatherName.trim(),
-                    is_verified: true,
-                    verification_status: 'verified'
                 };
 
                 if (publicUrl) {
                     profileUpdates.avatar_url = publicUrl;
                 } else {
-                    const defaultPlaceholder = "https://api.dicebear.com/9.x/pixel-art/svg?seed=sunglasses&glassesProbability=100";
                     const avatarSrc = document.getElementById('profile-avatar').src;
                     if (avatarSrc) {
-                        profileUpdates.avatar_url = avatarSrc; // Save whatever is in the src
+                        profileUpdates.avatar_url = avatarSrc;
                     }
                 }
 
@@ -283,7 +280,7 @@
                 if(progressBar) progressBar.style.transform = 'scaleX(1)';
                 
                 setTimeout(() => {
-                    window.location.href = '/index.html';
+                    window.location.href = '/auth/id_verification.html';
                 }, 800);
             } catch (err) {
                 alert("Error saving profile: " + err.message);
