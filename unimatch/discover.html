@@ -504,21 +504,13 @@
 
     setTimeout(() => {
       card.classList.remove('card-like-out');
-      if (res && res.isMatch) {
-        // MUTUAL MATCH! Show match modal (Instagram locked behind ₹29)
-        const name = (res.matchedProfile && res.matchedProfile.full_name) || p.name;
-        currentMatchedInsta = (res.matchedProfile && res.matchedProfile.instagram_username) || p.instagram || name.toLowerCase().replace(' ','_');
-        
-        document.getElementById('match-student-name').textContent = name;
-        document.getElementById('match-student-insta-blurred').textContent = '@•••••••••';
-        document.getElementById('unlock-insta-btn').style.display = 'flex';
-        document.getElementById('send-dm-btn').style.display = 'none';
-        document.getElementById('match-modal').style.display = 'flex';
-      } else {
-        // Just a one-way like: advance to next card (no match pop-up)
-        cardIndex++;
-        renderCard(cardIndex);
+      // All popups suppressed during swiping!
+      // Matches are queued with a 10-minute timer for notification & dual-lock reveal
+      if (typeof checkUniMatchNotifications === 'function') {
+        checkUniMatchNotifications(currentUserId).catch(() => {});
       }
+      cardIndex++;
+      renderCard(cardIndex);
     }, 260);
   }
 

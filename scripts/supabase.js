@@ -144,6 +144,8 @@ async function recordUniMatchAction(targetUserId, action) {
     return { isMatch: false };
   }
 
+  }
+
   // 2. Check if the target user has ALREADY liked current user
   try {
     const { data: otherLike } = await supabase
@@ -155,18 +157,31 @@ async function recordUniMatchAction(targetUserId, action) {
       .maybeSingle();
 
     if (otherLike) {
-      // MUTUAL MATCH! Create entry in unimatch_matches
+      // MUTUAL MATCH! Calculate 10-minute delayed reveal time
       const user1 = likerId < targetUserId ? likerId : targetUserId;
       const user2 = likerId < targetUserId ? targetUserId : likerId;
+
+      const revealAvailableAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+      // Fetch profiles to extract common interests & generate fun icebreaker
+      const { data: p1 } = await supabase.from('profiles').select('full_name, interests, major').eq('id', user1).maybeSingle();
+      const { data: p2 } = await supabase.from('profiles').select('full_name, interests, major').eq('id', user2).maybeSingle();
+
+      const icebreakerData = generateFunIcebreaker(p1?.interests, p2?.interests);
 
       await supabase
         .from('unimatch_matches')
         .upsert({
           user1_id: user1,
-          user2_id: user2
+          user2_id: user2,
+          reveal_available_at: revealAvailableAt,
+          user1_unlocked: false,
+          user2_unlocked: false,
+          icebreaker_prompt: icebreakerData.prompt,
+          common_interests: JSON.stringify(icebreakerData.common)
         }, { onConflict: 'user1_id,user2_id' });
 
-      // Fetch matched user's profile details
+      // Fetch target profile info for return
       const { data: matchedProfile } = await supabase
         .from('profiles')
         .select('full_name, instagram_username, avatar_url')
@@ -175,6 +190,8 @@ async function recordUniMatchAction(targetUserId, action) {
 
       return {
         isMatch: true,
+        delayed: true,
+        revealAvailableAt,
         matchedProfile: matchedProfile || null
       };
     }
@@ -183,6 +200,115 @@ async function recordUniMatchAction(targetUserId, action) {
   }
 
   return { isMatch: false };
+}
+
+// Helper: Generate Icebreaker Question based on Common Interests
+function generateFunIcebreaker(rawInterests1, rawInterests2) {
+  let parseInterests = (raw) => {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch(e) {}
+    if (typeof raw === 'string') return raw.split(',').map(s => s.trim()).filter(Boolean);
+    return [];
+  };
+
+  const arr1 = parseInterests(rawInterests1);
+  const arr2 = parseInterests(rawInterests2);
+  
+  const set2 = new Set(arr2.map(i => i.toLowerCase()));
+  const common = arr1.filter(i => set2.has(i.toLowerCase()));
+
+  const templates = {
+    coffee: "☕ What's your go-to coffee order to survive exam week?",
+    tea: "☕ Are you a chai lover or a coffee loyalist on campus?",
+    coding: "💻 Tabs or spaces? And what's your late-night coding snack?",
+    tech: "🚀 What's a tech gadget or app you can't live without for a single day?",
+    anime: "⛩️ Which anime series could you rewatch 100 times without getting bored?",
+    manga: "📖 What's the #1 manga/comic series you recommend reading right now?",
+    music: "🎧 If you could get VIP tickets to any concert this weekend, who are we seeing?",
+    gaming: "🎮 Late-night Valorant / FIFA session or cozy casual gaming?",
+    fitness: "🏋️ What's your absolute favorite workout track when hitting PRs?",
+    gym: "💪 Morning gym person or late-night workout enthusiast?",
+    travel: "✈️ What's the #1 dream destination on your bucket list right now?",
+    food: "🍕 Best food spot near campus: street food stalls or cozy cafes?",
+    foodie: "🍔 If you had to eat only one dish for the rest of college, what is it?",
+    photography: "📸 Film aesthetic or high-def digital photography?",
+    movies: "🍿 What's a movie you think everyone must watch at least once?",
+    books: "📚 Fiction or Non-fiction? What book changed your perspective recently?",
+    art: "🎨 What's your favorite creative outlet when you need to de-stress?"
+  };
+
+  if (common.length > 0) {
+    const firstCommon = common[0].toLowerCase();
+    for (const [key, prompt] of Object.entries(templates)) {
+      if (firstCommon.includes(key)) {
+        return { common, prompt: `You both love ${common[0]}! ${prompt}` };
+      }
+    }
+    return {
+      common,
+      prompt: `You both share a passion for ${common.join(', ')}! What got you into it?`
+    };
+  }
+
+  return {
+    common: [],
+    prompt: "Fun Campus Icebreaker: If we were skipping lectures today, where on campus would we hide out?"
+  };
+}
+
+// Helper: Check and dispatch 10-minute delayed UniMatch notifications
+async function checkUniMatchNotifications(userId) {
+  if (!userId) return;
+  try {
+    const nowIso = new Date().toISOString();
+    
+    // Find matches involving userId where reveal_available_at <= now()
+    const { data: matches } = await supabase
+      .from('unimatch_matches')
+      .select('*')
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      .lte('reveal_available_at', nowIso);
+
+    if (!matches || matches.length === 0) return;
+
+    for (const m of matches) {
+      const isUser1 = m.user1_id === userId;
+      const isNotified = isUser1 ? m.notified_user1 : m.notified_user2;
+      
+      if (!isNotified) {
+        // Send notification to user
+        await supabase.from('notifications').insert({
+          user_id: userId,
+          title: '🎉 You Have a New UniMatch!',
+          message: 'A student on campus matched with you! Tap to unlock their profile, Instagram & fun icebreaker question.',
+          type: 'unimatch_match'
+        });
+
+        // Mark as notified
+        const updatePayload = isUser1 ? { notified_user1: true } : { notified_user2: true };
+        await supabase.from('unimatch_matches').update(updatePayload).eq('id', m.id);
+      }
+    }
+  } catch (err) {
+    console.warn("Error checking match notifications:", err);
+  }
+}
+
+// Helper: Unlock Dual-Lock UniMatch for specific user after payment
+async function unlockUniMatchForUser(matchId, userId) {
+  const { data: match } = await supabase.from('unimatch_matches').select('*').eq('id', matchId).single();
+  if (!match) throw new Error("Match not found");
+
+  const isUser1 = match.user1_id === userId;
+  const updatePayload = isUser1 ? { user1_unlocked: true } : { user2_unlocked: true };
+
+  const { error } = await supabase.from('unimatch_matches').update(updatePayload).eq('id', matchId);
+  if (error) throw error;
+  return true;
 }
 
 // Helper: 24-Hour Daily Free Likes Manager

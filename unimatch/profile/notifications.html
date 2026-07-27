@@ -225,16 +225,25 @@
         });
       });
 
-      // Add Mutual Match Notifications
+      // Dispatch any ready 10-minute delayed match notifications
+      if (typeof checkUniMatchNotifications === 'function') {
+        await checkUniMatchNotifications(profile.id);
+      }
+
+      // Add Mutual Match Notifications (only if 10-minute timer elapsed)
+      const now = new Date();
       matches.forEach(m => {
-        items.push({
-          type: 'match',
-          title: `You have a new mutual match! 🎉`,
-          desc: 'You both liked each other! Tap to see your match & Instagram.',
-          photo: '',
-          icon: 'celebration',
-          link: '/unimatch/hidden-likes.html'
-        });
+        const revealTime = m.reveal_available_at ? new Date(m.reveal_available_at) : new Date(0);
+        if (revealTime <= now) {
+          items.push({
+            type: 'match',
+            title: `You have a new mutual match! 🎉`,
+            desc: 'You both liked each other! Tap to unlock your match, Instagram handle & AI Icebreaker.',
+            photo: '',
+            icon: 'celebration',
+            link: '/unimatch/hidden-likes.html'
+          });
+        }
       });
 
       container.innerHTML = items.map(item => `

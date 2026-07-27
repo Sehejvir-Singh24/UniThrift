@@ -223,7 +223,11 @@
       const { error } = await supabase.auth.signInWithOtp({ email });
 
       if (error) {
-        showError('Could not send sign-in link: ' + error.message);
+        let errMsg = error.message || '';
+        if (errMsg === '{}' || error.name === 'AuthRetryableFetchError' || error.status === 500) {
+          errMsg = 'Email rate limit reached or server email issue. Please try Google Sign-In or try again later.';
+        }
+        showError('Could not send sign-in link: ' + errMsg);
         btn.classList.remove('opacity-60', 'pointer-events-none');
         btnText.textContent = 'Send Sign-In Link';
         return;

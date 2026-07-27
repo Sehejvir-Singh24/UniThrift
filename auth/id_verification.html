@@ -16,16 +16,28 @@
 <h1 class="font-display-lg text-display-lg text-on-surface">Verify Student Status</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant">Upload your Student ID. First-year students may upload their latest School ID card if College ID is not yet issued.</p>
 </div>
-<div class="bg-surface-container rounded-xl p-stack-md flex items-start gap-stack-md relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
-<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent z-0"></div>
-<div class="bg-primary-container text-on-primary-container rounded-full p-2 flex items-center justify-center relative z-10 shrink-0">
-<span class="material-symbols-outlined text-[20px]">security</span>
+<details class="group bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 overflow-hidden shadow-sm transition-all">
+<summary class="flex items-center justify-between p-3.5 cursor-pointer select-none gap-2 hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-2 text-primary font-bold text-[13.5px]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">verified_user</span>
+<span>Why do we ask for Student ID?</span>
 </div>
-<div class="flex flex-col gap-1 relative z-10">
-<h3 class="font-title-md text-title-md text-on-surface">Why do we need this?</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant">To keep our marketplace safe, we verify every member is a current GGSIPU student.</p>
+<div class="flex items-center gap-1.5 text-primary font-semibold text-[12px]">
+<span class="group-open:hidden text-[11px] bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">Tap to read</span>
+<span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</div>
+</summary>
+<div class="px-4 pb-4 pt-1 flex flex-col gap-2.5 border-t border-primary/10">
+<h4 class="font-bold text-primary text-[13px]">Closed Campus Safety Guarantee</h4>
+<p class="text-[12.5px] text-on-surface-variant leading-relaxed">
+We collect Student IDs strictly to maintain a safe, closed-campus environment. Verification ensures every member buying, selling, or finding roommates is a real student from your university, keeping out spammers and non-students.
+</p>
+<div class="flex items-center gap-3 pt-2 border-t border-primary/10 text-[11px] text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-emerald-600">lock</span> Encrypted & Private</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-emerald-600">visibility_off</span> Never Shared</span>
 </div>
 </div>
+</details>
 <button class="w-full aspect-[4/3] max-h-64 md:max-h-80 rounded-xl bg-surface-container-lowest relative overflow-hidden flex flex-col items-center justify-center gap-stack-sm transition-all duration-300 active:scale-[0.99] group shadow-sm hover:shadow-md" id="upload-area">
 <svg class="absolute inset-0 pointer-events-none text-outline-variant" height="100%" preserveaspectratio="none" width="100%">
 <rect class="group-hover:stroke-primary transition-colors duration-300" fill="none" height="calc(100% - 4px)" rx="10" ry="10" stroke="currentColor" stroke-dasharray="8 8" stroke-width="2" width="calc(100% - 4px)" x="2" y="2"></rect>
