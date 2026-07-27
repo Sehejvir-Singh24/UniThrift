@@ -433,6 +433,12 @@ async function verifyAction(actionCallback) {
   return false;
 }
 
+// Helper: Clear Profile Cache
+function clearProfileCache() {
+  _cachedProfile = null;
+  try { sessionStorage.removeItem('unimatch_cached_profile'); } catch (e) {}
+}
+
 // Helper: Update Profile
 async function updateProfile(updates) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -446,6 +452,12 @@ async function updateProfile(updates) {
   if (error) {
     console.error("Error updating profile:", error);
     throw error;
+  }
+
+  // Clear cache & force fresh fetch on next call
+  clearProfileCache();
+  if (_cachedProfile) {
+    Object.assign(_cachedProfile, updates);
   }
 }
 
