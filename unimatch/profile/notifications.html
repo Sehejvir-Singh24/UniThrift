@@ -160,21 +160,14 @@
       const profile = await requireUniMatchAuth();
       if (!profile) return;
 
-      // Fetch real likes received (admirers)
-      const { data: likesReceived } = await supabase
-        .from('unimatch_likes')
-        .select('liker_id, created_at')
-        .eq('liked_user_id', profile.id)
-        .eq('action', 'like');
+      // Fetch real likes received (admirers) and mutual matches in PARALLEL for max speed
+      const [likesRes, matchesRes] = await Promise.all([
+        supabase.from('unimatch_likes').select('liker_id, created_at').eq('liked_user_id', profile.id).eq('action', 'like'),
+        supabase.from('unimatch_matches').select('*').or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`)
+      ]);
 
-      // Fetch mutual matches
-      const { data: matches } = await supabase
-        .from('unimatch_matches')
-        .select('*')
-        .or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`);
-
-      const realLikes = likesReceived || [];
-      const realMatches = matches || [];
+      const realLikes = (likesRes && likesRes.data) || [];
+      const realMatches = (matchesRes && matchesRes.data) || [];
 
       // Collect sender profile IDs
       const likerIds = realLikes.map(l => l.liker_id);
@@ -192,7 +185,13 @@
         }
       }
 
+      // Render activity feed immediately (zero-wait UI)
       renderActivityFeed(realLikes, realMatches, profile.id, profileMap);
+
+      // Dispatch 10-minute notifications in the background (non-blocking)
+      if (typeof checkUniMatchNotifications === 'function') {
+        checkUniMatchNotifications(profile.id).catch(() => {});
+      }
     })();
 
     function renderActivityFeed(likes, matches, myId, profileMap) {

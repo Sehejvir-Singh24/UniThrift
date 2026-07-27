@@ -496,16 +496,13 @@
     const card = document.getElementById('active-card');
     card.classList.add('card-like-out');
 
-    // Save like and check if MUTUAL match
-    let res = { isMatch: false };
+    // Save like asynchronously in background (non-blocking for instant card swipe)
     if (p && p.id) {
-      res = await recordUniMatchAction(p.id, 'like');
+      recordUniMatchAction(p.id, 'like').catch(() => {});
     }
 
     setTimeout(() => {
       card.classList.remove('card-like-out');
-      // All popups suppressed during swiping!
-      // Matches are queued with a 10-minute timer for notification & dual-lock reveal
       if (typeof checkUniMatchNotifications === 'function') {
         checkUniMatchNotifications(currentUserId).catch(() => {});
       }

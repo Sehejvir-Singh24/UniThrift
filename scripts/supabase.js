@@ -161,9 +161,11 @@ async function recordUniMatchAction(targetUserId, action) {
 
       const revealAvailableAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-      // Fetch profiles to extract common interests & generate fun icebreaker
-      const { data: p1 } = await supabase.from('profiles').select('full_name, interests, major').eq('id', user1).maybeSingle();
-      const { data: p2 } = await supabase.from('profiles').select('full_name, interests, major').eq('id', user2).maybeSingle();
+      // Fetch profiles in parallel to extract common interests & generate fun icebreaker
+      const [{ data: p1 }, { data: p2 }] = await Promise.all([
+        supabase.from('profiles').select('full_name, interests, major').eq('id', user1).maybeSingle(),
+        supabase.from('profiles').select('full_name, interests, major').eq('id', user2).maybeSingle()
+      ]);
 
       const icebreakerData = generateFunIcebreaker(p1?.interests, p2?.interests);
 
@@ -258,7 +260,7 @@ function generateFunIcebreaker(rawInterests1, rawInterests2) {
   };
 }
 
-// Helper: Check and dispatch 10-minute delayed UniMatch notifications
+// Helper: Check and dispatch 10-minute delayed UniMatch notifications (optimized parallel batch)
 async function checkUniMatchNotifications(userId) {
   if (!userId) return;
   try {
@@ -273,24 +275,26 @@ async function checkUniMatchNotifications(userId) {
 
     if (!matches || matches.length === 0) return;
 
-    for (const m of matches) {
+    const unnotified = matches.filter(m => {
       const isUser1 = m.user1_id === userId;
-      const isNotified = isUser1 ? m.notified_user1 : m.notified_user2;
-      
-      if (!isNotified) {
-        // Send notification to user
-        await supabase.from('notifications').insert({
-          user_id: userId,
-          title: '🎉 You Have a New UniMatch!',
-          message: 'A student on campus matched with you! Tap to unlock their profile, Instagram & fun icebreaker question.',
-          type: 'unimatch_match'
-        });
+      return isUser1 ? !m.notified_user1 : !m.notified_user2;
+    });
 
-        // Mark as notified
-        const updatePayload = isUser1 ? { notified_user1: true } : { notified_user2: true };
-        await supabase.from('unimatch_matches').update(updatePayload).eq('id', m.id);
-      }
-    }
+    if (unnotified.length === 0) return;
+
+    // Process notification dispatches in parallel
+    await Promise.all(unnotified.map(async (m) => {
+      const isUser1 = m.user1_id === userId;
+      await supabase.from('notifications').insert({
+        user_id: userId,
+        title: '🎉 You Have a New UniMatch!',
+        message: 'A student on campus matched with you! Tap to unlock their profile, Instagram & fun icebreaker question.',
+        type: 'unimatch_match'
+      });
+
+      const updatePayload = isUser1 ? { notified_user1: true } : { notified_user2: true };
+      await supabase.from('unimatch_matches').update(updatePayload).eq('id', m.id);
+    }));
   } catch (err) {
     console.warn("Error checking match notifications:", err);
   }
