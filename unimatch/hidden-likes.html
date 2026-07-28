@@ -910,33 +910,68 @@
       }
 
       try {
-        let matchRecord = null;
-        if (typeof recordLike === 'function') {
-          matchRecord = await recordLike(_currentUserId, likerId, 'like');
+        // 1. Call recordUniMatchAction to record like back and create mutual match in DB
+        if (typeof recordUniMatchAction === 'function') {
+          await recordUniMatchAction(likerId, 'like');
         } else {
-          await supabase.from('unimatch_likes').insert({ liker_id: _currentUserId, liked_user_id: likerId, action: 'like' });
-          const { data: m } = await supabase.from('unimatch_matches').select('*').or(`and(user1_id.eq.${_currentUserId},user2_id.eq.${likerId}),and(user1_id.eq.${likerId},user2_id.eq.${_currentUserId})`).maybeSingle();
-          matchRecord = m;
+          await supabase.from('unimatch_likes').upsert({ liker_id: _currentUserId, liked_user_id: likerId, action: 'like' }, { onConflict: 'liker_id,liked_user_id' });
+        }
+
+        // 2. Fetch or create the match record from DB
+        const user1 = _currentUserId < likerId ? _currentUserId : likerId;
+        const user2 = _currentUserId < likerId ? likerId : _currentUserId;
+
+        let { data: matchRecord } = await supabase
+          .from('unimatch_matches')
+          .select('*')
+          .eq('user1_id', user1)
+          .eq('user2_id', user2)
+          .maybeSingle();
+
+        if (!matchRecord) {
+          const icebreakerData = typeof generateFunIcebreaker === 'function'
+            ? generateFunIcebreaker(_currentProfile?.interests, _modalCurrentProfile?.interests)
+            : { prompt: DEFAULT_ICEBREAKER, common: [] };
+
+          const { data: inserted } = await supabase
+            .from('unimatch_matches')
+            .upsert({
+              user1_id: user1,
+              user2_id: user2,
+              user1_unlocked: user1 === _currentUserId,
+              user2_unlocked: user2 === _currentUserId,
+              icebreaker_prompt: icebreakerData.prompt,
+              common_interests: JSON.stringify(icebreakerData.common)
+            }, { onConflict: 'user1_id,user2_id' })
+            .select()
+            .maybeSingle();
+
+          matchRecord = inserted;
         }
 
         const matchId = matchRecord ? matchRecord.id : `match_${likerId}`;
         
-        // Save unlock state for _currentUserId because they ALREADY paid ₹29 for this profile!
+        // 3. Mark match as unlocked for _currentUserId because they ALREADY paid ₹29 for this profile!
         saveMatchUnlock(matchId);
         try {
           if (typeof unlockUniMatchForUser === 'function') {
             await unlockUniMatchForUser(matchId, _currentUserId);
+          } else if (matchRecord) {
+            const isUser1 = matchRecord.user1_id === _currentUserId;
+            const updatePayload = isUser1 ? { user1_unlocked: true } : { user2_unlocked: true };
+            await supabase.from('unimatch_matches').update(updatePayload).eq('id', matchRecord.id);
           }
         } catch(e) {}
 
-        // Reload data so Admirers and Matches lists update
+        // 4. Reload data so Admirers grid and Mutual Matches list update
         await refreshAllData();
 
-        // Switch modal to match view
+        // 5. Find updated match item
         const matchItem = _allMatches.find(m => (m.match.user1_id === likerId || m.match.user2_id === likerId));
         const pObj = _modalCurrentProfile || (matchItem ? matchItem.profile : {});
         const mObj = matchItem ? matchItem.match : (matchRecord || { id: matchId, user1_id: _currentUserId, user2_id: likerId, user1_unlocked: true, user2_unlocked: false });
 
+        // 6. Switch modal to match view
         _modalType = 'match';
         _modalCurrentMatchId = matchId;
         _modalIsUnlocked = true;
@@ -944,7 +979,7 @@
         renderModalContactSection('match', pObj, mObj);
       } catch(err) {
         console.error("Error creating match:", err);
-        location.reload();
+        await refreshAllData();
       }
     }
 
