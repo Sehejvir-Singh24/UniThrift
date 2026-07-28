@@ -495,16 +495,29 @@ async function getProductById(id) {
 
 // Helper: Get All Products for Marketplace
 async function getAllProducts() {
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('*, profiles!seller_id(full_name)')
-    .order('created_at', { ascending: false });
+  try {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*, profiles!seller_id(full_name)')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error("Error fetching products:", error);
-    return [];
-  }
-  return products || [];
+    if (!error && products) {
+      return products;
+    }
+  } catch(e) { console.warn("getAllProducts join error:", e); }
+
+  try {
+    const { data: simpleProducts, error: simpleError } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!simpleError && simpleProducts) {
+      return simpleProducts;
+    }
+  } catch(e) { console.error("getAllProducts fallback error:", e); }
+
+  return [];
 }
 // Helper: Get Active Boosted Products (for Home Page Trending Offers ⚡)
 async function getBoostedProducts() {
@@ -522,7 +535,20 @@ async function getBoostedProducts() {
     }
   } catch(e) {}
 
-  // Fallback to regular products if no active boosted items
+  // Fallback 1: query without boosted_until check
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_boosted', true)
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data;
+    }
+  } catch(e) {}
+
+  // Fallback 2: regular products
   return await getAllProducts();
 }
 
