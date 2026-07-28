@@ -498,7 +498,6 @@ async function getAllProducts() {
   const { data: products, error } = await supabase
     .from('products')
     .select('*, profiles!seller_id(full_name)')
-    .eq('status', 'Available')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -506,6 +505,64 @@ async function getAllProducts() {
     return [];
   }
   return products || [];
+}
+// Helper: Get Boosted Products (for Home Page Trending Offers ⚡)
+async function getBoostedProducts() {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, profiles!seller_id(full_name)')
+      .eq('is_boosted', true)
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data;
+    }
+  } catch(e) {}
+
+  // Return regular products if no items are boosted yet
+  return await getAllProducts();
+}
+
+// Helper: Boost Product Listing (⚡ ₹59)
+async function boostProductListing(productId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Please log in to boost a listing.");
+
+  const { error } = await supabase
+    .from('products')
+    .update({
+      is_boosted: true,
+      boosted_at: new Date().toISOString()
+    })
+    .eq('id', productId)
+    .eq('seller_id', session.user.id);
+
+  if (error) {
+    console.error("Error boosting product:", error);
+    throw error;
+  }
+}
+
+// Helper: Calculate Listing Fee for New Products
+// First 2 listings are FREE
+// 3rd listing onwards:
+// Under ₹100: ₹19
+// ₹100 – ₹200: ₹29
+// > ₹200: ₹39
+async function calculateListingFeeForUser(userId, price) {
+  const userProducts = await getUserProducts(userId);
+  if (userProducts.length < 2) {
+    return { fee: 0, isFree: true, count: userProducts.length };
+  }
+  const numericPrice = parseFloat(price) || 0;
+  let fee = 39;
+  if (numericPrice < 100) {
+    fee = 19;
+  } else if (numericPrice <= 200) {
+    fee = 29;
+  }
+  return { fee, isFree: false, count: userProducts.length };
 }
 
 // Helper: Buy Product Directly

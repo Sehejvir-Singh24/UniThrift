@@ -422,11 +422,11 @@
     async function loadTrendingProducts() {
       const grid = document.getElementById('trending-products-grid');
       try {
-        const products = await getAllProducts();
+        const products = await getBoostedProducts();
         if (!products || products.length === 0) {
           grid.innerHTML = `
-            <div class="col-span-2 text-center py-6 text-xs text-on-surface-variant bg-surface-container-low rounded-2xl">
-              No products found yet. Be the first to post!
+            <div class="col-span-2 md:col-span-4 text-center py-6 text-xs text-on-surface-variant bg-surface-container-low rounded-2xl">
+              No boosted products featured yet. Boost your item for ₹59 to appear here!
             </div>`;
           return;
         }
@@ -435,15 +435,15 @@
         grid.innerHTML = items.map(p => `
           <div onclick="window.location.href='/marketplace/item.html?id=${p.id}'" class="bg-surface-container-lowest border border-outline-variant/30 rounded-[20px] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow cursor-pointer">
             <div class="relative w-full aspect-square bg-surface-container-low">
-              ${p.image_url ? `<img src="${p.image_url}" class="w-full h-full object-cover" alt="${p.title}"/>` : `<div class="w-full h-full flex items-center justify-center text-on-surface-variant/40"><span class="material-symbols-outlined text-[32px]">image</span></div>`}
-              <div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
-                <span class="font-label-caps text-[9px] text-on-surface font-semibold">${p.condition || 'Verified'}</span>
+              ${p.image_url ? `<img src="${p.image_url}" class="w-full h-full object-cover" alt="${escapeHTML(p.title)}"/>` : `<div class="w-full h-full flex items-center justify-center text-on-surface-variant/40"><span class="material-symbols-outlined text-[32px]">image</span></div>`}
+              <div class="absolute top-2 left-2 bg-emerald-700 text-white backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                <span class="font-label-caps text-[9px] font-bold">${p.is_boosted ? 'Featured' : (p.condition || 'Verified')}</span>
               </div>
             </div>
             <div class="p-3 flex flex-col gap-0.5">
-              <h4 class="font-body-sm text-xs text-on-background font-semibold truncate">${p.title}</h4>
-              <p class="font-label-caps text-[10px] text-on-surface-variant truncate">${p.category || 'General'}</p>
+              <h4 class="font-body-sm text-xs text-on-background font-semibold truncate">${escapeHTML(p.title)}</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant truncate">${escapeHTML(p.category || 'General')}</p>
               <div class="flex items-center justify-between mt-1">
                 <span class="font-title-md text-sm text-primary font-bold">₹${p.price}</span>
               </div>

@@ -182,7 +182,27 @@
                 id="item-original-price" placeholder="e.g. 900" type="number" min="1" />
             </div>
           </div>
+        <!-- Listing Fee & Boost Option Box -->
+        <div class="flex flex-col gap-3 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 mt-2">
+          <div id="listing-fee-banner" class="flex items-center justify-between text-xs text-on-surface">
+            <div class="flex items-center gap-1.5 font-bold">
+              <span class="material-symbols-outlined text-[18px] text-primary">sell</span>
+              <span id="fee-text">Calculating listing fee...</span>
+            </div>
+            <span id="fee-amount-badge" class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold text-xs">FREE</span>
+          </div>
+
+          <label class="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-emerald-900/10 via-primary/5 to-surface-container-high border border-primary/30 cursor-pointer hover:bg-primary/10 transition-colors">
+            <input type="checkbox" id="boost-checkbox" class="w-5 h-5 accent-primary rounded cursor-pointer shrink-0"/>
+            <div class="flex flex-col">
+              <span class="font-title-md text-xs font-bold text-on-surface flex items-center gap-1">
+                ⚡ Boost Listing for ₹59
+              </span>
+              <span class="font-body-sm text-[11px] text-on-surface-variant">Feature on the Home page Trending Offers!</span>
+            </div>
+          </label>
         </div>
+
       </form>
       <!-- Sticky Bottom Bar -->
       <div
@@ -231,6 +251,34 @@
         selectedCondition = btn.textContent.trim();
       }
 
+      let _currentFee = 0;
+      async function updateFeeDisplay() {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+          const price = parseFloat(document.getElementById('item-price').value) || 0;
+          const info = await calculateListingFeeForUser(session.user.id, price);
+          _currentFee = info.fee;
+          
+          const feeText = document.getElementById('fee-text');
+          const feeBadge = document.getElementById('fee-amount-badge');
+          if (feeText && feeBadge) {
+            if (info.isFree) {
+              feeText.textContent = `🎉 Listing #${info.count + 1} of 2 FREE listings!`;
+              feeBadge.textContent = `₹0 FREE`;
+              feeBadge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs';
+            } else {
+              feeText.textContent = `Listing Fee (Price: ₹${price})`;
+              feeBadge.textContent = `₹${info.fee}`;
+              feeBadge.className = 'px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-xs';
+            }
+          }
+        } catch(e) { console.error(e); }
+      }
+
+      document.getElementById('item-price')?.addEventListener('input', updateFeeDisplay);
+      document.addEventListener('DOMContentLoaded', updateFeeDisplay);
+
       // Publish listing to Supabase
       async function publishListing() {
         const title = document.getElementById('item-title').value.trim();
@@ -238,6 +286,7 @@
         const price = parseFloat(document.getElementById('item-price').value);
         const originalPrice = parseFloat(document.getElementById('item-original-price').value) || null;
         const category = document.querySelector('.cat-btn.selected')?.textContent.trim() || null;
+        const isBoosted = document.getElementById('boost-checkbox')?.checked || false;
 
         if (!title || !price) {
           alert('Please fill in at least the Title and Your Price.');
@@ -298,7 +347,10 @@
             category,
             condition: selectedCondition,
             image_url: imageUrl,
-            image_urls: imageUrls
+            image_urls: imageUrls,
+            is_boosted: isBoosted,
+            boosted_at: isBoosted ? new Date().toISOString() : null,
+            listing_fee_paid: _currentFee
           });
 
           if (insertError) throw insertError;
