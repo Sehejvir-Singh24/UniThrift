@@ -161,15 +161,6 @@
         }
       }
 
-      async function handleSellClick() {
-        const isLoggedIn = await checkAuth();
-        if (isLoggedIn) {
-          verifyAction(() => window.location.href = '/marketplace/add_photos.html');
-        } else {
-          window.location.href = '/auth/login.html';
-        }
-      }
-
       document.addEventListener('DOMContentLoaded', () => {
         initMarketplace();
       });
@@ -252,11 +243,13 @@
       window.location.href = '/auth/login.html';
       return;
     }
-    if (_userListingsCount > 0) {
-      document.getElementById('sell-options-modal').classList.remove('hidden');
-    } else {
-      window.location.href = '/marketplace/add_photos.html';
-    }
+    verifyAction(() => {
+      if (_userListingsCount > 0) {
+        document.getElementById('sell-options-modal').classList.remove('hidden');
+      } else {
+        window.location.href = '/marketplace/add_photos.html';
+      }
+    });
   }
 
   async function openManageListingsModal() {
