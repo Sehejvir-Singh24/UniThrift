@@ -1,92 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Dashboard - UniThrift</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" rel="stylesheet" />
-
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>UniThrift — Campus Ecosystem Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
-    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary": "#ffffff", "on-surface-variant": "#3d4a3d", "surface-bright": "#f8f9ff", "on-primary-fixed": "#002109", "surface-dim": "#cbdbf5", "primary-fixed-dim": "#4ae176", "inverse-on-surface": "#eaf1ff", "outline": "#6d7b6c", "surface": "#f8f9ff", "on-secondary-fixed-variant": "#3f465c", "surface-container-low": "#eff4ff", "secondary-fixed-dim": "#bec6e0", "on-secondary-container": "#5c647a", "tertiary-fixed-dim": "#bdcac1", "secondary-fixed": "#dae2fd", "error": "#ba1a1a", "tertiary-container": "#a2afa7", "inverse-on-surface": "#eaf1ff", "outline-variant": "#bccbb9", "on-tertiary-fixed": "#131e19", "secondary-container": "#dae2fd", "on-tertiary-fixed-variant": "#3e4943", "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "on-tertiary": "#ffffff", "tertiary-fixed": "#d9e6dd", "surface-tint": "#006e2f", "tertiary": "#55615a", "surface-container-highest": "#d3e4fe", "on-secondary": "#ffffff", "primary-container": "#22c55e", "background": "#f8f9ff", "primary-fixed": "#6bff8f", "primary": "#006e2f", "on-primary-fixed-variant": "#005321", "on-secondary-fixed": "#131b2e", "surface-container": "#e5eeff", "error-container": "#ffdad6", "surface-container-high": "#dce9ff", "on-tertiary-container": "#37433c", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", "on-primary-container": "#004b1e", "secondary": "#565e74", "inverse-primary": "#4ae176", "on-background": "#0b1c30", "on-surface": "#0b1c30" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "stack-sm": "8px", "stack-md": "16px", "stack-lg": "32px", "unit": "4px", "container-padding-mobile": "20px", "container-padding-desktop": "48px", "gutter": "16px" }, "fontFamily": { "body-lg": ["Geist"], "headline-lg-mobile": ["Geist"], "title-md": ["Geist"], "headline-lg": ["Geist"], "label-caps": ["Geist"], "body-sm": ["Geist"], "display-lg": ["Geist"] }, "fontSize": { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700" }] } } }
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#ffffff", "on-surface-variant": "#3d4a3d", "surface-bright": "#f8f9ff",
+            "on-primary-fixed": "#002109", "surface-dim": "#cbdbf5", "primary-fixed-dim": "#4ae176",
+            "inverse-on-surface": "#eaf1ff", "outline": "#6d7b6c", "surface": "#f8f9ff",
+            "on-secondary-fixed-variant": "#3f465c", "surface-container-low": "#eff4ff",
+            "secondary-fixed-dim": "#bec6e0", "on-secondary-container": "#5c647a",
+            "tertiary-fixed-dim": "#bdcac1", "secondary-fixed": "#dae2fd", "error": "#ba1a1a",
+            "tertiary-container": "#a2afa7", "outline-variant": "#bccbb9", "on-tertiary-fixed": "#131e19",
+            "secondary-container": "#dae2fd", "on-tertiary-fixed-variant": "#3e4943",
+            "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "on-tertiary": "#ffffff",
+            "tertiary-fixed": "#d9e6dd", "surface-tint": "#006e2f", "tertiary": "#55615a",
+            "surface-container-highest": "#e5eeff", "on-secondary": "#ffffff",
+            "primary-container": "#006e2f", "background": "#f8f9ff", "primary-fixed": "#6bff8f",
+            "primary": "#006e2f", "on-primary-fixed-variant": "#005321", "on-secondary-fixed": "#131b2e",
+            "surface-container": "#e5eeff", "error-container": "#ffdad6", "surface-container-high": "#dce9ff",
+            "on-tertiary-container": "#37433c", "surface-variant": "#d3e4fe", "on-error-container": "#93000a",
+            "on-primary-container": "#ffffff", "secondary": "#565e74", "inverse-primary": "#4ae176",
+            "on-background": "#0b1c30", "on-surface": "#0b1c30"
+          },
+          "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          "spacing": { "stack-sm": "8px", "stack-md": "16px", "stack-lg": "28px", "unit": "4px", "container-padding-mobile": "20px" },
+          "fontFamily": { "body-lg": ["Geist"], "headline-lg-mobile": ["Geist"], "title-md": ["Geist"], "headline-lg": ["Geist"], "label-caps": ["Geist"], "body-sm": ["Geist"] },
+          "fontSize": {
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+          }
+        }
+      }
+    };
   </script>
   <style>
-    @layer base {
-      body { -webkit-tap-highlight-color: transparent; }
-      .pt-safe { padding-top: env(safe-area-inset-top); }
-      .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-    }
-    .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    @layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); } }
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
-  <script>
-    requireAuth();
-  </script>
 </head>
 <body class="bg-background font-body-lg text-on-background min-h-screen flex flex-col pb-safe">
 
   <!-- Header -->
   <header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-14 px-4 flex items-center justify-between">
-      <button class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface" onclick="history.back()">
-        <span class="material-symbols-outlined">arrow_back_ios_new</span>
-      </button>
-      <div id="platform-switcher-slot"></div>
-      <a href="/core/profile.html" class="w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary-container/20">
-        <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA" />
+    <div class="h-16 px-container-padding-mobile max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='/index.html'">
+          <img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/>
+          <span class="font-title-md text-title-md text-on-surface font-bold">UniThrift</span>
+        </div>
+        <div id="platform-switcher-slot"></div>
+      </div>
+      <a href="/core/profile.html" class="w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/20 hover:scale-105 transition-transform">
+        <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
       </a>
-    </div>
-    <!-- Tabs -->
-    <div class="flex px-4 gap-6 overflow-x-auto hide-scrollbar pt-2 pb-1">
-      <button id="tab-buyer" class="pb-2 font-title-md text-[16px] text-primary border-b-2 border-primary whitespace-nowrap px-1" onclick="switchTab('buyer')">Buying</button>
-      <button id="tab-seller" class="pb-2 font-title-md text-[16px] text-on-surface-variant border-b-2 border-transparent whitespace-nowrap px-1 transition-colors" onclick="switchTab('seller')">Selling</button>
     </div>
   </header>
 
-  <main class="flex-1 pt-28 px-4 md:px-8 max-w-3xl mx-auto w-full flex flex-col gap-4">
-    <!-- Content Area -->
-    <div id="reservations-container" class="flex flex-col gap-4 pb-12">
-      <!-- Loading State -->
-      <div class="animate-pulse bg-surface-container rounded-3xl h-40"></div>
-      <div class="animate-pulse bg-surface-container rounded-3xl h-40"></div>
+  <!-- Main Content -->
+  <main class="pt-20 pb-28 bg-background min-h-screen">
+    <div class="flex flex-col w-full max-w-4xl mx-auto gap-stack-lg">
+      
+      <!-- Greeting & Search -->
+      <div class="px-container-padding-mobile flex flex-col gap-3 mt-2">
+        <div>
+          <h2 id="user-greeting" class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Good day 👋</h2>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Ready to find campus deals today?</p>
+        </div>
+        <form onsubmit="handleSearch(event)" class="relative flex items-center w-full bg-surface-container-highest rounded-full shadow-sm px-4 py-3 transition-all focus-within:ring-2 focus-within:ring-primary/40">
+          <span class="material-symbols-outlined text-on-surface-variant mr-3">search</span>
+          <input id="search-input" class="bg-transparent w-full font-body-lg text-body-lg text-on-background outline-none placeholder:text-on-surface-variant/60" placeholder="Search campus essentials..." type="text"/>
+          <button type="submit" class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-transform">
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Categories Carousel -->
+      <div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4">
+        <div class="flex gap-4 pb-1">
+          <button onclick="window.location.href='/marketplace/marketplace.html?category=Books'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">menu_book</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">Books</span>
+          </button>
+          <button onclick="window.location.href='/marketplace/marketplace.html?category=Lab%20Coats'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">science</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">Lab Gear</span>
+          </button>
+          <button onclick="window.location.href='/marketplace/marketplace.html?category=Electronics'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">devices</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">Gadgets</span>
+          </button>
+          <button onclick="window.location.href='/marketplace/marketplace.html?category=Cycles'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">pedal_bike</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">Cycles</span>
+          </button>
+          <button onclick="window.location.href='/pghostels/pghostels.html'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">apartment</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">PGs</span>
+          </button>
+          <button onclick="window.location.href='/roommates/flatmates.html'" class="flex flex-col items-center gap-2 group min-w-[72px]">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-colors text-on-surface-variant">
+              <span class="material-symbols-outlined text-[28px]">group</span>
+            </div>
+            <span class="font-label-caps text-[11px] text-on-surface">Flatmates</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Trending Offers -->
+      <div class="px-container-padding-mobile flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+          <h3 class="font-title-md text-title-md text-on-background font-bold">Trending Offers ⚡</h3>
+          <a href="/marketplace/marketplace.html" class="font-label-caps text-xs text-primary font-semibold hover:underline">See All</a>
+        </div>
+        <div id="trending-products-grid" class="grid grid-cols-2 gap-4">
+          <!-- Dynamic products loaded from Supabase -->
+          <div class="animate-pulse bg-surface-container h-52 rounded-[20px]"></div>
+          <div class="animate-pulse bg-surface-container h-52 rounded-[20px]"></div>
+        </div>
+      </div>
+
+      <!-- Near Campus Stays (PGs) -->
+      <div class="flex flex-col gap-3">
+        <div class="px-container-padding-mobile flex justify-between items-end">
+          <div>
+            <h3 class="font-title-md text-title-md text-on-background font-bold">Near Campus Stays</h3>
+            <p class="font-body-sm text-xs text-on-surface-variant">Verified PGs & Hostels for students</p>
+          </div>
+          <a href="/pghostels/pghostels.html" class="font-label-caps text-xs text-primary font-semibold flex items-center gap-0.5 hover:underline">
+            Explore <span class="material-symbols-outlined text-[16px]">explore</span>
+          </a>
+        </div>
+        <div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4 pb-2 snap-x snap-mandatory">
+          <div class="flex gap-4 w-max">
+            <!-- Sample PG Card 1 -->
+            <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
+              <div class="relative w-full h-36 bg-surface-container-low">
+                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuUPfF1o9YOkPRgQHoT6UltXjGr-u06EZAHbfTTTkMGxeT2Ep37IMERTngn51GD_Upy_ZAx1iItrRqdvYB_ww7bRkOnoDY3axsae9vVzaoCzRc9MSfXzL1M3Z1hnQa_9KSY7sEFXd_uARJIx4Ij8AfLR7mAbDOsN2G73lryiBFXbEr3UV-AlaICRB-qbxaHjtR3dOJwRgFJ7Yq2a81s8mxvIkHVFulGGGYT-3WRc_EKmQ0zI7I4Wq0hrqZ6jiInCJjlQNn0-DEnVnH" alt="Greenwoods Hostel"/>
+                <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span class="font-label-caps text-[10px] text-on-surface font-bold">8 min walk</span>
+                </div>
+              </div>
+              <div class="p-3 flex flex-col gap-1">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-body-lg text-sm text-on-background font-semibold">Greenwoods Hostel</h4>
+                  <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="font-label-caps text-[10px] text-on-surface font-bold">4.8</span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-xs text-on-surface-variant truncate">AC, WiFi, Meals included</p>
+                <div class="mt-1 flex items-center justify-between">
+                  <span class="font-title-md text-sm text-primary font-bold">₹8,500<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sample PG Card 2 -->
+            <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
+              <div class="relative w-full h-36 bg-surface-container-low">
+                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX4j9SYNS6oozro-AgKjhtzX2YI_Fyiy4tYsQed_ky39TkhgPq2wph4Eh3jjW3NqNGxEDn1BKuopo_kz5iuHMBVVWfIBuy2_Orka1SYTvwQoLCc7ZklwXkij6gEfGyLoDLcFMTK8C1uFsAKz8nxxwTRvdm1AMhcLf1K93M-5rLLP7-KTpfMp14x2ezpjWmuvDdJB9ptZw0EdEMpStV489TVPMIs9XYqEPrX5OGx7oV7f_Y2EbDshD2hKqnuhwll_QTT9xUscbVnSwV" alt="The Hive Coliving"/>
+                <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span class="font-label-caps text-[10px] text-on-surface font-bold">12 min walk</span>
+                </div>
+              </div>
+              <div class="p-3 flex flex-col gap-1">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-body-lg text-sm text-on-background font-semibold">The Hive Coliving</h4>
+                  <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="font-label-caps text-[10px] text-on-surface font-bold">4.9</span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-xs text-on-surface-variant truncate">Gym, Library, En-suite</p>
+                <div class="mt-1 flex items-center justify-between">
+                  <span class="font-title-md text-sm text-primary font-bold">₹11,000<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Looking for Roomies (Flatmates) -->
+      <div class="px-container-padding-mobile flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+          <h3 class="font-title-md text-title-md text-on-background font-bold">Looking for Roomies 👥</h3>
+          <a href="/roommates/flatmates.html" class="font-label-caps text-xs text-primary font-semibold hover:underline">View All</a>
+        </div>
+        <div class="w-full overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
+          <div class="flex gap-3 w-max">
+            <!-- Flatmate 1 -->
+            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdAw6qmHQkE9BAGN3O4wQe5KinPvcDeypDra-V88Uus3PSHd7UJZqbBO6EJ7Pq0jpex5QUnUES3FhzSRTouAKTsDzExwTVVszFA5oRcMLZpJdXMmiwZdVtSW3X3MpxpLlcBUzW7pmIyp4ICd6MtMFSxW-yA6HvJ_aaBjOdYo9dXDqFQDSTyUjI9QkFe9UPpyxN23b3Dp1CFfzglfZoIBlgCKDn31fb5qjuixb7jV1V-RM-0HEh7CkajNj5NeLEe1OwvnJAfhBcu6To" alt="Sam K."/>
+              <h4 class="font-body-sm text-xs font-bold text-on-background">Sam K.</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant">2nd Year, CS</p>
+              <div class="flex flex-wrap justify-center gap-1 mt-2">
+                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Night Owl</span>
+              </div>
+            </div>
+
+            <!-- Flatmate 2 -->
+            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxqegqJINSPEoJ4KVZVKlS2oDu7JuXpxvsBm9Lph9O0u0OvXG6YDd8mQedKMAQIMx66FyYSdUAusVSv2Av9rcu5iO7CjOCDuxrq-zPio3VvbIjn2iF7IcohprC3J4bfqUG6a5OkI2XCNvBPXaI_N0zi4vHX3Uz6QyLmrmpRGpSGxQco6Pvtsdbug2RVMXqarJhbPxGPA0LqF3wvjG-lI9gAqPoET5zVeXnPcPTldnOxv2gAZ9qvJPTxWyXvyiF0lGUsJ7oUiSlaFN1" alt="Jordan M."/>
+              <h4 class="font-body-sm text-xs font-bold text-on-background">Jordan M.</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant">3rd Year, Arts</p>
+              <div class="flex flex-wrap justify-center gap-1 mt-2">
+                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Gamer</span>
+              </div>
+            </div>
+
+            <!-- Flatmate 3 -->
+            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmqI9cuR3CLUTwaMlYzXme1l52xP8CCb7cP4IHZbHvIxBnmKRjMWgf4Sic1SEv-GZxeBcbJjuFRp8Ko14zOL7-BA7HDUmh-fCoh3D9kXB7nYxgJAv1BtijncL5u7ztb6jbcHww9LVRKzTo0DwIJYQWrag0pk3re8sX_65dzqtj4IC8EFXUGod0KDw3qDaB2wUBMhe1TuFStMr6pbVG3Cdo-CRLO-PS9UNk6F7HOX3qvoS_x5K561jHJApahed8yfQoJ4mktztlUqkB" alt="Priya T."/>
+              <h4 class="font-body-sm text-xs font-bold text-on-background">Priya T.</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant">Masters, Biz</p>
+              <div class="flex flex-wrap justify-center gap-1 mt-2">
+                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Quiet</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Active Reservations / Orders (Collapsible / Compact) -->
+      <div class="px-container-padding-mobile flex flex-col gap-3 mt-2">
+        <div class="flex justify-between items-center border-t border-outline-variant/20 pt-4">
+          <h3 class="font-title-md text-title-md text-on-background font-bold">My Orders & Reservations 📦</h3>
+          <div class="flex gap-2">
+            <button id="tab-buyer" onclick="switchReservationTab('buyer')" class="px-3 py-1 text-xs font-bold rounded-full bg-primary text-white">Buying</button>
+            <button id="tab-seller" onclick="switchReservationTab('seller')" class="px-3 py-1 text-xs font-bold rounded-full bg-surface-container text-on-surface-variant">Selling</button>
+          </div>
+        </div>
+        <div id="reservations-container" class="flex flex-col gap-3">
+          <div class="animate-pulse bg-surface-container rounded-2xl h-24"></div>
+        </div>
+      </div>
+
     </div>
   </main>
 
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container">
+    <div class="flex justify-around items-center h-16 px-4 max-w-4xl mx-auto">
+      <a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary font-bold" data-path="dashboard" href="/core/dashboard.html">
+        <span class="material-symbols-outlined text-[24px]">dashboard</span>
+        <span class="font-label-caps text-[11px]">Home</span>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" data-path="marketplace" href="/marketplace/marketplace.html">
+        <span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+        <span class="font-label-caps text-[11px]">Market</span>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" data-path="flatmates" href="/roommates/flatmates.html">
+        <span class="material-symbols-outlined text-[24px]">group</span>
+        <span class="font-label-caps text-[11px]">Mates</span>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html">
+        <span class="material-symbols-outlined text-[24px]">apartment</span>
+        <span class="font-label-caps text-[11px]">PG/Hostel</span>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="/core/activity.html">
+        <span class="material-symbols-outlined text-[24px]">notifications</span>
+        <span class="font-label-caps text-[11px]">Activity</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="/scripts/support-widget.js" defer></script>
+
   <script>
-    let currentRole = 'buyer'; // 'buyer' or 'seller'
+    let currentRole = 'buyer';
 
-    function switchTab(role) {
-      currentRole = role;
-      
-      const tabBuyer = document.getElementById('tab-buyer');
-      const tabSeller = document.getElementById('tab-seller');
-      
-      if (role === 'buyer') {
-        tabBuyer.classList.replace('text-on-surface-variant', 'text-primary');
-        tabBuyer.classList.replace('border-transparent', 'border-primary');
-        tabSeller.classList.replace('text-primary', 'text-on-surface-variant');
-        tabSeller.classList.replace('border-primary', 'border-transparent');
+    function handleSearch(e) {
+      e.preventDefault();
+      const query = document.getElementById('search-input').value.trim();
+      if (query) {
+        window.location.href = `/marketplace/marketplace.html?search=${encodeURIComponent(query)}`;
       } else {
-        tabSeller.classList.replace('text-on-surface-variant', 'text-primary');
-        tabSeller.classList.replace('border-transparent', 'border-primary');
-        tabBuyer.classList.replace('text-primary', 'text-on-surface-variant');
-        tabBuyer.classList.replace('border-primary', 'border-transparent');
+        window.location.href = '/marketplace/marketplace.html';
       }
+    }
 
+    async function initHome() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const profile = await getProfile();
+          if (profile?.full_name) {
+            document.getElementById('user-greeting').textContent = `Good day, ${profile.full_name.split(' ')[0]} 👋`;
+          }
+          if (profile?.avatar_url) {
+            const av = document.getElementById('header-avatar');
+            if (av) av.src = profile.avatar_url;
+          }
+        }
+      } catch(e) { console.error('Profile fetch error:', e); }
+
+      loadTrendingProducts();
+      loadReservations();
+    }
+
+    async function loadTrendingProducts() {
+      const grid = document.getElementById('trending-products-grid');
+      try {
+        const products = await getAllProducts();
+        if (!products || products.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-2 text-center py-6 text-xs text-on-surface-variant bg-surface-container-low rounded-2xl">
+              No products found yet. Be the first to post!
+            </div>`;
+          return;
+        }
+
+        const items = products.slice(0, 4);
+        grid.innerHTML = items.map(p => `
+          <div onclick="window.location.href='/marketplace/product_detail.html?id=${p.id}'" class="bg-surface-container-lowest border border-outline-variant/30 rounded-[20px] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow cursor-pointer">
+            <div class="relative w-full aspect-square bg-surface-container-low">
+              ${p.image_url ? `<img src="${p.image_url}" class="w-full h-full object-cover" alt="${p.title}"/>` : `<div class="w-full h-full flex items-center justify-center text-on-surface-variant/40"><span class="material-symbols-outlined text-[32px]">image</span></div>`}
+              <div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                <span class="font-label-caps text-[9px] text-on-surface font-semibold">${p.condition || 'Verified'}</span>
+              </div>
+            </div>
+            <div class="p-3 flex flex-col gap-0.5">
+              <h4 class="font-body-sm text-xs text-on-background font-semibold truncate">${p.title}</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant truncate">${p.category || 'General'}</p>
+              <div class="flex items-center justify-between mt-1">
+                <span class="font-title-md text-sm text-primary font-bold">₹${p.price}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch(e) {
+        console.error('loadTrendingProducts error:', e);
+        grid.innerHTML = `<div class="col-span-2 text-center py-4 text-xs text-red-500">Failed to load trending items.</div>`;
+      }
+    }
+
+    function switchReservationTab(role) {
+      currentRole = role;
+      const bBtn = document.getElementById('tab-buyer');
+      const sBtn = document.getElementById('tab-seller');
+      if (role === 'buyer') {
+        bBtn.className = 'px-3 py-1 text-xs font-bold rounded-full bg-primary text-white';
+        sBtn.className = 'px-3 py-1 text-xs font-bold rounded-full bg-surface-container text-on-surface-variant';
+      } else {
+        sBtn.className = 'px-3 py-1 text-xs font-bold rounded-full bg-primary text-white';
+        bBtn.className = 'px-3 py-1 text-xs font-bold rounded-full bg-surface-container text-on-surface-variant';
+      }
       loadReservations();
     }
 
     async function loadReservations() {
       const container = document.getElementById('reservations-container');
-      container.innerHTML = `
-        <div class="animate-pulse bg-surface-container rounded-3xl h-40"></div>
-        <div class="animate-pulse bg-surface-container rounded-3xl h-40"></div>
-      `;
+      container.innerHTML = `<div class="animate-pulse bg-surface-container rounded-2xl h-20"></div>`;
 
       try {
         let reservations = [];
@@ -96,126 +391,44 @@
           reservations = await getReservationsAsSeller();
         }
 
-        if (reservations.length === 0) {
+        if (!reservations || reservations.length === 0) {
           container.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-16 text-center">
-              <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center text-on-surface-variant mb-4">
-                <span class="material-symbols-outlined text-[32px]">inventory_2</span>
-              </div>
-              <h3 class="font-title-md text-title-md text-on-background">No active reservations</h3>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-2 max-w-[250px]">
-                ${currentRole === 'buyer' ? 'Items you reserve will appear here.' : 'When someone reserves your items, they will appear here.'}
-              </p>
-            </div>
-          `;
+            <div class="text-center py-6 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl">
+              <span class="material-symbols-outlined text-3xl text-on-surface-variant/40 mb-1">inventory_2</span>
+              <p class="text-xs text-on-surface-variant font-medium">No active ${currentRole} reservations right now.</p>
+            </div>`;
           return;
         }
 
-        container.innerHTML = '';
-        reservations.forEach(res => {
-          // Status styling
-          let statusBadge = '';
-          if (res.status === 'Reserved') {
-            statusBadge = `<span class="bg-primary-container text-on-primary-container text-[10px] font-label-caps px-2 py-0.5 rounded-full">Active</span>`;
-          } else if (res.status === 'Completed') {
-            statusBadge = `<span class="bg-surface-variant text-on-surface-variant text-[10px] font-label-caps px-2 py-0.5 rounded-full">Completed</span>`;
-          } else {
-            statusBadge = `<span class="bg-error-container text-error text-[10px] font-label-caps px-2 py-0.5 rounded-full">${res.status}</span>`;
-          }
-
-          const otherPartyName = res.profiles ? res.profiles.full_name : 'Unknown';
-          const otherPartyAvatar = res.profiles?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback';
-          
-          let actionButton = '';
-          if (res.status === 'Reserved') {
-            actionButton = `
-              <button onclick="window.location.href='/core/chat.html?id=${res.id}'" class="flex-1 bg-primary text-on-primary font-title-md text-[14px] py-3 rounded-xl hover:opacity-90 transition-opacity active:scale-[0.98] flex items-center justify-center gap-2">
-                <span>Open Chat</span>
-                <span class="material-symbols-outlined text-[18px]">chat_bubble</span>
-              </button>
-            `;
-          } else if (res.status === 'Completed') {
-            actionButton = `
-              <button onclick="window.location.href='/core/chat.html?id=${res.id}'" class="flex-1 bg-surface-container text-on-surface-variant font-title-md text-[14px] py-3 rounded-xl hover:bg-surface-variant transition-opacity active:scale-[0.98]">
-                View Details
-              </button>
-            `;
-          }
-
-          const card = document.createElement('div');
-          card.className = "bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-5 shadow-sm flex flex-col gap-4";
-          
-          card.innerHTML = `
-            <div class="flex justify-between items-start gap-4">
-              <div class="flex gap-4">
-                <div class="w-16 h-16 rounded-2xl bg-surface-container overflow-hidden shrink-0">
-                  ${res.products.image_url ? `<img src="${res.products.image_url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-on-surface-variant/40"><span class="material-symbols-outlined text-[24px]">image</span></div>`}
+        container.innerHTML = reservations.map(res => {
+          const otherName = currentRole === 'buyer' ? (res.seller_profile?.full_name || 'Seller') : (res.buyer_profile?.full_name || 'Buyer');
+          return `
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden shrink-0">
+                  ${res.products?.image_url ? `<img src="${res.products.image_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-sm">📦</span>`}
                 </div>
-                <div class="flex flex-col">
-                  <div class="flex items-center gap-2 mb-0.5">
-                    <h3 class="font-title-md text-[16px] text-on-background line-clamp-1">${res.products.title}</h3>
-                    ${statusBadge}
-                  </div>
-                  <p class="font-body-sm text-[12px] text-on-surface-variant line-clamp-1">
-                    ${currentRole === 'buyer' ? 'Purchasing from' : 'Selling to'}: <strong>${otherPartyName}</strong>
-                  </p>
-                  <p class="font-title-md text-[14px] text-primary mt-1">₹${res.products.price}</p>
+                <div>
+                  <h4 class="font-body-sm text-xs font-bold text-on-background truncate max-w-[160px]">${res.products?.title || 'Item'}</h4>
+                  <p class="text-[11px] text-on-surface-variant">${currentRole === 'buyer' ? 'Seller' : 'Buyer'}: ${otherName}</p>
                 </div>
               </div>
-            </div>
-            
-            <div class="bg-surface-container/50 rounded-xl p-3 flex justify-between items-center">
-              <div class="flex flex-col">
-                <span class="font-label-caps text-[10px] text-on-surface-variant">Remaining Balance</span>
-                <span class="font-title-md text-[16px] text-on-background">₹${res.remaining_amount}</span>
+              <div class="text-right">
+                <span class="text-xs font-bold text-primary">₹${res.products?.price || 0}</span>
+                <span class="block text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold mt-0.5">${res.status || 'Active'}</span>
               </div>
-              <div class="text-right flex flex-col">
-                <span class="font-label-caps text-[10px] text-on-surface-variant">Deposit Paid</span>
-                <span class="font-body-sm text-[12px] text-primary">₹${res.deposit_amount}</span>
-              </div>
-            </div>
-            
-            <div class="flex gap-2">
-              ${actionButton}
-            </div>
-          `;
-          
-          container.appendChild(card);
-        });
+            </div>`;
+        }).join('');
       } catch(e) {
         console.error(e);
-        container.innerHTML = `<div class="text-error p-4 text-center">Failed to load reservations.</div>`;
+        container.innerHTML = `<div class="text-xs text-on-surface-variant text-center py-3">Log in to view your orders.</div>`;
       }
     }
 
-    // Initial load
     document.addEventListener('DOMContentLoaded', () => {
-      loadReservations();
+      initHome();
     });
   </script>
-  <nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container">
-    <div class="flex justify-around items-center h-16 px-4">
-      <a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="/core/dashboard.html">
-        <span class="material-symbols-outlined">dashboard</span>
-        <span class="font-label-caps text-label-caps">Home</span>
-      </a>
-      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="/marketplace/marketplace.html">
-        <span class="material-symbols-outlined">shopping_bag</span>
-        <span class="font-label-caps text-label-caps">Market</span>
-      </a>
-      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="/roommates/flatmates.html">
-        <span class="material-symbols-outlined">group</span>
-        <span class="font-label-caps text-label-caps">Mates</span>
-      </a>
-      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="/pghostels/pghostels.html">
-        <span class="material-symbols-outlined">apartment</span>
-        <span class="font-label-caps text-label-caps">PG/Hostel</span>
-      </a>
-      <a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" href="/core/activity.html">
-        <span class="material-symbols-outlined">notifications</span>
-        <span class="font-label-caps text-label-caps">Activity</span>
-      </a>
-    </div>
-  </nav>
+
 </body>
 </html>
