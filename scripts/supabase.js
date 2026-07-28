@@ -66,6 +66,10 @@ async function getProfile(forceRefresh = false) {
     try { sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(fallbackProfile)); } catch (e) {}
     return fallbackProfile;
   }
+
+  _cachedProfile = profile;
+  try { sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(profile)); } catch (e) {}
+  return profile;
 }
 
 async function refreshProfileInBackground() {
