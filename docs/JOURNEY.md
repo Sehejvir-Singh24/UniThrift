@@ -4,7 +4,56 @@ This document chronicles what we have built so far and the roadmap for what we n
 
 ---
 
-## Session 8: Real Database UniMatch Engine, ₹29 Paywalls, Admin Verification Hub & Mobile Performance Optimization (Latest)
+## Session 9: Stitch Home Page Restoration, Global PG Interception, Tiered Listing Fees & Per-Day Product Boosting Engine (Latest)
+
+We completed a comprehensive update to the UniThrift ecosystem, restoring the Stitch design system home page, launching platform-wide monetization rules, building a per-day product boosting engine, and refining marketplace seller tools.
+
+### 1. Stitch Premium Campus Home Page Restoration (`core/dashboard.html`)
+- **Stitch Design System Integration:** Restored the UniThrift Home page layout using the Stitch design project system (Screen ID `e7c78bfa4dbf449bb1661a5df9c682bc`).
+- **Live Supabase Data Feeds:** Connected dynamic carousels & grids (`loadTrendingProducts()`, `loadNearCampusStays()`, `loadRoommates()`, `loadReservations()`) to live Supabase backend data.
+- **Desktop Grid Fix:** Converted grid layout from hardcoded 2 columns to responsive `grid-cols-2 sm:grid-cols-3 md:grid-cols-4` to prevent enlarged card images on laptop and desktop displays.
+- **URL Route Correction:** Fixed product click navigation from invalid `/marketplace/product_detail.html` (which caused Vercel 404 errors) to `/marketplace/item.html?id=...`.
+
+### 2. Global PG & Hostel "Launching Soon" Interception (`scripts/coming-soon.js`)
+- **Capture-Phase Delegation:** Implemented capture-phase click delegation targeting `a[href*="/pghostels/"]`, `[data-path="hostel-hub"]`, `[onclick*="/pghostels/"]`, and `.pg-trigger` across Home, Mates, and Navigation bars.
+- **Launching Soon Modal:** Intercepts clicks everywhere to display a sleek bottom-sheet modal: *"PG & Hostel Finder Launching Soon 🚀"*.
+
+### 3. Platform-Wide 25% Deposit Standard
+- **Uniform Deposit Rule:** Updated all deposit callouts and guarantee notices from 60% down to **25%** across `marketplace/item.html`, `marketplace/make_offer.html`, and `marketplace/offer_accepted.html`.
+
+### 4. Marketplace & Mates How-It-Works Banners
+- **Marketplace Banner (`marketplace/marketplace.html`):** Inserted a dismissible info card (*"How UniThrift Marketplace Works 💡"*) detailing the 3-step process (Browse ➔ 25% Secure Deposit ➔ Safe Campus Pickup).
+- **Flatmates Banner (`roommates/flatmates.html`):** Added a dismissible guide banner (*"How Campus Flatmate Matching Works 💡"*) detailing profile browsing, filtering, and contact unlock steps.
+
+### 5. Profile Page Real Metrics & Active Listing Rules (`core/profile.html`)
+- **Real Stat Counters:** Removed hardcoded `4.9 ★ Rating` cards and connected live counters for **Active Listings**, **Items Sold**, and **Transactions**.
+- **Active Listings Removal:** Updated `loadMyListings()` to filter out sold/reserved items from "My Listings" and added a **`[Mark as Sold]`** button on listing cards.
+
+### 6. Tiered Listing Fees System (`marketplace/sell_item_details.html`)
+- **First 2 Listings Free:** First 2 products listed by any seller are 100% **FREE (₹0)**.
+- **3rd Listing Onwards (Price-Based Tiers):**
+  - Product price under ₹100: **₹19**
+  - Product price ₹100 – ₹200: **₹29**
+  - Product price above ₹200: **₹39**
+- **Live Fee Calculator:** Dynamically displays listing fee status as the seller types the item price.
+
+### 7. Per-Day Product Boosting Engine (⚡ ₹19/day)
+- **Home Page Trending Offers ⚡:** Sellers can pay to feature their listings on the Home page under **Trending Offers ⚡** with a **⚡ Featured** badge.
+- **Duration Pricing:** Charged at **₹19 per day** with a **2-day minimum** (₹38). Selector options include 2, 3, 5, 7, 14, and 30 days integrated with Razorpay Checkout.
+- **Automatic Expiration (`boosted_until`):** Product records assign `boosted_until = now() + (days * 24h)`. `getBoostedProducts()` queries active boosted items (`is_boosted = true AND boosted_until > now()`). Products automatically un-feature when the duration expires.
+
+### 8. Seller Dashboard FAB & Manage Modal (`marketplace/marketplace.html`)
+- **Dynamic FAB Text:** Floating action button automatically changes from **Sell** to **Sell / Manage** for sellers with active listings.
+- **Seller Management Modal:** Displays active products with 56x56 thumbnail, title, price, status badge, and side-by-side **`[✏️ Edit]`** and **`[⚡ Boost]`** buttons.
+
+### 9. Database Migrations & Fault-Tolerant Fallbacks (`db/boost_and_listing_fees_migration.sql`)
+- **Schema Migration:** Added `is_boosted`, `boosted_at`, `boosted_until`, and `listing_fee_paid` columns to `products`.
+- **Public RLS Policy:** Added `CREATE POLICY "Public products are viewable by everyone" ON public.products FOR SELECT USING (true);` for guest access.
+- **Multi-Stage Query Fallbacks:** Updated `getAllProducts()` and `getBoostedProducts()` with fallback queries to handle foreign key joins gracefully.
+
+---
+
+## Session 8: Real Database UniMatch Engine, ₹29 Paywalls, Admin Verification Hub & Mobile Performance Optimization
 
 We completed a comprehensive transformation of **UniMatch**, replacing all mock data with a real Supabase database pipeline, building monetization paywalls, creating an Admin ID Verification Hub, and optimizing mobile UI performance by over 20x.
 
