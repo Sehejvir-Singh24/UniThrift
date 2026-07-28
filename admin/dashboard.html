@@ -183,6 +183,17 @@
                 <span class="material-symbols-outlined text-[20px]">badge</span>
                 <span class="font-label-caps text-[13px] tracking-wide text-left">Registered Users</span>
             </button>
+            <button onclick="switchTab('unimatch')" id="nav-unimatch" class="nav-btn text-on-surface-variant hover:bg-surface-variant/30 rounded-xl mx-3 my-1 px-4 py-3 flex items-center gap-3 transition-all active:scale-98">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">favorite</span>
+                <span class="font-label-caps text-[13px] tracking-wide text-left">UniMatch</span>
+            </button>
+            <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn text-on-surface-variant hover:bg-surface-variant/30 rounded-xl mx-3 my-1 px-4 py-3 flex items-center justify-between transition-all active:scale-98">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[20px]">bug_report</span>
+                    <span class="font-label-caps text-[13px] tracking-wide text-left">Bug Reports</span>
+                </div>
+                <span id="reports-open-badge" class="px-2 py-0.5 bg-red-500 text-white text-[11px] font-bold rounded-full hidden">0</span>
+            </button>
         </nav>
 
         <!-- Sidebar Overlay (mobile only) -->
@@ -335,6 +346,153 @@
                     </div>
                 </section>
 
+                <!-- SECTION: UNIMATCH -->
+                <section id="sec-unimatch" class="tab-section hidden">
+                    <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
+                        <div>
+                            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">UniMatch 💕</h2>
+                            <p class="font-body-lg text-body-lg text-secondary">Overview of the campus dating platform — profiles, matches, and activity.</p>
+                        </div>
+                        <button onclick="loadUniMatch()" class="text-xs px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center gap-1 hover:bg-surface-container-highest transition-colors">
+                            <span class="material-symbols-outlined text-[14px]">refresh</span> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+                            <p class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Total Profiles</p>
+                            <p id="um-stat-profiles" class="text-3xl font-bold text-on-surface">—</p>
+                        </div>
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+                            <p class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Mutual Matches</p>
+                            <p id="um-stat-matches" class="text-3xl font-bold" style="color:#B05070">—</p>
+                        </div>
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+                            <p class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Total Likes Given</p>
+                            <p id="um-stat-likes" class="text-3xl font-bold text-violet-600">—</p>
+                        </div>
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+                            <p class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Active Today</p>
+                            <p id="um-stat-active" class="text-3xl font-bold text-emerald-600">—</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Recent Matches -->
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-outline-variant/10">
+                                <h3 class="font-title-md text-[15px] font-semibold text-on-surface">Recent Matches 💕</h3>
+                            </div>
+                            <div id="um-recent-matches" class="divide-y divide-outline-variant/10 max-h-72 overflow-y-auto">
+                                <p class="px-5 py-6 text-center text-sm text-on-surface-variant">Loading...</p>
+                            </div>
+                        </div>
+
+                        <!-- Top Interests -->
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-outline-variant/10">
+                                <h3 class="font-title-md text-[15px] font-semibold text-on-surface">Top Interest Tags</h3>
+                            </div>
+                            <div id="um-top-interests" class="p-5 flex flex-wrap gap-2 max-h-72 overflow-y-auto">
+                                <p class="text-sm text-on-surface-variant">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UniMatch Users Table -->
+                    <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
+                        <div class="px-6 py-4 border-b border-outline-variant/10 flex items-center justify-between">
+                            <h3 class="font-title-md text-[15px] font-semibold text-on-surface">UniMatch Profiles</h3>
+                            <span id="um-profiles-badge" class="px-3 py-1 bg-surface-container-highest text-primary font-label-caps text-[11px] rounded-full">0 Profiles</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-container-low border-b border-outline-variant/20 font-label-caps text-[11px] text-on-surface-variant tracking-wider uppercase">
+                                        <th class="py-4 px-6">Student</th>
+                                        <th class="py-4 px-6">College</th>
+                                        <th class="py-4 px-6">Year</th>
+                                        <th class="py-4 px-6">Interests</th>
+                                        <th class="py-4 px-6">Instagram</th>
+                                        <th class="py-4 px-6">Verified</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="um-profiles-table" class="divide-y divide-outline-variant/10">
+                                    <tr><td colspan="6" class="py-6 text-center text-sm text-on-surface-variant">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: BUG REPORTS -->
+                <section id="sec-reports" class="tab-section hidden">
+                    <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
+                        <div>
+                            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Bug Reports & Feedback 🐛</h2>
+                            <p class="font-body-lg text-body-lg text-secondary">User submitted bug reports, UI issues, feature requests, and help requests.</p>
+                        </div>
+                        <button onclick="loadReports()" class="text-xs px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center gap-1 hover:bg-surface-container-highest transition-colors">
+                            <span class="material-symbols-outlined text-[14px]">refresh</span> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Stats Bar -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-4 shadow-sm text-center">
+                            <p class="text-2xl font-bold text-on-surface" id="rep-stat-total">—</p>
+                            <p class="text-[11px] text-on-surface-variant mt-1 uppercase tracking-wide font-semibold">Total</p>
+                        </div>
+                        <div class="bg-red-50 rounded-2xl border border-red-100 p-4 shadow-sm text-center">
+                            <p class="text-2xl font-bold text-red-600" id="rep-stat-open">—</p>
+                            <p class="text-[11px] text-red-400 mt-1 uppercase tracking-wide font-semibold">Open</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-2xl border border-amber-100 p-4 shadow-sm text-center">
+                            <p class="text-2xl font-bold text-amber-600" id="rep-stat-inprogress">—</p>
+                            <p class="text-[11px] text-amber-400 mt-1 uppercase tracking-wide font-semibold">In Progress</p>
+                        </div>
+                        <div class="bg-green-50 rounded-2xl border border-green-100 p-4 shadow-sm text-center">
+                            <p class="text-2xl font-bold text-green-600" id="rep-stat-resolved">—</p>
+                            <p class="text-[11px] text-green-400 mt-1 uppercase tracking-wide font-semibold">Resolved</p>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="flex gap-2 mb-5" id="rep-filter-tabs">
+                        <button onclick="filterReports('all')"      id="rep-filter-all"        class="rep-filter-btn px-4 py-1.5 rounded-full text-sm font-semibold bg-on-surface text-surface transition-colors">All</button>
+                        <button onclick="filterReports('open')"     id="rep-filter-open"       class="rep-filter-btn px-4 py-1.5 rounded-full text-sm font-semibold bg-surface-container-high text-on-surface-variant transition-colors">Open</button>
+                        <button onclick="filterReports('in_progress')" id="rep-filter-in_progress" class="rep-filter-btn px-4 py-1.5 rounded-full text-sm font-semibold bg-surface-container-high text-on-surface-variant transition-colors">In Progress</button>
+                        <button onclick="filterReports('resolved')" id="rep-filter-resolved"   class="rep-filter-btn px-4 py-1.5 rounded-full text-sm font-semibold bg-surface-container-high text-on-surface-variant transition-colors">Resolved</button>
+                    </div>
+
+                    <!-- Reports Table -->
+                    <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-container-low border-b border-outline-variant/20 font-label-caps text-[11px] text-on-surface-variant tracking-wider uppercase">
+                                        <th class="py-4 px-5">Type</th>
+                                        <th class="py-4 px-5">Title</th>
+                                        <th class="py-4 px-5">Page</th>
+                                        <th class="py-4 px-5">Submitted</th>
+                                        <th class="py-4 px-5">Status</th>
+                                        <th class="py-4 px-5">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reports-table-body" class="divide-y divide-outline-variant/10">
+                                    <tr><td colspan="6" class="py-8 text-center text-sm text-on-surface-variant">Loading reports...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="reports-empty" class="hidden flex flex-col items-center justify-center p-12 text-center">
+                            <span class="text-4xl mb-3">🎉</span>
+                            <h3 class="font-title-md text-on-surface mb-1">No Reports</h3>
+                            <p class="text-sm text-on-surface-variant">No bug reports matching this filter.</p>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </main>
     </div>
@@ -392,7 +550,9 @@
                 loadMarketplace(),
                 loadFlatmates(),
                 loadPGListings(),
-                loadUsers()
+                loadUsers(),
+                loadReports(),
+                loadUniMatch()
             ]);
         }
 
@@ -842,6 +1002,208 @@
                 modal.classList.remove('flex');
             }, 200);
         }
+
+        // ── BUG REPORTS TAB ───────────────────────────────────────────
+        let allReports = [];
+        let currentReportFilter = 'all';
+
+        async function loadReports() {
+            try {
+                const { data, error } = await supabase
+                    .from('bug_reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                allReports = data || [];
+                updateReportsStats();
+                renderReports(allReports);
+                // Update sidebar badge
+                const open = allReports.filter(r => r.status === 'open').length;
+                const badge = document.getElementById('reports-open-badge');
+                if (open > 0) { badge.textContent = open; badge.classList.remove('hidden'); }
+                else { badge.classList.add('hidden'); }
+            } catch(e) {
+                console.error('loadReports error:', e);
+                document.getElementById('reports-table-body').innerHTML = `<tr><td colspan="6" class="py-8 text-center text-sm text-red-500">Failed to load reports: ${e.message}</td></tr>`;
+            }
+        }
+
+        function updateReportsStats() {
+            document.getElementById('rep-stat-total').textContent      = allReports.length;
+            document.getElementById('rep-stat-open').textContent       = allReports.filter(r => r.status === 'open').length;
+            document.getElementById('rep-stat-inprogress').textContent = allReports.filter(r => r.status === 'in_progress').length;
+            document.getElementById('rep-stat-resolved').textContent   = allReports.filter(r => r.status === 'resolved').length;
+        }
+
+        function filterReports(filter) {
+            currentReportFilter = filter;
+            document.querySelectorAll('.rep-filter-btn').forEach(b => {
+                b.classList.remove('bg-on-surface','text-surface');
+                b.classList.add('bg-surface-container-high','text-on-surface-variant');
+            });
+            const active = document.getElementById(`rep-filter-${filter}`);
+            active.classList.add('bg-on-surface','text-surface');
+            active.classList.remove('bg-surface-container-high','text-on-surface-variant');
+            const filtered = filter === 'all' ? allReports : allReports.filter(r => r.status === filter);
+            renderReports(filtered);
+        }
+
+        function renderReports(reports) {
+            const tbody  = document.getElementById('reports-table-body');
+            const empty  = document.getElementById('reports-empty');
+            if (!reports || reports.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            const typeMap = {
+                bug:             { label:'Bug 🐛',              bg:'bg-red-100 text-red-700' },
+                ui_bug:          { label:'UI Issue 🎨',          bg:'bg-orange-100 text-orange-700' },
+                feature_request: { label:'Feature 💡',           bg:'bg-violet-100 text-violet-700' },
+                help:            { label:'Help ❓',              bg:'bg-blue-100 text-blue-700' }
+            };
+            const statusMap = {
+                open:        { label:'Open',        cls:'bg-red-100 text-red-700' },
+                in_progress: { label:'In Progress', cls:'bg-amber-100 text-amber-700' },
+                resolved:    { label:'Resolved',    cls:'bg-green-100 text-green-700' }
+            };
+            tbody.innerHTML = reports.map(r => {
+                const t = typeMap[r.type] || { label: r.type, bg:'bg-surface-container-high text-on-surface-variant' };
+                const s = statusMap[r.status] || { label: r.status, cls:'bg-surface-container-high text-on-surface-variant' };
+                const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+                const page = r.page_url ? r.page_url.replace(/https?:\/\/[^\/]+/, '') : '—';
+                return `
+                <tr class="hover:bg-surface-container-lowest/50 transition-colors">
+                    <td class="py-3 px-5"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${t.bg}">${t.label}</span></td>
+                    <td class="py-3 px-5 max-w-[220px]">
+                        <p class="text-sm font-semibold text-on-surface">${r.title}</p>
+                        ${r.description ? `<p class="text-xs text-on-surface-variant truncate mt-0.5">${r.description}</p>` : ''}
+                    </td>
+                    <td class="py-3 px-5 text-xs text-on-surface-variant max-w-[160px] truncate" title="${r.page_url || ''}">${page}</td>
+                    <td class="py-3 px-5 text-xs text-on-surface-variant whitespace-nowrap">${date}</td>
+                    <td class="py-3 px-5"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${s.cls}">${s.label}</span></td>
+                    <td class="py-3 px-5">
+                        <div class="flex gap-2 items-center">
+                            <select onchange="updateReportStatus('${r.id}', this.value)" class="text-xs border border-outline-variant/30 rounded-lg px-2 py-1 bg-surface-container-lowest text-on-surface focus:outline-none">
+                                <option value="open"        ${r.status==='open'        ? 'selected':''}>Open</option>
+                                <option value="in_progress" ${r.status==='in_progress' ? 'selected':''}>In Progress</option>
+                                <option value="resolved"    ${r.status==='resolved'    ? 'selected':''}>Resolved</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function updateReportStatus(id, newStatus) {
+            try {
+                const update = { status: newStatus };
+                if (newStatus === 'resolved') update.resolved_at = new Date().toISOString();
+                await supabase.from('bug_reports').update(update).eq('id', id);
+                // Refresh in background
+                await loadReports();
+                filterReports(currentReportFilter);
+            } catch(e) { console.error('updateReportStatus error:', e); }
+        }
+
+        // ── UNIMATCH TAB ──────────────────────────────────────────────
+        async function loadUniMatch() {
+            try {
+                const [profilesRes, matchesRes, likesRes] = await Promise.all([
+                    supabase.from('profiles').select('*').eq('unimatch_profile_complete', true),
+                    supabase.from('unimatch_matches').select('*').order('matched_at', { ascending: false }),
+                    supabase.from('unimatch_likes').select('liker_id, liked_user_id, action')
+                ]);
+
+                const profiles = profilesRes.data || [];
+                const matches  = matchesRes.data  || [];
+                const likes    = likesRes.data     || [];
+
+                // Stats
+                document.getElementById('um-stat-profiles').textContent = profiles.length;
+                document.getElementById('um-stat-matches').textContent  = matches.length;
+                document.getElementById('um-stat-likes').textContent    = likes.filter(l => l.action === 'like').length;
+                const today = Date.now() - 24*60*60*1000;
+                document.getElementById('um-stat-active').textContent   = profiles.filter(p => new Date(p.updated_at).getTime() > today).length;
+
+                // Badge
+                document.getElementById('um-profiles-badge').textContent = `${profiles.length} Profiles`;
+
+                // Profile map for names
+                const profileMap = {};
+                profiles.forEach(p => { profileMap[p.id] = p.full_name || 'Student'; });
+
+                // Recent Matches
+                const recentEl = document.getElementById('um-recent-matches');
+                if (matches.length === 0) {
+                    recentEl.innerHTML = '<p class="px-5 py-6 text-center text-sm text-on-surface-variant">No matches yet.</p>';
+                } else {
+                    recentEl.innerHTML = matches.slice(0,10).map(m => {
+                        const u1 = profileMap[m.user1_id] || m.user1_id?.slice(0,8);
+                        const u2 = profileMap[m.user2_id] || m.user2_id?.slice(0,8);
+                        const d  = new Date(m.matched_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+                        return `<div class="px-5 py-3 flex items-center justify-between">
+                            <span class="text-sm font-medium text-on-surface">${u1} 💕 ${u2}</span>
+                            <span class="text-xs text-on-surface-variant">${d}</span>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Top Interests
+                const interestCount = {};
+                profiles.forEach(p => {
+                    try {
+                        const ints = typeof p.interests === 'string' ? JSON.parse(p.interests) : (p.interests || []);
+                        ints.forEach(i => { const k = i.toLowerCase().trim(); interestCount[k] = (interestCount[k]||0)+1; });
+                    } catch(e) {}
+                });
+                const sorted = Object.entries(interestCount).sort((a,b)=>b[1]-a[1]).slice(0,20);
+                const intEl = document.getElementById('um-top-interests');
+                if (sorted.length === 0) {
+                    intEl.innerHTML = '<p class="text-sm text-on-surface-variant">No interest data yet.</p>';
+                } else {
+                    intEl.innerHTML = sorted.map(([tag, count]) =>
+                        `<span class="px-3 py-1.5 bg-surface-container-high text-on-surface text-xs font-semibold rounded-full">${tag} <span class="text-on-surface-variant">${count}</span></span>`
+                    ).join('');
+                }
+
+                // Profiles Table
+                const tbody = document.getElementById('um-profiles-table');
+                if (profiles.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-sm text-on-surface-variant">No UniMatch profiles yet.</td></tr>';
+                } else {
+                    tbody.innerHTML = profiles.map(p => {
+                        const ints = (() => { try { const a = typeof p.interests==='string'?JSON.parse(p.interests):(p.interests||[]); return a.slice(0,3).join(', '); } catch { return '—'; } })();
+                        const verified = p.id_verified ? '<span class="px-2 py-0.5 text-[11px] bg-green-100 text-green-700 rounded-full font-semibold">✓ Verified</span>' : '<span class="px-2 py-0.5 text-[11px] bg-surface-container-high text-on-surface-variant rounded-full">Pending</span>';
+                        return `<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+                            <td class="py-3 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden flex-shrink-0">
+                                        ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-sm text-on-surface-variant">👤</span>`}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-on-surface">${p.full_name || '—'}</p>
+                                        <p class="text-xs text-on-surface-variant">${p.gender || ''}${p.age ? ', '+p.age : ''}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.university || p.college || '—'}</td>
+                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.year_of_study || '—'}</td>
+                            <td class="py-3 px-6 text-xs text-on-surface-variant max-w-[180px] truncate">${ints || '—'}</td>
+                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.instagram_username ? `@${p.instagram_username}` : '—'}</td>
+                            <td class="py-3 px-6">${verified}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+            } catch(e) {
+                console.error('loadUniMatch error:', e);
+            }
+        }
+
+
+
     </script>
 </body>
 </html>
