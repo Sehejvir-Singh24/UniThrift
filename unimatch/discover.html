@@ -290,12 +290,36 @@
     return INTEREST_ICONS[name.toLowerCase()] || 'interests';
   }
 
-  // ─── FEED ALGORITHM ─────────────────────────────────────────────
-  function scoreProfile(candidate, myInterests) {
+  // ─── FEED ALGORITHM v2 ──────────────────────────────────────────
+  function scoreProfile(candidate, myProfile, mutualLikerIds) {
     const ci = (() => { try { return typeof candidate.interests === 'string' ? JSON.parse(candidate.interests) : (candidate.interests || []); } catch { return []; } })();
-    const mySet = new Set((myInterests || []).map(i => i.toLowerCase().trim()));
+    const myInterests = (() => { try { return typeof myProfile.interests === 'string' ? JSON.parse(myProfile.interests) : (myProfile.interests || []); } catch { return []; } })();
+    const mySet = new Set(myInterests.map(i => i.toLowerCase().trim()));
+
     let score = 0;
+
+    // +1 per shared interest
     ci.forEach(i => { if (mySet.has(i.toLowerCase().trim())) score++; });
+
+    // +2 if same university/college
+    const myColl = (myProfile.university || myProfile.college || '').toLowerCase().trim();
+    const cColl  = (candidate.university || candidate.college || '').toLowerCase().trim();
+    if (myColl && cColl && myColl === cColl) score += 2;
+
+    // +1 if overlapping looking_for goals
+    const myGoals = (() => { try { const g = typeof myProfile.looking_for === 'string' ? JSON.parse(myProfile.looking_for) : (myProfile.looking_for || []); return g.map(x => x.toLowerCase().trim()); } catch { return []; } })();
+    const cGoals  = (() => { try { const g = typeof candidate.looking_for === 'string' ? JSON.parse(candidate.looking_for) : (candidate.looking_for || []); return g.map(x => x.toLowerCase().trim()); } catch { return []; } })();
+    if (myGoals.some(g => cGoals.includes(g))) score += 1;
+
+    // +3 if candidate has already liked you (mutual boost)
+    if (mutualLikerIds && mutualLikerIds.has(candidate.id)) score += 3;
+
+    // +1 if profile updated within last 7 days
+    if (candidate.updated_at) {
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      if (new Date(candidate.updated_at).getTime() > sevenDaysAgo) score += 1;
+    }
+
     return score;
   }
 
@@ -315,21 +339,43 @@
     return true;
   }
 
-  function buildFeedProfiles(candidates, myProfile) {
-    const myInterests = (() => { try { return typeof myProfile.interests === 'string' ? JSON.parse(myProfile.interests) : (myProfile.interests || []); } catch { return []; } })();
+  function mapToCardProfile(c) {
+    const photos = (() => { try { const arr = typeof c.profile_photos === 'string' ? JSON.parse(c.profile_photos) : (c.profile_photos || []); return arr.length > 0 ? arr : (c.avatar_url ? [c.avatar_url] : []); } catch { return c.avatar_url ? [c.avatar_url] : []; } })();
+    const interests = (() => { try { return typeof c.interests === 'string' ? JSON.parse(c.interests) : (c.interests || []); } catch { return []; } })();
+    const lookingFor = (() => { try { const arr = typeof c.looking_for === 'string' ? JSON.parse(c.looking_for) : (c.looking_for || []); return arr[0] || ''; } catch { return ''; } })();
+    return { id: c.id, name: c.full_name || 'Student', age: c.age || null, major: c.major || c.college || '', year: c.year_of_study || '', university: c.university || c.college || 'GGSIPU', gender: c.gender || '', goal: lookingFor.toUpperCase(), instagram: c.instagram_username || '', bio: c.bio || '', interests, photos: photos.length > 0 ? photos : ['https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80'], _score: c._score };
+  }
+
+  // Three-tier feed:
+  //   Tier 1 — Never-swiped profiles, sorted by score (high to low)
+  //   Tier 2 — Passed (not liked) profiles, sorted by score — shown only when Tier 1 is empty
+  //   Tier 3 — Liked profiles → NEVER shown
+  function buildFeedProfiles(allCandidates, myProfile, likedIds, passedIds, mutualLikerIds) {
     const myPreferredGender = myProfile.preferred_gender || 'Everyone';
-    let filtered = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true && isGenderMatch(c.gender, myPreferredGender));
-    if (filtered.length === 0 && candidates.length > 0) {
-      filtered = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true);
-    }
-    const scored = filtered.map(c => ({ ...c, _score: scoreProfile(c, myInterests) }));
-    scored.sort((a, b) => b._score - a._score);
-    return scored.map(c => {
-      const photos = (() => { try { const arr = typeof c.profile_photos === 'string' ? JSON.parse(c.profile_photos) : (c.profile_photos || []); return arr.length > 0 ? arr : (c.avatar_url ? [c.avatar_url] : []); } catch { return c.avatar_url ? [c.avatar_url] : []; } })();
-      const interests = (() => { try { return typeof c.interests === 'string' ? JSON.parse(c.interests) : (c.interests || []); } catch { return []; } })();
-      const lookingFor = (() => { try { const arr = typeof c.looking_for === 'string' ? JSON.parse(c.looking_for) : (c.looking_for || []); return arr[0] || ''; } catch { return ''; } })();
-      return { id: c.id, name: c.full_name || 'Student', age: c.age || null, major: c.major || c.college || '', year: c.year_of_study || '', university: c.university || c.college || 'GGSIPU', gender: c.gender || '', goal: lookingFor.toUpperCase(), instagram: c.instagram_username || '', bio: c.bio || '', interests, photos: photos.length > 0 ? photos : ['https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=780&q=80'], _score: c._score };
-    });
+    const blockedIds = (() => { try { return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]'); } catch { return []; } })();
+
+    // Base filter: exclude self, incomplete profiles, blocked users, and liked profiles
+    const base = allCandidates.filter(c =>
+      c.id !== myProfile.id &&
+      c.unimatch_profile_complete === true &&
+      !blockedIds.includes(c.id) &&
+      !likedIds.has(c.id)   // ← liked profiles NEVER appear
+    );
+
+    // Gender filter with graceful fallback
+    let genderFiltered = base.filter(c => isGenderMatch(c.gender, myPreferredGender));
+    if (genderFiltered.length === 0 && base.length > 0) genderFiltered = base;
+
+    // Tier 1: never interacted with
+    const unswiped = genderFiltered.filter(c => !passedIds.has(c.id) && !likedIds.has(c.id));
+    // Tier 2: passed (not liked) — fallback
+    const passed   = genderFiltered.filter(c =>  passedIds.has(c.id));
+
+    const score = c => scoreProfile(c, myProfile, mutualLikerIds);
+    const sort  = arr => arr.map(c => ({ ...c, _score: score(c) })).sort((a, b) => b._score - a._score);
+
+    // Tier 1 first, Tier 2 appended at the end
+    return [...sort(unswiped), ...sort(passed)].map(mapToCardProfile);
   }
 
   let currentUserId = null;
@@ -344,19 +390,28 @@
     remainingLikes = likesInfo.remaining;
     document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
 
-    // Fetch user's past likes and student candidate profiles in PARALLEL for max speed
-    let alreadySwiped = new Set();
+    // Fetch my past swipes (with action), mutual likers, and all candidates in PARALLEL
+    let likedIds       = new Set(); // profiles I liked   → never show in feed
+    let passedIds      = new Set(); // profiles I passed  → show as fallback
+    let mutualLikerIds = new Set();
     let candidates = [];
     let error = null;
 
     try {
-      const [likesRes, candidatesRes] = await Promise.all([
-        supabase.from('unimatch_likes').select('liked_user_id').eq('liker_id', myProfile.id),
+      const [mySwipesRes, theirLikesRes, candidatesRes] = await Promise.all([
+        supabase.from('unimatch_likes').select('liked_user_id, action').eq('liker_id', myProfile.id),
+        supabase.from('unimatch_likes').select('liker_id').eq('liked_user_id', myProfile.id).eq('action', 'like'),
         supabase.from('profiles').select('*').eq('unimatch_profile_complete', true)
       ]);
 
-      if (likesRes && likesRes.data) {
-        likesRes.data.forEach(l => alreadySwiped.add(l.liked_user_id));
+      if (mySwipesRes && mySwipesRes.data) {
+        mySwipesRes.data.forEach(l => {
+          if (l.action === 'like') likedIds.add(l.liked_user_id);
+          else                     passedIds.add(l.liked_user_id);
+        });
+      }
+      if (theirLikesRes && theirLikesRes.data) {
+        theirLikesRes.data.forEach(l => mutualLikerIds.add(l.liker_id));
       }
       candidates = (candidatesRes && candidatesRes.data) || [];
       error = candidatesRes && candidatesRes.error;
@@ -365,15 +420,7 @@
     }
 
     if (!error && candidates && candidates.length > 0) {
-      const blockedIds = (() => { try { return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]'); } catch { return []; } })();
-      const otherCandidates = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true && !blockedIds.includes(c.id));
-      const unswiped = otherCandidates.filter(c => !alreadySwiped.has(c.id));
-
-      if (unswiped.length > 0) {
-        DISCOVERY_PROFILES = buildFeedProfiles(unswiped, myProfile || {});
-      } else {
-        DISCOVERY_PROFILES = [];
-      }
+      DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {}, likedIds, passedIds, mutualLikerIds);
     }
 
     renderCard(0);
