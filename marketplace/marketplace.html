@@ -174,67 +174,7 @@
         initMarketplace();
       });
     </script>
-  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto flex items-center justify-between"><div class="flex items-center gap-3"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface hidden sm:inline">UniThrift</span></div><div id="platform-switcher-slot"></div></div><h1 class="hidden">Marketplace</h1>
-
-<div id="header-auth-area" class="flex items-center">
-  <!-- Populated dynamically -->
-</div></div></header><main class="pt-16 pb-[120px] md:pb-8 bg-background min-h-screen"><div class="flex flex-col w-full px-container-padding-mobile md:px-6 md:max-w-7xl md:mx-auto gap-stack-md">
-
-<!-- How UniThrift Marketplace Works Banner -->
-<div id="marketplace-how-it-works" class="mt-4 bg-gradient-to-r from-emerald-900/10 via-primary/5 to-surface-container-high rounded-2xl p-4 border border-primary/20 relative shadow-sm transition-all duration-300">
-  <div class="flex items-start justify-between gap-3">
-    <div class="flex items-start gap-3">
-      <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-        <span class="material-symbols-outlined text-[20px]">storefront</span>
-      </div>
-      <div class="flex flex-col gap-1">
-        <h3 class="font-title-md text-sm font-bold text-on-surface flex items-center gap-1.5">
-          How UniThrift Marketplace Works 💡
-        </h3>
-        <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
-          • <strong>Browse & Make Offers:</strong> Connect directly with verified campus students.<br/>
-          • <strong>Reserve Safely:</strong> Reserve items with a <strong>25% secure deposit</strong> to unlock exact seller contact & campus meetup location.<br/>
-          • <strong>Safe Pickup:</strong> Meet on campus, inspect your item, and pay the rest!
-        </p>
-      </div>
-    </div>
-    <button onclick="document.getElementById('marketplace-how-it-works').remove()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-black/5 transition-colors shrink-0" aria-label="Close guide">
-      <span class="material-symbols-outlined text-[18px]">close</span>
-    </button>
-  </div>
-</div>
-
-<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x pt-2">
-<button class="snap-start shrink-0 flex items-center gap-1 px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-caps transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-<span class="material-symbols-outlined text-[18px]">filter_list</span>
-            Filters
-        </button>
-<button class="snap-start shrink-0 px-4 py-2 bg-primary text-on-primary rounded-full font-label-caps transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-            All Items
-        </button>
-<button class="snap-start shrink-0 px-4 py-2 bg-surface-container text-on-surface-variant rounded-full font-label-caps transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-            Under $50
-        </button>
-<button class="snap-start shrink-0 px-4 py-2 bg-surface-container text-on-surface-variant rounded-full font-label-caps transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-            Textbooks
-        </button>
-<button class="snap-start shrink-0 px-4 py-2 bg-surface-container text-on-surface-variant rounded-full font-label-caps transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-            Electronics
-        </button>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter" id="marketplace-grid">
-<!-- Product cards will be injected here by JavaScript -->
-<div class="col-span-2 md:col-span-4 lg:col-span-5 flex flex-col items-center justify-center py-12 text-center gap-3" id="marketplace-placeholder">
-  <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-    <span class="material-symbols-outlined text-[32px]">inventory_2</span>
-  </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">Loading items...</p>
-</div><!-- Floating Action Button for Selling -->
-<button id="sell-fab-btn" onclick="handleSellClick()" class="fixed bottom-[120px] right-4 z-[60] bg-primary text-on-primary rounded-full px-5 py-4 shadow-[0_4px_20px_rgba(0,110,47,0.3)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform">
-    <span class="material-symbols-outlined text-[24px]">add</span>
-    <span id="sell-fab-text" class="font-title-md text-[16px]">Sell</span>
-</button>
-</main>
+  </head><body class="bg-background font-body-lg text-on-background">
 
 <!-- Sell Options Modal -->
 <div id="sell-options-modal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center hidden">
