@@ -237,10 +237,11 @@
       }
     });
 
-    let filtered = _allProducts;
-    if (type === 'under50') filtered = _allProducts.filter(p => p.price < 500);
-    if (type === 'textbooks') filtered = _allProducts.filter(p => p.category && p.category.toLowerCase().includes('book'));
-    if (type === 'electronics') filtered = _allProducts.filter(p => p.category && p.category.toLowerCase().includes('electron'));
+    let availableOnly = _allProducts.filter(p => !p.status || p.status.toLowerCase() === 'available');
+    let filtered = availableOnly;
+    if (type === 'under50') filtered = availableOnly.filter(p => p.price < 500);
+    if (type === 'textbooks') filtered = availableOnly.filter(p => p.category && p.category.toLowerCase().includes('book'));
+    if (type === 'electronics') filtered = availableOnly.filter(p => p.category && p.category.toLowerCase().includes('electron'));
 
     renderGrid(filtered);
   }
@@ -486,7 +487,7 @@
     // Load products
     try {
       const products = await getAllProducts();
-      _allProducts = products || [];
+      _allProducts = (products || []).filter(p => !p.status || p.status.toLowerCase() === 'available');
       renderGrid(_allProducts);
     } catch(e) {
       console.error('Failed to load products:', e);

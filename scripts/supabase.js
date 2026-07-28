@@ -510,20 +510,21 @@ async function getProductById(id) {
 }
 
 
-// Helper: Get All Products for Marketplace
+// Helper: Get All Available Products for Marketplace
 async function getAllProducts() {
   // Primary query: join with profiles for seller name
   try {
     const { data: products, error } = await supabase
       .from('products')
       .select('*, profiles!seller_id(full_name)')
+      .neq('status', 'Reserved')
+      .neq('status', 'Sold')
       .order('created_at', { ascending: false });
 
-    if (!error) {
-      // Return even if empty — empty marketplace is valid
-      return products || [];
+    if (!error && products) {
+      return products.filter(p => !p.status || p.status.toLowerCase() === 'available');
     }
-    console.warn('[getAllProducts] join query error, falling back:', error.message);
+    console.warn('[getAllProducts] join query error, falling back:', error?.message);
   } catch(e) {
     console.warn('[getAllProducts] join query threw, falling back:', e);
   }
@@ -533,12 +534,14 @@ async function getAllProducts() {
     const { data: simpleProducts, error: simpleError } = await supabase
       .from('products')
       .select('*')
+      .neq('status', 'Reserved')
+      .neq('status', 'Sold')
       .order('created_at', { ascending: false });
 
-    if (!simpleError) {
-      return simpleProducts || [];
+    if (!simpleError && simpleProducts) {
+      return simpleProducts.filter(p => !p.status || p.status.toLowerCase() === 'available');
     }
-    console.error('[getAllProducts] fallback error:', simpleError.message);
+    console.error('[getAllProducts] fallback error:', simpleError?.message);
   } catch(e) {
     console.error('[getAllProducts] fallback threw:', e);
   }
