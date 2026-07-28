@@ -529,8 +529,12 @@ async function getAllProducts() {
   return [];
 }
 // Helper: Get Active Boosted Products (for Home Page Trending Offers ⚡)
+// STRICT RULE: Only returns products where is_boosted=true AND boosted_until > now()
+// Never falls back to showing all products — returns [] if no paid active boosts exist.
 async function getBoostedProducts() {
   const nowStr = new Date().toISOString();
+
+  // Primary: join with profiles for full seller name
   try {
     const { data, error } = await supabase
       .from('products')
@@ -539,26 +543,34 @@ async function getBoostedProducts() {
       .gt('boosted_until', nowStr)
       .order('boosted_until', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      return data;
+    if (!error) {
+      // Return as-is — empty array means no active boosts (correct behaviour)
+      return data || [];
     }
-  } catch(e) {}
+    console.warn('[getBoostedProducts] join query error, trying simple query:', error.message);
+  } catch(e) {
+    console.warn('[getBoostedProducts] join query threw:', e);
+  }
 
-  // Fallback 1: query without boosted_until check
+  // Fallback: same strict filter but without the profile join
   try {
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('is_boosted', true)
-      .order('created_at', { ascending: false });
+      .gt('boosted_until', nowStr)
+      .order('boosted_until', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      return data;
+    if (!error) {
+      return data || [];
     }
-  } catch(e) {}
+    console.error('[getBoostedProducts] fallback error:', error.message);
+  } catch(e) {
+    console.error('[getBoostedProducts] fallback threw:', e);
+  }
 
-  // Fallback 2: regular products
-  return await getAllProducts();
+  // Never show un-boosted products in Trending Offers
+  return [];
 }
 
 // Helper: Boost Product Listing (⚡ ₹19/day, min 2 days)
