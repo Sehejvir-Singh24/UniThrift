@@ -506,34 +506,41 @@ async function getAllProducts() {
   }
   return products || [];
 }
-// Helper: Get Boosted Products (for Home Page Trending Offers ⚡)
+// Helper: Get Active Boosted Products (for Home Page Trending Offers ⚡)
 async function getBoostedProducts() {
+  const nowStr = new Date().toISOString();
   try {
     const { data, error } = await supabase
       .from('products')
       .select('*, profiles!seller_id(full_name)')
       .eq('is_boosted', true)
-      .order('created_at', { ascending: false });
+      .gt('boosted_until', nowStr)
+      .order('boosted_until', { ascending: false });
 
     if (!error && data && data.length > 0) {
       return data;
     }
   } catch(e) {}
 
-  // Return regular products if no items are boosted yet
+  // Fallback to regular products if no active boosted items
   return await getAllProducts();
 }
 
-// Helper: Boost Product Listing (⚡ ₹59)
-async function boostProductListing(productId) {
+// Helper: Boost Product Listing (⚡ ₹19/day, min 2 days)
+async function boostProductListing(productId, days = 2) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Please log in to boost a listing.");
+
+  const boostDays = Math.max(2, parseInt(days) || 2);
+  const now = new Date();
+  const until = new Date(now.getTime() + (boostDays * 24 * 60 * 60 * 1000));
 
   const { error } = await supabase
     .from('products')
     .update({
       is_boosted: true,
-      boosted_at: new Date().toISOString()
+      boosted_at: now.toISOString(),
+      boosted_until: until.toISOString()
     })
     .eq('id', productId)
     .eq('seller_id', session.user.id);
@@ -542,6 +549,11 @@ async function boostProductListing(productId) {
     console.error("Error boosting product:", error);
     throw error;
   }
+}
+
+function calculateBoostCost(days) {
+  const boostDays = Math.max(2, parseInt(days) || 2);
+  return boostDays * 19;
 }
 
 // Helper: Calculate Listing Fee for New Products

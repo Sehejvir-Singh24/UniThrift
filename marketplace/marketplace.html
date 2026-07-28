@@ -212,8 +212,6 @@
           <div class="flex items-center gap-3">
             <div class="w-14 h-14 rounded-xl bg-surface-container overflow-hidden shrink-0">
               ${p.image_url ? `<img src="${p.image_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-sm">📦</span>`}
-            </div>
-            <div>
               <h4 class="font-body-sm text-xs font-bold text-on-background truncate max-w-[140px]">${escapeHTML(p.title)}</h4>
               <p class="text-xs text-primary font-bold">₹${p.price}</p>
               ${p.is_boosted ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">⚡ Boosted</span>` : ''}
@@ -222,7 +220,7 @@
           <div class="flex flex-col gap-1.5 shrink-0">
             <button onclick="triggerBoostPayment('${p.id}', '${escapeHTML(p.title).replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl ${p.is_boosted ? 'bg-emerald-600 text-white' : 'bg-primary text-white'} font-title-md text-xs font-bold shadow-sm hover:scale-105 transition-transform flex items-center gap-1">
               <span class="material-symbols-outlined text-[14px]">bolt</span>
-              ${p.is_boosted ? 'Boosted ⚡' : 'Boost ₹59'}
+              ${p.is_boosted ? 'Boosted ⚡' : 'Boost ⚡'}
             </button>
             <a href="/core/profile.html" class="text-center text-[10px] text-on-surface-variant hover:underline">Edit details</a>
           </div>
@@ -235,36 +233,105 @@
   }
 
   function triggerBoostPayment(productId, productTitle) {
-    const options = {
-      key: 'rzp_test_placeholder',
-      amount: 5900,
-      currency: 'INR',
-      name: 'UniThrift Marketplace',
-      description: `Boost Listing: ${productTitle}`,
-      handler: async function (response) {
-        try {
-          await boostProductListing(productId);
-          alert('⚡ Success! Your product is now boosted and featured on the Home page Trending Offers!');
-          window.location.reload();
-        } catch(e) {
-          alert('Failed to update boost status: ' + e.message);
-        }
-      },
-      prefill: { name: 'UniThrift Student' },
-      theme: { color: '#006e2f' }
-    };
+    let modal = document.getElementById('boost-days-picker-modal');
+    if (!modal) {
+      const modalHTML = `
+        <div id="boost-days-picker-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+          <div class="bg-surface-container-lowest w-full max-w-sm rounded-3xl p-6 flex flex-col gap-4 shadow-2xl border border-outline-variant/30 text-left">
+            <div class="flex justify-between items-center pb-2 border-b border-outline-variant/30">
+              <div>
+                <h3 class="font-title-md text-base text-on-surface font-bold">⚡ Boost Product</h3>
+                <p id="boost-modal-product-title" class="font-body-sm text-xs text-on-surface-variant truncate max-w-[220px]"></p>
+              </div>
+              <button onclick="document.getElementById('boost-days-picker-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
 
-    if (window.Razorpay) {
-      const rzp = new Razorpay(options);
-      rzp.open();
-    } else {
-      if (confirm(`Confirm ₹59 payment to Boost "${productTitle}" on Home page?`)) {
-        boostProductListing(productId).then(() => {
-          alert('⚡ Success! Your product is now boosted and featured on the Home page Trending Offers!');
-          window.location.reload();
-        }).catch(err => alert("Error: " + err.message));
-      }
+            <div class="flex flex-col gap-3">
+              <div class="bg-primary/5 p-3 rounded-2xl border border-primary/20 flex flex-col gap-1">
+                <span class="text-xs font-bold text-primary">Daily Rate: ₹19 / day</span>
+                <span class="text-[11px] text-on-surface-variant">Minimum duration requirement is 2 days.</span>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-on-surface">Select Duration (Days):</label>
+                <select id="boost-modal-days-select" onchange="updateBoostModalCost()" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl p-3 text-sm font-bold text-on-surface outline-none">
+                  <option value="2">2 Days (₹38)</option>
+                  <option value="3">3 Days (₹57)</option>
+                  <option value="5">5 Days (₹95)</option>
+                  <option value="7">7 Days (₹133)</option>
+                  <option value="14">14 Days (₹266)</option>
+                  <option value="30">30 Days (₹570)</option>
+                </select>
+              </div>
+
+              <div class="flex justify-between items-center py-2 px-1 border-t border-outline-variant/30 mt-1">
+                <span class="text-xs font-bold text-on-surface">Total Amount:</span>
+                <span id="boost-modal-total-cost" class="font-title-md text-lg text-primary font-bold">₹38</span>
+              </div>
+
+              <button id="boost-modal-pay-btn" class="w-full py-3.5 rounded-2xl bg-primary text-white font-title-md text-sm font-bold shadow-md hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">bolt</span>
+                Proceed to Pay & Boost
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      modal = document.getElementById('boost-days-picker-modal');
     }
+
+    document.getElementById('boost-modal-product-title').textContent = productTitle;
+    const select = document.getElementById('boost-modal-days-select');
+    select.value = "2";
+    
+    window.updateBoostModalCost = function() {
+      const days = parseInt(select.value) || 2;
+      const cost = days * 19;
+      document.getElementById('boost-modal-total-cost').textContent = `₹${cost}`;
+    };
+    updateBoostModalCost();
+
+    modal.classList.remove('hidden');
+
+    document.getElementById('boost-modal-pay-btn').onclick = function() {
+      const days = parseInt(select.value) || 2;
+      const cost = days * 19;
+      modal.classList.add('hidden');
+
+      const options = {
+        key: 'rzp_test_placeholder',
+        amount: cost * 100,
+        currency: 'INR',
+        name: 'UniThrift Marketplace',
+        description: `Boost (${days} Days): ${productTitle}`,
+        handler: async function (response) {
+          try {
+            await boostProductListing(productId, days);
+            alert(`⚡ Success! Your product is now boosted for ${days} days and featured on the Home page Trending Offers!`);
+            window.location.reload();
+          } catch(e) {
+            alert('Failed to update boost status: ' + e.message);
+          }
+        },
+        prefill: { name: 'UniThrift Student' },
+        theme: { color: '#006e2f' }
+      };
+
+      if (window.Razorpay) {
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } else {
+        if (confirm(`Confirm ₹${cost} payment to Boost "${productTitle}" for ${days} days?`)) {
+          boostProductListing(productId, days).then(() => {
+            alert(`⚡ Success! Your product is now boosted for ${days} days and featured on the Home page Trending Offers!`);
+            window.location.reload();
+          }).catch(err => alert("Error: " + err.message));
+        }
+      }
+    };
   }
 
   document.addEventListener('DOMContentLoaded', async () => {

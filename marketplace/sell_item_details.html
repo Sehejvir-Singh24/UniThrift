@@ -192,15 +192,31 @@
             <span id="fee-amount-badge" class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold text-xs">FREE</span>
           </div>
 
-          <label class="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-emerald-900/10 via-primary/5 to-surface-container-high border border-primary/30 cursor-pointer hover:bg-primary/10 transition-colors">
-            <input type="checkbox" id="boost-checkbox" class="w-5 h-5 accent-primary rounded cursor-pointer shrink-0"/>
-            <div class="flex flex-col">
-              <span class="font-title-md text-xs font-bold text-on-surface flex items-center gap-1">
-                ⚡ Boost Listing for ₹59
-              </span>
-              <span class="font-body-sm text-[11px] text-on-surface-variant">Feature on the Home page Trending Offers!</span>
+          <div class="flex flex-col gap-2 p-3.5 rounded-xl bg-gradient-to-r from-emerald-900/10 via-primary/5 to-surface-container-high border border-primary/30">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" id="boost-checkbox" onchange="toggleBoostOptions()" class="w-5 h-5 accent-primary rounded cursor-pointer shrink-0"/>
+              <div class="flex flex-col flex-1">
+                <span class="font-title-md text-xs font-bold text-on-surface flex items-center gap-1">
+                  ⚡ Boost Listing (₹19 / day)
+                </span>
+                <span class="font-body-sm text-[11px] text-on-surface-variant">Feature on the Home page Trending Offers!</span>
+              </div>
+            </label>
+
+            <div id="boost-days-container" class="hidden flex items-center justify-between pt-2 border-t border-primary/20">
+              <span class="font-label-caps text-xs text-on-surface font-semibold">Boost Duration (Min 2 Days):</span>
+              <div class="flex items-center gap-2">
+                <select id="boost-days-select" class="bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-2.5 py-1 text-xs font-bold text-primary outline-none">
+                  <option value="2">2 Days (₹38)</option>
+                  <option value="3">3 Days (₹57)</option>
+                  <option value="5">5 Days (₹95)</option>
+                  <option value="7">7 Days (₹133)</option>
+                  <option value="14">14 Days (₹266)</option>
+                  <option value="30">30 Days (₹570)</option>
+                </select>
+              </div>
             </div>
-          </label>
+          </div>
         </div>
 
       </form>
@@ -279,6 +295,18 @@
       document.getElementById('item-price')?.addEventListener('input', updateFeeDisplay);
       document.addEventListener('DOMContentLoaded', updateFeeDisplay);
 
+      function toggleBoostOptions() {
+        const checkbox = document.getElementById('boost-checkbox');
+        const container = document.getElementById('boost-days-container');
+        if (checkbox && container) {
+          if (checkbox.checked) {
+            container.classList.remove('hidden');
+          } else {
+            container.classList.add('hidden');
+          }
+        }
+      }
+
       // Publish listing to Supabase
       async function publishListing() {
         const title = document.getElementById('item-title').value.trim();
@@ -287,6 +315,9 @@
         const originalPrice = parseFloat(document.getElementById('item-original-price').value) || null;
         const category = document.querySelector('.cat-btn.selected')?.textContent.trim() || null;
         const isBoosted = document.getElementById('boost-checkbox')?.checked || false;
+        const boostDays = isBoosted ? (parseInt(document.getElementById('boost-days-select')?.value) || 2) : 0;
+        const now = new Date();
+        const boostedUntil = isBoosted ? new Date(now.getTime() + (boostDays * 24 * 60 * 60 * 1000)).toISOString() : null;
 
         if (!title || !price) {
           alert('Please fill in at least the Title and Your Price.');
@@ -349,7 +380,8 @@
             image_url: imageUrl,
             image_urls: imageUrls,
             is_boosted: isBoosted,
-            boosted_at: isBoosted ? new Date().toISOString() : null,
+            boosted_at: isBoosted ? now.toISOString() : null,
+            boosted_until: boostedUntil,
             listing_fee_paid: _currentFee
           });
 
