@@ -1,12 +1,14 @@
 /**
  * coming-soon.js
  * Injects a "Coming Soon" bottom-sheet modal on any page and intercepts
- * navigation to /roommates/ and /pghostels/ sections.
+ * navigation to /pghostels/ and /roommates/ sections.
  */
 (function () {
+  'use strict';
+
   // ─── Inject modal HTML ───────────────────────────────────────────────
   const modalHTML = `
-  <div id="coming-soon-modal" class="fixed inset-0 z-[200] flex items-end justify-center hidden" aria-modal="true" role="dialog">
+  <div id="coming-soon-modal" class="fixed inset-0 z-[999999] flex items-end justify-center hidden" aria-modal="true" role="dialog">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideComingSoon()"></div>
     <div id="coming-soon-sheet" class="relative w-full max-w-lg rounded-t-[28px] p-8 flex flex-col items-center gap-5 shadow-[0_-8px_40px_rgba(0,0,0,0.15)] translate-y-full transition-transform duration-300 ease-out" style="background:#ffffff">
       <div class="w-10 h-1 rounded-full mx-auto -mt-2" style="background:rgba(0,0,0,0.15)"></div>
@@ -25,26 +27,37 @@
     </div>
   </div>`;
 
-  document.addEventListener('DOMContentLoaded', function () {
-    // Only inject if not already present (index.html has its own)
+  function init() {
+    if (!document.body) {
+      setTimeout(init, 50);
+      return;
+    }
     if (!document.getElementById('coming-soon-modal')) {
       document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
+  }
 
-    // Intercept all links pointing to pghostels
-    document.querySelectorAll('a[href*="/pghostels/"]').forEach(function (link) {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const href = link.getAttribute('href') || '';
-        const title = 'PG & Hostel Finder';
-        const desc = "Browse verified PGs and hostels near your campus. We're putting the finishing touches on this!";
-        showComingSoon(title, desc);
-      });
-    });
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // ─── Capture-phase event delegation for all PG / Hostel clicks ─────────────
+  document.addEventListener('click', function (e) {
+    const target = e.target.closest('a[href*="/pghostels/"], [data-path="hostel-hub"], [onclick*="/pghostels/"], .pg-trigger');
+    if (target) {
+      e.preventDefault();
+      e.stopPropagation();
+      const title = 'PG & Hostel Finder';
+      const desc = "Browse verified PGs and hostels near your campus. We're putting the finishing touches on this!";
+      showComingSoon(title, desc);
+    }
+  }, true);
 
   // ─── Global show/hide functions ──────────────────────────────────────
   window.showComingSoon = function (title, desc) {
+    init();
     const modal = document.getElementById('coming-soon-modal');
     const sheet = document.getElementById('coming-soon-sheet');
     if (!modal) return;

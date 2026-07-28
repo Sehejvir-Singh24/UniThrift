@@ -1,0 +1,246 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary": "#ffffff", "on-surface-variant": "#3d4a3d", "surface-bright": "#f8f9ff", "on-primary-fixed": "#002109", "surface-dim": "#cbdbf5", "primary-fixed-dim": "#4ae176", "inverse-on-surface": "#eaf1ff", "outline": "#6d7b6c", "surface": "#f8f9ff", "on-secondary-fixed-variant": "#3f465c", "surface-container-low": "#eff4ff", "secondary-fixed-dim": "#bec6e0", "on-secondary-container": "#5c647a", "tertiary-fixed-dim": "#bdcac1", "secondary-fixed": "#dae2fd", "error": "#ba1a1a", "tertiary-container": "#a2afa7", "inverse-on-surface": "#eaf1ff", "outline-variant": "#bccbb9", "on-tertiary-fixed": "#131e19", "secondary-container": "#dae2fd", "on-tertiary-fixed-variant": "#3e4943", "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "on-tertiary": "#ffffff", "tertiary-fixed": "#d9e6dd", "surface-tint": "#006e2f", "tertiary": "#55615a", "surface-container-highest": "#d3e4fe", "on-secondary": "#ffffff", "primary-container": "#22c55e", "background": "#f8f9ff", "primary-fixed": "#6bff8f", "primary": "#006e2f", "on-primary-fixed-variant": "#005321", "on-secondary-fixed": "#131b2e", "surface-container": "#e5eeff", "error-container": "#ffdad6", "surface-container-high": "#dce9ff", "on-tertiary-container": "#37433c", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", "on-primary-container": "#004b1e", "secondary": "#565e74", "inverse-primary": "#4ae176", "on-background": "#0b1c30", "on-surface": "#0b1c30" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "stack-sm": "8px", "stack-md": "16px", "stack-lg": "32px", "unit": "4px", "container-padding-mobile": "20px", "container-padding-desktop": "48px", "gutter": "16px" }, "fontFamily": { "body-lg": ["Geist"], "headline-lg-mobile": ["Geist"], "title-md": ["Geist"], "headline-lg": ["Geist"], "label-caps": ["Geist"], "body-sm": ["Geist"], "display-lg": ["Geist"] }, "fontSize": { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700" }] } } } }</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); } } .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-lg text-on-background"><header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-padding-mobile flex items-center justify-between"><div class="flex items-center gap-stack-sm"><img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/><span class="font-title-md text-title-md text-on-surface">UniThrift</span></div><h1 class="hidden">Dashboard</h1><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/></div></header><main class="pt-16 pb-24 bg-background min-h-screen"><div class="flex flex-col w-full gap-stack-lg pb-stack-lg">
+<!-- Header & Search -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md mt-stack-md">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Good morning, Alex 👋</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Ready to find a steal today?</p>
+</div>
+<div class="relative flex items-center w-full bg-surface-container-highest rounded-full shadow-sm px-4 py-3 transition-transform duration-200 focus-within:scale-[1.02] focus-within:shadow-md">
+<span class="material-symbols-outlined text-on-surface-variant mr-3">search</span>
+<input class="bg-transparent w-full font-body-lg text-body-lg text-on-background outline-none placeholder:text-on-surface-variant/60" placeholder="Search campus essentials..." type="text"/>
+<button class="bg-primary-container text-on-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm hover:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Categories -->
+<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4">
+<div class="flex gap-stack-md pb-2">
+<!-- Category Item -->
+<button class="flex flex-col items-center gap-2 group min-w-[72px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]">menu_book</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">Books</span>
+</button>
+<button class="flex flex-col items-center gap-2 group min-w-[72px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]">science</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">Lab Coats</span>
+</button>
+<button class="flex flex-col items-center gap-2 group min-w-[72px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]">devices</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">Gadgets</span>
+</button>
+<button class="flex flex-col items-center gap-2 group min-w-[72px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]">pedal_bike</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">Cycles</span>
+</button>
+<button class="flex flex-col items-center gap-2 group min-w-[72px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center shadow-sm group-hover:bg-primary-container group-hover:text-on-primary transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]">apartment</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">PGs</span>
+</button>
+</div>
+</div>
+<!-- Trending Items -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md">
+<div class="flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-background">Trending Offers ⚡</h3>
+<button class="font-label-caps text-label-caps text-primary-container">See All</button>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
+<div class="relative w-full aspect-square bg-surface-container-low">
+<div class="bg-cover bg-center w-full h-full" data-alt="A softly lit photograph of a nearly new mechanical engineering textbook sitting on a clean wooden desk. A subtle green coffee mug is in the slightly blurred background, emphasizing a calm study environment. Minimalist and bright aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFfXGuC1fXSns6cUi7eh4ubu9ag3VJWAp92ndsa8ZWzDaEt1NKSqtU7eCjN3cExyiFQk12vDgRl3YSJH7xL3wEUBh8z-uputunsnwhdWNE0c59ZZTsVjSrOQqsGN_T5LttSqAN6T2-csDriACqqV8zcSR6X599l91cLFWrrjDTgRNgMDfV9r47i2x_cMlubiY-mpkdeEMVuP78yeIQM5nF6khvSHZEdbZg_aWoypv7aYKAZnocDyOP7HqXQ3RfBUTDQBJH5_XUXc8b')"></div>
+<div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[12px] text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-caps text-[10px] text-on-surface">Verified</span>
+</div>
+<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-lowest/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-1">
+<h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">Engineering Math V4</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Like New</p>
+<div class="flex items-center justify-between mt-1">
+<span class="font-title-md text-[18px] text-primary-container">$45</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant line-through">$80</span>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300">
+<div class="relative w-full aspect-square bg-surface-container-low">
+<div class="bg-cover bg-center w-full h-full" data-alt="A sleek black noise-canceling headphone resting on a white minimalist dorm room shelf. Natural sunlight casts soft shadows. A tiny vibrant green succulent sits next to it." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDDyAOvj7q60Ampac_9k_bza_iawy_fE5D_HP0u9Z-aRLyIB0dkH-wd9bP2CiJmP3fCVEgj2UyqWT_ltuh0S0LvzSzTrsx-ubeg9uRUCp3TMaVJ0SsXT57syMrfgaWaCCEKXI2X5f7bd0KGN8hLMuNwOvM8le6RcHyabsVu0BtlCw6t67Mw7gmTbn-xWpLocP58FdoPytz4EH6uc5BmYEGMPUU9igokgosDEMyQmECJoT3JrAz7Q_sXwtHWCP2i7vCYtPxzseAXyjBs')"></div>
+<div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[12px] text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-caps text-[10px] text-on-surface">Verified</span>
+</div>
+<button class="absolute top-2 right-2 w-8 h-8 bg-surface-container-lowest/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-1">
+<h4 class="font-body-sm text-body-sm text-on-background font-semibold truncate">Sony WH-1000XM4</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Good</p>
+<div class="flex items-center justify-between mt-1">
+<span class="font-title-md text-[18px] text-primary-container">$120</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant line-through">$350</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sponsored PGs -->
+<div class="flex flex-col gap-stack-md mt-4">
+<div class="px-container-padding-mobile flex justify-between items-end">
+<div>
+<h3 class="font-title-md text-title-md text-on-background">Near Campus Stays</h3>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Sponsored PGs & Hostels</p>
+</div>
+<button class="font-label-caps text-label-caps text-primary-container flex items-center gap-1">
+        Map <span class="material-symbols-outlined text-[16px]">explore</span>
+</button>
+</div>
+<div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4 pb-4 snap-x snap-mandatory">
+<div class="flex gap-gutter w-max">
+<!-- PG Card -->
+<div class="w-[280px] bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col snap-start">
+<div class="relative w-full h-40">
+<div class="bg-cover bg-center w-full h-full" data-alt="A beautifully lit, modern student accommodation room with a cozy bed, crisp white linens, a wooden study desk, and a large window showing green campus trees outside." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAuUPfF1o9YOkPRgQHoT6UltXjGr-u06EZAHbfTTTkMGxeT2Ep37IMERTngn51GD_Upy_ZAx1iItrRqdvYB_ww7bRkOnoDY3axsae9vVzaoCzRc9MSfXzL1M3Z1hnQa_9KSY7sEFXd_uARJIx4Ij8AfLR7mAbDOsN2G73lryiBFXbEr3UV-AlaICRB-qbxaHjtR3dOJwRgFJ7Yq2a81s8mxvIkHVFulGGGYT-3WRc_EKmQ0zI7I4Wq0hrqZ6jiInCJjlQNn0-DEnVnH')"></div>
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+<span class="font-label-caps text-label-caps text-on-surface font-bold">8 min walk</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h4 class="font-body-lg text-body-lg text-on-background font-semibold leading-tight">Greenwoods Hostel</h4>
+<div class="flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-[10px] text-on-surface font-bold">4.8</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">AC, WiFi, Meals included</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="font-title-md text-title-md text-on-background">$400<span class="font-body-sm text-body-sm text-on-surface-variant font-normal">/mo</span></span>
+</div>
+</div>
+</div>
+<!-- PG Card 2 -->
+<div class="w-[280px] bg-surface-container-lowest rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col snap-start">
+<div class="relative w-full h-40">
+<div class="bg-cover bg-center w-full h-full" data-alt="A trendy coliving space lounge area for students. Features a comfy green velvet sofa, a communal kitchen island, and bright pendant lights. Very inviting and modern." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDX4j9SYNS6oozro-AgKjhtzX2YI_Fyiy4tYsQed_ky39TkhgPq2wph4Eh3jjW3NqNGxEDn1BKuopo_kz5iuHMBVVWfIBuy2_Orka1SYTvwQoLCc7ZklwXkij6gEfGyLoDLcFMTK8C1uFsAKz8nxxwTRvdm1AMhcLf1K93M-5rLLP7-KTpfMp14x2ezpjWmuvDdJB9ptZw0EdEMpStV489TVPMIs9XYqEPrX5OGx7oV7f_Y2EbDshD2hKqnuhwll_QTT9xUscbVnSwV')"></div>
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+<span class="font-label-caps text-label-caps text-on-surface font-bold">12 min walk</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h4 class="font-body-lg text-body-lg text-on-background font-semibold leading-tight">The Hive Coliving</h4>
+<div class="flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-[10px] text-on-surface font-bold">4.9</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Gym, Library, En-suite</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="font-title-md text-title-md text-on-background">$550<span class="font-body-sm text-body-sm text-on-surface-variant font-normal">/mo</span></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended Flatmates -->
+<div class="px-container-padding-mobile flex flex-col gap-stack-md mt-2">
+<div class="flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-background">Looking for Roomies</h3>
+</div>
+<div class="w-full overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
+<div class="flex gap-4 w-max">
+<!-- Flatmate 1 -->
+<div class="w-[140px] bg-surface-container-low rounded-2xl p-4 flex flex-col items-center gap-3 text-center snap-start shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="relative">
+<img class="w-16 h-16 rounded-full object-cover shadow-sm" data-alt="A friendly, smiling college student with glasses and curly hair, wearing a casual green hoodie. Soft natural outdoor lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdAw6qmHQkE9BAGN3O4wQe5KinPvcDeypDra-V88Uus3PSHd7UJZqbBO6EJ7Pq0jpex5QUnUES3FhzSRTouAKTsDzExwTVVszFA5oRcMLZpJdXMmiwZdVtSW3X3MpxpLlcBUzW7pmIyp4ICd6MtMFSxW-yA6HvJ_aaBjOdYo9dXDqFQDSTyUjI9QkFe9UPpyxN23b3Dp1CFfzglfZoIBlgCKDn31fb5qjuixb7jV1V-RM-0HEh7CkajNj5NeLEe1OwvnJAfhBcu6To"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-primary-container rounded-full shadow-sm flex items-center justify-center">
+<div class="w-2 h-2 bg-on-primary rounded-full"></div>
+</div>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-background">Sam K.</h4>
+<p class="font-label-caps text-[10px] text-on-surface-variant">2nd Year, CS</p>
+</div>
+<div class="flex flex-wrap justify-center gap-1 mt-1">
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Night Owl</span>
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Neat</span>
+</div>
+</div>
+<!-- Flatmate 2 -->
+<div class="w-[140px] bg-surface-container-low rounded-2xl p-4 flex flex-col items-center gap-3 text-center snap-start shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="relative">
+<img class="w-16 h-16 rounded-full object-cover shadow-sm" data-alt="A vibrant, energetic college student wearing a stylish denim jacket. Smiling broadly, background is softly blurred university architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxqegqJINSPEoJ4KVZVKlS2oDu7JuXpxvsBm9Lph9O0u0OvXG6YDd8mQedKMAQIMx66FyYSdUAusVSv2Av9rcu5iO7CjOCDuxrq-zPio3VvbIjn2iF7IcohprC3J4bfqUG6a5OkI2XCNvBPXaI_N0zi4vHX3Uz6QyLmrmpRGpSGxQco6Pvtsdbug2RVMXqarJhbPxGPA0LqF3wvjG-lI9gAqPoET5zVeXnPcPTldnOxv2gAZ9qvJPTxWyXvyiF0lGUsJ7oUiSlaFN1"/>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-background">Jordan M.</h4>
+<p class="font-label-caps text-[10px] text-on-surface-variant">3rd Year, Arts</p>
+</div>
+<div class="flex flex-wrap justify-center gap-1 mt-1">
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Early Bird</span>
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Gamer</span>
+</div>
+</div>
+<!-- Flatmate 3 -->
+<div class="w-[140px] bg-surface-container-low rounded-2xl p-4 flex flex-col items-center gap-3 text-center snap-start shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="relative">
+<img class="w-16 h-16 rounded-full object-cover shadow-sm" data-alt="A relaxed, approachable college student in a plain white t-shirt. They are holding a coffee cup, standing in a brightly lit campus cafe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmqI9cuR3CLUTwaMlYzXme1l52xP8CCb7cP4IHZbHvIxBnmKRjMWgf4Sic1SEv-GZxeBcbJjuFRp8Ko14zOL7-BA7HDUmh-fCoh3D9kXB7nYxgJAv1BtijncL5u7ztb6jbcHww9LVRKzTo0DwIJYQWrag0pk3re8sX_65dzqtj4IC8EFXUGod0KDw3qDaB2wUBMhe1TuFStMr6pbVG3Cdo-CRLO-PS9UNk6F7HOX3qvoS_x5K561jHJApahed8yfQoJ4mktztlUqkB"/>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-background">Priya T.</h4>
+<p class="font-label-caps text-[10px] text-on-surface-variant">Masters, Biz</p>
+</div>
+<div class="flex flex-wrap justify-center gap-1 mt-1">
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Quiet</span>
+<span class="bg-surface-container px-2 py-1 rounded-full font-label-caps text-[9px] text-on-surface">Gym</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple intersection observer to add a playful entrance animation to cards as they scroll into view
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const animatedCards = document.querySelectorAll('.grid > div, .snap-start');
+    animatedCards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `opacity 0.5s ease ${index * 0.05}s, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) ${index * 0.05}s`;
+      observer.observe(card);
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container"><div class="flex justify-around items-center h-16 px-4"><a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary-container" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="marketplace" href="#"><span class="material-symbols-outlined">shopping_bag</span><span class="font-label-caps text-label-caps">Market</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="flatmates" href="#"><span class="material-symbols-outlined">group</span><span class="font-label-caps text-label-caps">Mates</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="hostel-hub" href="#"><span class="material-symbols-outlined">apartment</span><span class="font-label-caps text-label-caps">PG/Hostel</span></a><a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary-container transition-colors" data-path="account" href="#"><span class="material-symbols-outlined">verified_user</span><span class="font-label-caps text-label-caps">Profile</span></a></div></nav></body></html>
