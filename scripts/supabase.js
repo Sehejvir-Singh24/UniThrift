@@ -51,14 +51,21 @@ async function getProfile(forceRefresh = false) {
     .eq('id', session.user.id)
     .single();
 
-  if (error) {
-    console.error("Error fetching profile:", error);
-    return null;
+  if (error || !profile) {
+    console.warn("Profile row missing or fetch error, returning fallback profile for user:", session.user.id);
+    const fallbackProfile = {
+      id: session.user.id,
+      full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Campus Student',
+      email: session.user.email,
+      avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
+      enrollment_number: null,
+      college: null,
+      role: 'student'
+    };
+    _cachedProfile = fallbackProfile;
+    try { sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(fallbackProfile)); } catch (e) {}
+    return fallbackProfile;
   }
-
-  _cachedProfile = profile;
-  try { sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(profile)); } catch (e) {}
-  return profile;
 }
 
 async function refreshProfileInBackground() {
@@ -680,17 +687,31 @@ function renderProductCard(product) {
 
 // Helper: Get Products by Seller ID
 async function getUserProducts(userId) {
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('*, profiles!seller_id(full_name)')
-    .eq('seller_id', userId)
-    .order('created_at', { ascending: false });
+  try {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*, profiles!seller_id(full_name)')
+      .eq('seller_id', userId)
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error("Error fetching user products:", error);
-    return [];
-  }
-  return products || [];
+    if (!error && products) {
+      return products;
+    }
+  } catch(e) {}
+
+  try {
+    const { data: simpleProducts, error: simpleError } = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (!simpleError && simpleProducts) {
+      return simpleProducts;
+    }
+  } catch(e) {}
+
+  return [];
 }
 
 // Helper: Update Product
