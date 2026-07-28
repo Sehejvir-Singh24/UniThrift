@@ -73,9 +73,45 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) throw new Error('Unauthorized');
 
-    // ✅ STEP 3: Calculate deposit (25%)
-    const depositAmount = (product_price * 0.25).toFixed(2);
-    const remainingAmount = (product_price * 0.75).toFixed(2);
+    // ✅ STEP 2.5: Fetch actual product price from database securely
+    const { data: product, error: productError } = await supabaseClient
+      .from('products')
+      .select('price')
+      .eq('id', product_id)
+      .single();
+
+    if (productError || !product) {
+      throw new Error('Product not found or error fetching price');
+    }
+    const actual_product_price = parseFloat(product.price);
+
+    // ✅ STEP 3: Calculate deposit (25%) using trusted database price
+    const depositAmount = (actual_product_price * 0.25).toFixed(2);
+    const remainingAmount = (actual_product_price * 0.75).toFixed(2);
+
+    // ✅ STEP 3.5: Fetch order details from Razorpay to verify the amount paid
+    const RAZORPAY_KEY_ID = Deno.env.get('RAZORPAY_KEY_ID');
+    if (!RAZORPAY_KEY_ID) {
+      throw new Error('Razorpay Key ID not configured');
+    }
+
+    const orderResponse = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Basic ' + btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)
+      }
+    });
+
+    if (!orderResponse.ok) {
+      throw new Error('Failed to verify order details with Razorpay');
+    }
+
+    const orderDetails = await orderResponse.json();
+    const expectedAmountPaise = Math.round(parseFloat(depositAmount) * 100);
+
+    if (orderDetails.amount < expectedAmountPaise) {
+      throw new Error(`Payment amount tampering detected. Paid: ${orderDetails.amount}, Required: ${expectedAmountPaise}`);
+    }
 
     // ✅ STEP 4: Create the reservation in the database
     const { data: reservation, error: resError } = await supabaseClient
