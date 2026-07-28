@@ -495,27 +495,36 @@ async function getProductById(id) {
 
 // Helper: Get All Products for Marketplace
 async function getAllProducts() {
+  // Primary query: join with profiles for seller name
   try {
     const { data: products, error } = await supabase
       .from('products')
       .select('*, profiles!seller_id(full_name)')
       .order('created_at', { ascending: false });
 
-    if (!error && products && products.length > 0) {
-      return products;
+    if (!error) {
+      // Return even if empty — empty marketplace is valid
+      return products || [];
     }
-  } catch(e) {}
+    console.warn('[getAllProducts] join query error, falling back:', error.message);
+  } catch(e) {
+    console.warn('[getAllProducts] join query threw, falling back:', e);
+  }
 
+  // Fallback: simple query without join
   try {
     const { data: simpleProducts, error: simpleError } = await supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!simpleError && simpleProducts) {
-      return simpleProducts;
+    if (!simpleError) {
+      return simpleProducts || [];
     }
-  } catch(e) {}
+    console.error('[getAllProducts] fallback error:', simpleError.message);
+  } catch(e) {
+    console.error('[getAllProducts] fallback threw:', e);
+  }
 
   return [];
 }
