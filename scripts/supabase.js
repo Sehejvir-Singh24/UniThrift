@@ -501,11 +501,11 @@ async function getAllProducts() {
       .select('*, profiles!seller_id(full_name)')
       .order('created_at', { ascending: false });
 
-    if (!error && products && products.length > 0) {
+    if (!error && Array.isArray(products)) {
       return products;
     }
-    if (error) console.warn("getAllProducts join query returned error:", error);
-  } catch(e) { console.warn("getAllProducts join exception:", e); }
+    if (error) console.warn("getAllProducts join query error:", error);
+  } catch(e) { console.warn("getAllProducts exception:", e); }
 
   try {
     const { data: simpleProducts, error: simpleError } = await supabase
@@ -513,11 +513,10 @@ async function getAllProducts() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!simpleError && simpleProducts) {
+    if (!simpleError && Array.isArray(simpleProducts)) {
       return simpleProducts;
     }
-    if (simpleError) console.error("getAllProducts simple query returned error:", simpleError);
-  } catch(e) { console.error("getAllProducts fallback exception:", e); }
+  } catch(e) {}
 
   return [];
 }
