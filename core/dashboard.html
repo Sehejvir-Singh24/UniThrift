@@ -160,52 +160,9 @@
           </a>
         </div>
         <div class="w-full overflow-x-auto no-scrollbar pl-container-padding-mobile pr-4 pb-2 snap-x snap-mandatory">
-          <div class="flex gap-4 w-max">
-            <!-- Sample PG Card 1 -->
-            <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
-              <div class="relative w-full h-36 bg-surface-container-low">
-                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuUPfF1o9YOkPRgQHoT6UltXjGr-u06EZAHbfTTTkMGxeT2Ep37IMERTngn51GD_Upy_ZAx1iItrRqdvYB_ww7bRkOnoDY3axsae9vVzaoCzRc9MSfXzL1M3Z1hnQa_9KSY7sEFXd_uARJIx4Ij8AfLR7mAbDOsN2G73lryiBFXbEr3UV-AlaICRB-qbxaHjtR3dOJwRgFJ7Yq2a81s8mxvIkHVFulGGGYT-3WRc_EKmQ0zI7I4Wq0hrqZ6jiInCJjlQNn0-DEnVnH" alt="Greenwoods Hostel"/>
-                <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
-                  <span class="font-label-caps text-[10px] text-on-surface font-bold">8 min walk</span>
-                </div>
-              </div>
-              <div class="p-3 flex flex-col gap-1">
-                <div class="flex justify-between items-start">
-                  <h4 class="font-body-lg text-sm text-on-background font-semibold">Greenwoods Hostel</h4>
-                  <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
-                    <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="font-label-caps text-[10px] text-on-surface font-bold">4.8</span>
-                  </div>
-                </div>
-                <p class="font-body-sm text-xs text-on-surface-variant truncate">AC, WiFi, Meals included</p>
-                <div class="mt-1 flex items-center justify-between">
-                  <span class="font-title-md text-sm text-primary font-bold">₹8,500<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sample PG Card 2 -->
-            <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
-              <div class="relative w-full h-36 bg-surface-container-low">
-                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX4j9SYNS6oozro-AgKjhtzX2YI_Fyiy4tYsQed_ky39TkhgPq2wph4Eh3jjW3NqNGxEDn1BKuopo_kz5iuHMBVVWfIBuy2_Orka1SYTvwQoLCc7ZklwXkij6gEfGyLoDLcFMTK8C1uFsAKz8nxxwTRvdm1AMhcLf1K93M-5rLLP7-KTpfMp14x2ezpjWmuvDdJB9ptZw0EdEMpStV489TVPMIs9XYqEPrX5OGx7oV7f_Y2EbDshD2hKqnuhwll_QTT9xUscbVnSwV" alt="The Hive Coliving"/>
-                <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
-                  <span class="font-label-caps text-[10px] text-on-surface font-bold">12 min walk</span>
-                </div>
-              </div>
-              <div class="p-3 flex flex-col gap-1">
-                <div class="flex justify-between items-start">
-                  <h4 class="font-body-lg text-sm text-on-background font-semibold">The Hive Coliving</h4>
-                  <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
-                    <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="font-label-caps text-[10px] text-on-surface font-bold">4.9</span>
-                  </div>
-                </div>
-                <p class="font-body-sm text-xs text-on-surface-variant truncate">Gym, Library, En-suite</p>
-                <div class="mt-1 flex items-center justify-between">
-                  <span class="font-title-md text-sm text-primary font-bold">₹11,000<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
-                </div>
-              </div>
-            </div>
+          <div id="pg-container" class="flex gap-4 w-max">
+            <div class="animate-pulse bg-surface-container w-[260px] h-48 rounded-[20px]"></div>
+            <div class="animate-pulse bg-surface-container w-[260px] h-48 rounded-[20px]"></div>
           </div>
         </div>
       </div>
@@ -217,36 +174,9 @@
           <a href="/roommates/flatmates.html" class="font-label-caps text-xs text-primary font-semibold hover:underline">View All</a>
         </div>
         <div class="w-full overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
-          <div class="flex gap-3 w-max">
-            <!-- Flatmate 1 -->
-            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdAw6qmHQkE9BAGN3O4wQe5KinPvcDeypDra-V88Uus3PSHd7UJZqbBO6EJ7Pq0jpex5QUnUES3FhzSRTouAKTsDzExwTVVszFA5oRcMLZpJdXMmiwZdVtSW3X3MpxpLlcBUzW7pmIyp4ICd6MtMFSxW-yA6HvJ_aaBjOdYo9dXDqFQDSTyUjI9QkFe9UPpyxN23b3Dp1CFfzglfZoIBlgCKDn31fb5qjuixb7jV1V-RM-0HEh7CkajNj5NeLEe1OwvnJAfhBcu6To" alt="Sam K."/>
-              <h4 class="font-body-sm text-xs font-bold text-on-background">Sam K.</h4>
-              <p class="font-label-caps text-[10px] text-on-surface-variant">2nd Year, CS</p>
-              <div class="flex flex-wrap justify-center gap-1 mt-2">
-                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Night Owl</span>
-              </div>
-            </div>
-
-            <!-- Flatmate 2 -->
-            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxqegqJINSPEoJ4KVZVKlS2oDu7JuXpxvsBm9Lph9O0u0OvXG6YDd8mQedKMAQIMx66FyYSdUAusVSv2Av9rcu5iO7CjOCDuxrq-zPio3VvbIjn2iF7IcohprC3J4bfqUG6a5OkI2XCNvBPXaI_N0zi4vHX3Uz6QyLmrmpRGpSGxQco6Pvtsdbug2RVMXqarJhbPxGPA0LqF3wvjG-lI9gAqPoET5zVeXnPcPTldnOxv2gAZ9qvJPTxWyXvyiF0lGUsJ7oUiSlaFN1" alt="Jordan M."/>
-              <h4 class="font-body-sm text-xs font-bold text-on-background">Jordan M.</h4>
-              <p class="font-label-caps text-[10px] text-on-surface-variant">3rd Year, Arts</p>
-              <div class="flex flex-wrap justify-center gap-1 mt-2">
-                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Gamer</span>
-              </div>
-            </div>
-
-            <!-- Flatmate 3 -->
-            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmqI9cuR3CLUTwaMlYzXme1l52xP8CCb7cP4IHZbHvIxBnmKRjMWgf4Sic1SEv-GZxeBcbJjuFRp8Ko14zOL7-BA7HDUmh-fCoh3D9kXB7nYxgJAv1BtijncL5u7ztb6jbcHww9LVRKzTo0DwIJYQWrag0pk3re8sX_65dzqtj4IC8EFXUGod0KDw3qDaB2wUBMhe1TuFStMr6pbVG3Cdo-CRLO-PS9UNk6F7HOX3qvoS_x5K561jHJApahed8yfQoJ4mktztlUqkB" alt="Priya T."/>
-              <h4 class="font-body-sm text-xs font-bold text-on-background">Priya T.</h4>
-              <p class="font-label-caps text-[10px] text-on-surface-variant">Masters, Biz</p>
-              <div class="flex flex-wrap justify-center gap-1 mt-2">
-                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Quiet</span>
-              </div>
-            </div>
+          <div id="roommates-container" class="flex gap-3 w-max">
+            <div class="animate-pulse bg-surface-container w-[150px] h-36 rounded-2xl"></div>
+            <div class="animate-pulse bg-surface-container w-[150px] h-36 rounded-2xl"></div>
           </div>
         </div>
       </div>
@@ -325,7 +255,168 @@
       } catch(e) { console.error('Profile fetch error:', e); }
 
       loadTrendingProducts();
+      loadNearCampusStays();
+      loadRoommates();
       loadReservations();
+    }
+
+    async function loadNearCampusStays() {
+      const container = document.getElementById('pg-container');
+      try {
+        const { data: pgs, error } = await supabase
+          .from('pg_listings')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (error || !pgs || pgs.length === 0) {
+          renderDefaultPGs(container);
+          return;
+        }
+
+        container.innerHTML = pgs.map(pg => {
+          const img = pg.image_url || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=500&q=80';
+          const rating = pg.rating || '4.8';
+          const dist = pg.distance_to_campus || 'Near Campus';
+          const price = pg.price ? `₹${Number(pg.price).toLocaleString('en-IN')}` : '₹8,500';
+          return `
+            <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
+              <div class="relative w-full h-36 bg-surface-container-low">
+                <img class="w-full h-full object-cover" src="${img}" alt="${escapeHTML(pg.title)}" onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=500&q=80'"/>
+                <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span class="font-label-caps text-[10px] text-on-surface font-bold">${escapeHTML(dist)}</span>
+                </div>
+              </div>
+              <div class="p-3 flex flex-col gap-1">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-body-lg text-sm text-on-background font-semibold truncate">${escapeHTML(pg.title)}</h4>
+                  <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="font-label-caps text-[10px] text-on-surface font-bold">${rating}</span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-xs text-on-surface-variant truncate">${escapeHTML(pg.type || 'Co-Ed PG')} • ${escapeHTML(pg.address || 'Near Campus')}</p>
+                <div class="mt-1 flex items-center justify-between">
+                  <span class="font-title-md text-sm text-primary font-bold">${price}<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        console.error('loadNearCampusStays error:', e);
+        renderDefaultPGs(container);
+      }
+    }
+
+    function renderDefaultPGs(container) {
+      container.innerHTML = `
+        <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
+          <div class="relative w-full h-36 bg-surface-container-low">
+            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuUPfF1o9YOkPRgQHoT6UltXjGr-u06EZAHbfTTTkMGxeT2Ep37IMERTngn51GD_Upy_ZAx1iItrRqdvYB_ww7bRkOnoDY3axsae9vVzaoCzRc9MSfXzL1M3Z1hnQa_9KSY7sEFXd_uARJIx4Ij8AfLR7mAbDOsN2G73lryiBFXbEr3UV-AlaICRB-qbxaHjtR3dOJwRgFJ7Yq2a81s8mxvIkHVFulGGGYT-3WRc_EKmQ0zI7I4Wq0hrqZ6jiInCJjlQNn0-DEnVnH" alt="Greenwoods Hostel"/>
+            <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
+              <span class="font-label-caps text-[10px] text-on-surface font-bold">8 min walk</span>
+            </div>
+          </div>
+          <div class="p-3 flex flex-col gap-1">
+            <div class="flex justify-between items-start">
+              <h4 class="font-body-lg text-sm text-on-background font-semibold">Greenwoods Hostel</h4>
+              <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
+                <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="font-label-caps text-[10px] text-on-surface font-bold">4.8</span>
+              </div>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant truncate">AC, WiFi, Meals included</p>
+            <div class="mt-1 flex items-center justify-between">
+              <span class="font-title-md text-sm text-primary font-bold">₹8,500<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
+            </div>
+          </div>
+        </div>
+        <div onclick="window.location.href='/pghostels/pghostels.html'" class="w-[260px] bg-surface-container-lowest rounded-[20px] shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col snap-start cursor-pointer hover:shadow-md transition-shadow">
+          <div class="relative w-full h-36 bg-surface-container-low">
+            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX4j9SYNS6oozro-AgKjhtzX2YI_Fyiy4tYsQed_ky39TkhgPq2wph4Eh3jjW3NqNGxEDn1BKuopo_kz5iuHMBVVWfIBuy2_Orka1SYTvwQoLCc7ZklwXkij6gEfGyLoDLcFMTK8C1uFsAKz8nxxwTRvdm1AMhcLf1K93M-5rLLP7-KTpfMp14x2ezpjWmuvDdJB9ptZw0EdEMpStV489TVPMIs9XYqEPrX5OGx7oV7f_Y2EbDshD2hKqnuhwll_QTT9xUscbVnSwV" alt="The Hive Coliving"/>
+            <div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm">
+              <span class="font-label-caps text-[10px] text-on-surface font-bold">12 min walk</span>
+            </div>
+          </div>
+          <div class="p-3 flex flex-col gap-1">
+            <div class="flex justify-between items-start">
+              <h4 class="font-body-lg text-sm text-on-background font-semibold">The Hive Coliving</h4>
+              <div class="flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded-full">
+                <span class="material-symbols-outlined text-[12px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="font-label-caps text-[10px] text-on-surface font-bold">4.9</span>
+              </div>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant truncate">Gym, Library, En-suite</p>
+            <div class="mt-1 flex items-center justify-between">
+              <span class="font-title-md text-sm text-primary font-bold">₹11,000<span class="font-body-sm text-xs text-on-surface-variant font-normal">/mo</span></span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function loadRoommates() {
+      const container = document.getElementById('roommates-container');
+      try {
+        const { data: listings, error } = await supabase
+          .from('roommate_listings')
+          .select('*, profiles!user_id(full_name, avatar_url, college, year_of_study)')
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (error || !listings || listings.length === 0) {
+          renderDefaultRoommates(container);
+          return;
+        }
+
+        container.innerHTML = listings.map(item => {
+          const p = item.profiles || {};
+          const name = p.full_name ? p.full_name.split(' ')[0] : (item.title || 'Student');
+          const avatar = p.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80';
+          const sub = p.college || item.preferred_area || 'Near Campus';
+          const tag = (item.tags && item.tags.length > 0) ? item.tags[0] : `₹${item.budget || 5000}/mo`;
+
+          return `
+            <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+              <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="${avatar}" alt="${escapeHTML(name)}" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80'"/>
+              <h4 class="font-body-sm text-xs font-bold text-on-background truncate max-w-[130px]">${escapeHTML(name)}</h4>
+              <p class="font-label-caps text-[10px] text-on-surface-variant truncate max-w-[130px]">${escapeHTML(sub)}</p>
+              <div class="flex flex-wrap justify-center gap-1 mt-2">
+                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface truncate max-w-[120px]">${escapeHTML(tag)}</span>
+              </div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        console.error('loadRoommates error:', e);
+        renderDefaultRoommates(container);
+      }
+    }
+
+    function renderDefaultRoommates(container) {
+      container.innerHTML = `
+        <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+          <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdAw6qmHQkE9BAGN3O4wQe5KinPvcDeypDra-V88Uus3PSHd7UJZqbBO6EJ7Pq0jpex5QUnUES3FhzSRTouAKTsDzExwTVVszFA5oRcMLZpJdXMmiwZdVtSW3X3MpxpLlcBUzW7pmIyp4ICd6MtMFSxW-yA6HvJ_aaBjOdYo9dXDqFQDSTyUjI9QkFe9UPpyxN23b3Dp1CFfzglfZoIBlgCKDn31fb5qjuixb7jV1V-RM-0HEh7CkajNj5NeLEe1OwvnJAfhBcu6To" alt="Sam K."/>
+          <h4 class="font-body-sm text-xs font-bold text-on-background">Sam K.</h4>
+          <p class="font-label-caps text-[10px] text-on-surface-variant">2nd Year, CS</p>
+          <div class="flex flex-wrap justify-center gap-1 mt-2">
+            <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Night Owl</span>
+          </div>
+        </div>
+        <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+          <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxqegqJINSPEoJ4KVZVKlS2oDu7JuXpxvsBm9Lph9O0u0OvXG6YDd8mQedKMAQIMx66FyYSdUAusVSv2Av9rcu5iO7CjOCDuxrq-zPio3VvbIjn2iF7IcohprC3J4bfqUG6a5OkI2XCNvBPXaI_N0zi4vHX3Uz6QyLmrmpRGpSGxQco6Pvtsdbug2RVMXqarJhbPxGPA0LqF3wvjG-lI9gAqPoET5zVeXnPcPTldnOxv2gAZ9qvJPTxWyXvyiF0lGUsJ7oUiSlaFN1" alt="Jordan M."/>
+          <h4 class="font-body-sm text-xs font-bold text-on-background">Jordan M.</h4>
+          <p class="font-label-caps text-[10px] text-on-surface-variant">3rd Year, Arts</p>
+          <div class="flex flex-wrap justify-center gap-1 mt-2">
+            <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Gamer</span>
+          </div>
+        </div>
+        <div onclick="window.location.href='/roommates/flatmates.html'" class="w-[150px] bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-3 flex flex-col items-center text-center snap-start shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+          <img class="w-14 h-14 rounded-full object-cover shadow-sm mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmqI9cuR3CLUTwaMlYzXme1l52xP8CCb7cP4IHZbHvIxBnmKRjMWgf4Sic1SEv-GZxeBcbJjuFRp8Ko14zOL7-BA7HDUmh-fCoh3D9kXB7nYxgJAv1BtijncL5u7ztb6jbcHww9LVRKzTo0DwIJYQWrag0pk3re8sX_65dzqtj4IC8EFXUGod0KDw3qDaB2wUBMhe1TuFStMr6pbVG3Cdo-CRLO-PS9UNk6F7HOX3qvoS_x5K561jHJApahed8yfQoJ4mktztlUqkB" alt="Priya T."/>
+          <h4 class="font-body-sm text-xs font-bold text-on-background">Priya T.</h4>
+          <p class="font-label-caps text-[10px] text-on-surface-variant">Masters, Biz</p>
+          <div class="flex flex-wrap justify-center gap-1 mt-2">
+            <span class="bg-surface-container px-2 py-0.5 rounded-full text-[9px] font-semibold text-on-surface">Quiet</span>
+          </div>
+        </div>`;
     }
 
     async function loadTrendingProducts() {
