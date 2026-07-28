@@ -8,7 +8,7 @@
 
   // ── Constants ─────────────────────────────────────────────────────────────
   const SUPABASE_URL = 'https://bwhvbynmqubjwgonsywd.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3aHZieW5tcXViandnb25zeXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMTI5MzMsImV4cCI6MjA2NDU4ODkzM30.t30MFcvKDiPAGvNm7JfFP0CaJBiuFpNLuUjN8NNKQ60';
+  const SUPABASE_ANON_KEY = 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G';
 
   const TYPES = [
     { value: 'bug',             label: 'Bug 🐛',              desc: 'Something is broken' },
@@ -225,18 +225,16 @@
     submitBtn.disabled = true;
     submitBtn.innerHTML = `<span style="animation:spin 1s linear infinite;display:inline-block">⟳</span> Submitting...`;
 
-    try {
-      // Get current session (optional, works without auth too)
+      const sbClient = window.supabase || window.Supabase;
       let reporterId = null;
-      try {
-        const sbClient = window.supabase || supabase;
-        if (sbClient) {
+
+      if (sbClient) {
+        try {
           const { data: { session } } = await sbClient.auth.getSession();
           if (session?.user?.id) reporterId = session.user.id;
-        }
-      } catch(e) {}
+        } catch(e) {}
+      }
 
-      // Insert via REST directly so it works even if supabase.js isn't on the page
       const body = {
         type: selectedType,
         title,
@@ -246,26 +244,35 @@
         status: 'open'
       };
 
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/bug_reports`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(body)
-      });
+      let success = false;
 
-      if (res.ok || res.status === 201) {
+      // Use SDK if available (handles auth automatically)
+      if (sbClient) {
+        const { error } = await sbClient.from('bug_reports').insert(body);
+        if (!error) success = true;
+        else console.error('Supabase SDK error:', error);
+      } else {
+        // Fallback to REST fetch
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/bug_reports`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(body)
+        });
+        if (res.ok || res.status === 201) success = true;
+        else console.error('REST fetch error:', await res.text());
+      }
+
+      if (success) {
         closeModal();
-        // Reset form
         document.getElementById('rb-title-input').value = '';
         document.getElementById('rb-desc-input').value = '';
         showToast('Report submitted! Thanks for helping us improve 🙏');
       } else {
-        const err = await res.text();
-        console.error('Bug report error:', err);
         showToast('Submission failed. Please try again.', true);
       }
     } catch(e) {
