@@ -169,7 +169,8 @@
     });
 
     async function routeAfterAuth() {
-      const profile = await getProfile();
+      if (typeof clearProfileCache === 'function') clearProfileCache();
+      const profile = await getProfile(true);
       if (!profile) return;
 
       if (!profile.is_verified) {

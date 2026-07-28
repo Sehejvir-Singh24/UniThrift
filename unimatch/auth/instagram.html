@@ -222,23 +222,16 @@
       btn.disabled = true;
       btnText.textContent = 'Saving...';
 
-      const { data: { session } } = await supabase.auth.getSession();
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({ instagram_username: handle })
-        .eq('id', session.user.id);
-
-      if (error) {
-        document.getElementById('error-banner').textContent = 'Failed to save: ' + error.message;
+      try {
+        await updateProfile({ instagram_username: handle });
+        // Route to profile setup (step 3)
+        window.location.href = '/unimatch/profile-setup/basic-info.html';
+      } catch (err) {
+        document.getElementById('error-banner').textContent = 'Failed to save: ' + err.message;
         document.getElementById('error-banner').classList.remove('hidden');
         btn.disabled = false;
         btnText.textContent = 'Connect Instagram';
-        return;
       }
-
-      // Route to profile setup (step 3)
-      window.location.href = '/unimatch/profile-setup/basic-info.html';
     }
   </script>
 </body>

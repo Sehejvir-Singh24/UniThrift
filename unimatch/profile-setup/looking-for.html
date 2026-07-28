@@ -165,9 +165,14 @@
     btn.disabled = true;
     btn.textContent = 'Saving...';
 
-    const { data: { session } } = await supabase.auth.getSession();
-    await supabase.from('profiles').update({ looking_for: JSON.stringify(selected) }).eq('id', session.user.id);
-    window.location.href = '/unimatch/profile-setup/interests.html';
+    try {
+      await updateProfile({ looking_for: JSON.stringify(selected) });
+      window.location.href = '/unimatch/profile-setup/interests.html';
+    } catch (err) {
+      alert("Error saving: " + err.message);
+      btn.disabled = false;
+      btn.textContent = 'Continue';
+    }
   }
 </script>
 </body></html>

@@ -451,21 +451,27 @@ async function updateProfile(updates) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Not authenticated");
 
+  const payload = {
+    id: session.user.id,
+    email: session.user.email,
+    ...updates
+  };
+
   const { error } = await supabase
     .from('profiles')
-    .update(updates)
-    .eq('id', session.user.id);
+    .upsert(payload, { onConflict: 'id' });
 
   if (error) {
-    console.error("Error updating profile:", error);
-    throw error;
+    console.warn("Upsert profile warning, falling back to update:", error.message);
+    const { error: updateErr } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', session.user.id);
+    if (updateErr) throw updateErr;
   }
 
   // Clear cache & force fresh fetch on next call
   clearProfileCache();
-  if (_cachedProfile) {
-    Object.assign(_cachedProfile, updates);
-  }
 }
 
 // Helper: Get Latest Products for Dashboard Feed

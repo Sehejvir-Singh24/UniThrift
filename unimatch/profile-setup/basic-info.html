@@ -45,7 +45,6 @@
         <p style="font-size:12px;color:var(--um-text-muted);margin:0;line-height:1.5;">We've pre-filled your name & college year from your UniThrift account. Please review and complete the UniMatch-specific fields below — they stay separate from your marketplace profile.</p>
       </div>
     </div>
-    </div>
 
     <!-- Error banner -->
     <div id="error-banner" style="display:none;background:#FFDAD6;color:#BA1A1A;font-size:14px;font-weight:500;padding:12px 16px;border-radius:12px;margin-bottom:16px;"></div>
@@ -170,24 +169,23 @@
     btn.disabled = true;
     btn.textContent = 'Saving...';
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const { error } = await supabase.from('profiles').update({
-      full_name: document.getElementById('fullName').value.trim(),
-      major: document.getElementById('major').value.trim(),
-      year_of_study: document.getElementById('year').value,
-      gender: document.getElementById('gender').value,
-      preferred_gender: document.getElementById('preferred_gender').value,
-      bio: document.getElementById('bio').value.trim(),
-    }).eq('id', session.user.id);
-
-    if (error) {
-      document.getElementById('error-banner').textContent = 'Failed to save: ' + error.message;
-      document.getElementById('error-banner').classList.remove('hidden');
+    try {
+      await updateProfile({
+        full_name: document.getElementById('fullName').value.trim(),
+        major: document.getElementById('major').value.trim(),
+        year_of_study: document.getElementById('year').value,
+        gender: document.getElementById('gender').value,
+        preferred_gender: document.getElementById('preferred_gender').value,
+        bio: document.getElementById('bio').value.trim(),
+      });
+      window.location.href = '/unimatch/profile-setup/looking-for.html';
+    } catch (err) {
+      const errBanner = document.getElementById('error-banner');
+      errBanner.textContent = 'Failed to save: ' + err.message;
+      errBanner.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Continue';
-      return;
     }
-    window.location.href = '/unimatch/profile-setup/looking-for.html';
   }
 </script>
 <script src="/unimatch/clouds-init.js"></script>

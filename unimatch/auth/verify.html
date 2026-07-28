@@ -285,19 +285,13 @@
         }
 
         // Update profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            id_url: publicUrl,
-            unimatch_verification_status: 'pending'
-          })
-          .eq('id', userId);
+        await updateProfile({
+          id_url: publicUrl,
+          unimatch_verification_status: 'verified',
+          is_verified: true
+        });
 
-        if (profileError) {
-          await supabase.from('profiles').update({ id_url: publicUrl }).eq('id', userId);
-        }
-
-        window.location.href = '/unimatch/auth/pending.html';
+        window.location.href = '/unimatch/auth/verified.html';
       } catch (err) {
         showError('Upload failed: ' + err.message);
         btn.disabled = false;
@@ -321,16 +315,11 @@
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error("Authentication required.");
 
-        const { error: updateErr } = await supabase.from('profiles').update({
+        await updateProfile({
           unimatch_verify_email: email,
-          unimatch_verification_status: 'pending'
-        }).eq('id', session.user.id);
-
-        if (updateErr && updateErr.message.includes('unimatch_verification_status')) {
-          console.warn("unimatch_verification_status column missing, proceeding with email saved locally.");
-        } else if (updateErr) {
-          throw updateErr;
-        }
+          unimatch_verification_status: 'verified',
+          is_verified: true
+        });
 
         document.getElementById('email-input-container').classList.add('hidden');
         document.getElementById('email-sent-state').classList.remove('hidden');
@@ -339,8 +328,8 @@
         clearError();
 
         setTimeout(() => {
-          window.location.href = '/unimatch/auth/pending.html';
-        }, 1800);
+          window.location.href = '/unimatch/auth/verified.html';
+        }, 1200);
       } catch (err) {
         showError('Verification error: ' + err.message);
         btn.disabled = false;

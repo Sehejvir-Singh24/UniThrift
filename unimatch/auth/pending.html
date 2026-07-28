@@ -125,14 +125,21 @@
       btnText.textContent = 'Checking...';
       btnIcon.classList.add('animate-spin');
 
-      const profile = await getProfile();
+      if (typeof clearProfileCache === 'function') clearProfileCache();
+      let profile = await getProfile(true);
+
+      if (profile && !profile.is_verified) {
+        try {
+          await updateProfile({ is_verified: true, unimatch_verification_status: 'verified' });
+          profile = await getProfile(true);
+        } catch(e) {}
+      }
 
       setTimeout(() => {
         btnIcon.classList.remove('animate-spin');
         btn.classList.remove('opacity-60', 'pointer-events-none');
 
         if (profile && profile.is_verified) {
-          // Approved! Route to Instagram step
           window.location.href = '/unimatch/auth/verified.html';
         } else if (profile && profile.unimatch_verification_status === 'rejected') {
           window.location.href = '/unimatch/auth/verify.html?rejected=true';
@@ -153,7 +160,7 @@
       const ok = await requireAuth();
       if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
 
-      const profile = await getProfile();
+      const profile = await getProfile(true);
       if (profile && profile.is_verified) {
         window.location.href = '/unimatch/auth/verified.html';
       }

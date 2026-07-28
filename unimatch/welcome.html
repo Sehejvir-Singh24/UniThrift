@@ -136,7 +136,8 @@
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
-      const profile = await getProfile();
+      if (typeof clearProfileCache === 'function') clearProfileCache();
+      const profile = await getProfile(true);
       if (!profile) return;
       if (!profile.is_verified) { window.location.href = '/unimatch/auth/verify.html'; return; }
       if (!profile.instagram_username) { window.location.href = '/unimatch/auth/instagram.html'; return; }

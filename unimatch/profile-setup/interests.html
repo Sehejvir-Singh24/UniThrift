@@ -259,10 +259,7 @@
     btn.disabled = true;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await supabase.from('profiles').update({ interests: JSON.stringify(selected) }).eq('id', session.user.id);
-      }
+      await updateProfile({ interests: JSON.stringify(selected) });
       window.location.href = '/unimatch/profile-setup/photos.html';
     } catch (err) {
       console.error("Error saving interests:", err);
