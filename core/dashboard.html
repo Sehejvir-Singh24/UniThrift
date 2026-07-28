@@ -141,7 +141,7 @@
           <h3 class="font-title-md text-title-md text-on-background font-bold">Trending Offers ⚡</h3>
           <a href="/marketplace/marketplace.html" class="font-label-caps text-xs text-primary font-semibold hover:underline">See All</a>
         </div>
-        <div id="trending-products-grid" class="grid grid-cols-2 gap-4">
+        <div id="trending-products-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           <!-- Dynamic products loaded from Supabase -->
           <div class="animate-pulse bg-surface-container h-52 rounded-[20px]"></div>
           <div class="animate-pulse bg-surface-container h-52 rounded-[20px]"></div>
@@ -433,7 +433,7 @@
 
         const items = products.slice(0, 4);
         grid.innerHTML = items.map(p => `
-          <div onclick="window.location.href='/marketplace/product_detail.html?id=${p.id}'" class="bg-surface-container-lowest border border-outline-variant/30 rounded-[20px] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow cursor-pointer">
+          <div onclick="window.location.href='/marketplace/item.html?id=${p.id}'" class="bg-surface-container-lowest border border-outline-variant/30 rounded-[20px] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow cursor-pointer">
             <div class="relative w-full aspect-square bg-surface-container-low">
               ${p.image_url ? `<img src="${p.image_url}" class="w-full h-full object-cover" alt="${p.title}"/>` : `<div class="w-full h-full flex items-center justify-center text-on-surface-variant/40"><span class="material-symbols-outlined text-[32px]">image</span></div>`}
               <div class="absolute top-2 left-2 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
