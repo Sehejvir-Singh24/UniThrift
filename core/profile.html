@@ -33,21 +33,18 @@
 <span class="font-label-caps text-label-caps text-on-surface-variant">GGSIPU Verified Student</span>
 </div>
 </div>
-<!-- Stats Bento -->
+<!-- Stats Bento (Real Data) -->
 <div class="grid grid-cols-3 gap-stack-sm">
 <div class="bg-surface-container-low rounded-xl p-stack-sm flex flex-col items-center justify-center text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-<div class="flex items-center gap-1 text-primary-container mb-1">
-<span class="font-title-md text-title-md">4.9</span>
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Rating</span>
+<div id="stat-active-listings" class="font-title-md text-title-md text-primary font-bold mb-1">0</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active</span>
 </div>
 <div class="bg-surface-container-low rounded-xl p-stack-sm flex flex-col items-center justify-center text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-<div class="font-title-md text-title-md text-on-surface mb-1">24</div>
+<div id="stat-items-sold" class="font-title-md text-title-md text-on-surface font-bold mb-1">0</div>
 <span class="font-body-sm text-body-sm text-on-surface-variant">Items Sold</span>
 </div>
 <div class="bg-surface-container-low rounded-xl p-stack-sm flex flex-col items-center justify-center text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-<div class="font-title-md text-title-md text-on-surface mb-1">42</div>
+<div id="stat-transactions" class="font-title-md text-title-md text-on-surface font-bold mb-1">0</div>
 <span class="font-body-sm text-body-sm text-on-surface-variant">Transacts</span>
 </div>
 </div>
@@ -375,42 +372,90 @@
   });
 
   async function loadMyListings(userId) {
-    myProducts = await getUserProducts(userId);
+    const allProducts = await getUserProducts(userId);
+    
+    // Fetch seller reservations to identify sold/reserved items
+    let reservations = [];
+    try {
+      const { data } = await supabase
+        .from('reservations')
+        .select('product_id, status')
+        .or(`seller_id.eq.${userId},buyer_id.eq.${userId}`);
+      reservations = data || [];
+    } catch(e) {}
+
+    const soldProductIds = new Set(
+      reservations
+        .filter(r => r.status === 'Completed' || r.status === 'Reserved')
+        .map(r => r.product_id)
+    );
+
+    const activeProducts = allProducts.filter(p => !p.is_sold && p.status !== 'sold' && !soldProductIds.has(p.id));
+    const soldProducts = allProducts.filter(p => p.is_sold || p.status === 'sold' || soldProductIds.has(p.id));
+
+    // Update real stats
+    const activeStat = document.getElementById('stat-active-listings');
+    const soldStat = document.getElementById('stat-items-sold');
+    const transStat = document.getElementById('stat-transactions');
+    
+    if (activeStat) activeStat.textContent = activeProducts.length;
+    if (soldStat) soldStat.textContent = soldProducts.length;
+    if (transStat) transStat.textContent = reservations.length;
+
+    myProducts = activeProducts;
     const grid = document.getElementById('my-listings-grid');
     const countBadge = document.getElementById('listing-count');
     
-    countBadge.textContent = `${myProducts.length} Active`;
+    if (countBadge) countBadge.textContent = `${activeProducts.length} Active`;
     grid.innerHTML = '';
     
-    if (myProducts.length === 0) {
+    if (activeProducts.length === 0) {
       grid.innerHTML = `
         <div class="col-span-2 md:col-span-3 flex flex-col items-center justify-center py-8 text-center gap-3 bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant">
           <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
             <span class="material-symbols-outlined text-[24px]">storefront</span>
           </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant">You don't have any active listings yet.</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">You don't have any active listings right now.</p>
         </div>
       `;
       return;
     }
     
-    myProducts.forEach(p => {
+    activeProducts.forEach(p => {
       const imageStyle = p.image_url ? `background-image: url('${p.image_url}')` : 'background-color: var(--color-surface-container)';
       const card = `
-        <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-outline-variant/30">
           <div class="w-full aspect-square bg-cover bg-center" style="${imageStyle}"></div>
           <div class="p-3 flex flex-col gap-2">
-            <h4 class="font-body-sm text-on-surface font-semibold truncate">${p.title}</h4>
-            <span class="font-title-md text-primary-container">$${p.price}</span>
-            <div class="flex gap-2 mt-1">
-              <button onclick="openEditModal('${p.id}')" class="flex-1 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-caps hover:bg-surface-container-high transition-colors">Edit</button>
-              <button onclick="confirmDelete('${p.id}')" class="flex-1 py-1.5 rounded-lg bg-error-container/20 text-error font-label-caps hover:bg-error-container/50 transition-colors">Delete</button>
+            <h4 class="font-body-sm text-on-surface font-semibold truncate">${escapeHTML(p.title)}</h4>
+            <span class="font-title-md text-primary font-bold">₹${p.price}</span>
+            <div class="flex flex-col gap-1.5 mt-1">
+              <div class="flex gap-2">
+                <button onclick="openEditModal('${p.id}')" class="flex-1 py-1 rounded-lg bg-surface-container text-on-surface-variant font-label-caps text-[11px] hover:bg-surface-container-high transition-colors">Edit</button>
+                <button onclick="confirmDelete('${p.id}')" class="flex-1 py-1 rounded-lg bg-error-container/20 text-error font-label-caps text-[11px] hover:bg-error-container/50 transition-colors">Delete</button>
+              </div>
+              <button onclick="markAsSold('${p.id}')" class="w-full py-1.5 rounded-lg bg-primary/10 text-primary font-label-caps text-[11px] font-bold hover:bg-primary/20 transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">check_circle</span> Mark as Sold
+              </button>
             </div>
           </div>
         </div>
       `;
       grid.insertAdjacentHTML('beforeend', card);
     });
+  }
+
+  async function markAsSold(id) {
+    if (confirm("Mark this listing as Sold? It will be removed from your active listings.")) {
+      try {
+        await updateProduct(id, { status: 'sold', is_sold: true });
+        const profile = await getProfile();
+        await loadMyListings(profile.id);
+      } catch(e) {
+        console.error(e);
+        alert("Failed to update listing status.");
+      }
+    }
   }
 
   function openEditModal(id) {
