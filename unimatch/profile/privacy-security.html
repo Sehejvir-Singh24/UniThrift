@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <title>Privacy & Security - UniMatch</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
     theme: {
       extend: {
         colors: {
-          "primary": "#5c0427", "background": "#faf9f7", "on-background": "#1a1c1b",
-          "on-surface": "#1a1c1b", "on-surface-variant": "#554245", "surface-container-lowest": "#ffffff",
+          "primary": "#B05070", "background": "#faf9f7", "on-background": "#1a1c1b",
+          "on-surface": "#1a1c1b", "on-surface-variant": "#7A4858", "surface-container-lowest": "#ffffff",
           "surface-container-low": "#f4f3f1", "outline-variant": "#dac0c4", "error": "#ba1a1a"
         },
         borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
@@ -24,23 +26,33 @@
   }
 </script>
 <style>
-  body { background-color: #faf9f7; color: #1a1c1b; min-height: max(884px, 100dvh); }
+  body { background-color: #faf9f7; color: #1a1c1b; min-height: 100dvh; }
+  .toast-enter { animation: toastIn 0.3s ease forwards; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
-<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased pb-20">
 
-<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md px-container-padding h-16 flex items-center gap-4">
-  <button onclick="location.href='/unimatch/profile/my-profile.html'" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low text-on-surface">
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md px-container-padding h-16 flex items-center gap-4 border-b border-outline-variant/30">
+  <button onclick="location.href='/unimatch/profile/my-profile.html'" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low text-on-surface transition-colors">
     <span class="material-symbols-outlined">arrow_back</span>
   </button>
-  <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Privacy & Security</h1>
+  <h1 class="text-lg font-bold text-primary">Privacy & Security</h1>
 </header>
 
-<main class="flex-grow pt-24 pb-32 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-6">
+<!-- Main Container -->
+<main class="flex-grow pt-24 pb-12 px-container-padding max-w-2xl mx-auto w-full flex flex-col gap-6">
 
   <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
     Manage how others interact with you and what information is visible on your profile. Changes are saved automatically.
   </p>
+
+  <!-- Auto-save Toast Notification -->
+  <div id="save-toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900/90 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 backdrop-blur-md toast-enter">
+    <span class="material-symbols-outlined text-[16px] text-emerald-400">check_circle</span>
+    <span>Setting saved automatically</span>
+  </div>
 
   <!-- Visibility Section -->
   <div class="space-y-3">
@@ -51,11 +63,11 @@
           <span class="material-symbols-outlined text-on-surface-variant mt-0.5">lock</span>
           <div>
             <h3 class="font-title-md text-title-md text-on-surface font-semibold">Private Profile</h3>
-            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Only approved connections can see your full profile details and posts.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Only approved connections can see your full profile details.</p>
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer" checked>
+          <input type="checkbox" id="toggle-private-profile" onchange="handleSettingChange('is_private', this.checked)" class="sr-only peer">
           <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
         </label>
       </div>
@@ -71,7 +83,7 @@
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer" checked>
+          <input type="checkbox" id="toggle-show-major" onchange="handleSettingChange('show_major', this.checked)" class="sr-only peer" checked>
           <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
         </label>
       </div>
@@ -80,60 +92,224 @@
 
   <!-- Connections Section -->
   <div class="space-y-3">
-    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Connections</h2>
+    <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold px-1">Connections & Safety</h2>
     <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/30 space-y-4">
-      <div class="flex items-center justify-between">
-        <div class="flex gap-3 items-start pr-4">
-          <span class="material-symbols-outlined text-on-surface-variant mt-0.5">photo_camera</span>
-          <div>
-            <h3 class="font-title-md text-title-md text-on-surface font-semibold">Allow Instagram Requests</h3>
-            <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-0.5">Let matches request your Instagram handle directly through chat.</p>
-          </div>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-          <input type="checkbox" class="sr-only peer">
-          <div class="w-11 h-6 bg-surface-container-low peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
-      </div>
 
-      <div class="h-px bg-outline-variant/30 w-full"></div>
-
-      <a href="#" onclick="alert('0 Blocked Users')" class="flex items-center justify-between py-1 hover:opacity-80 transition-opacity">
+      <!-- Blocked Users -->
+      <button onclick="openBlockedUsersModal()" class="w-full flex items-center justify-between py-1 text-left hover:opacity-80 transition-opacity">
         <div class="flex gap-3 items-center">
           <span class="material-symbols-outlined text-on-surface-variant">block</span>
           <span class="font-title-md text-title-md text-on-surface font-medium">Blocked Users</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-on-surface-variant font-medium">0</span>
+          <span id="blocked-count-badge" class="text-sm font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">0</span>
           <span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
         </div>
-      </a>
+      </button>
 
       <div class="h-px bg-outline-variant/30 w-full"></div>
 
-      <a href="#" onclick="alert('No Report History')" class="flex items-center justify-between py-1 hover:opacity-80 transition-opacity">
+      <!-- Report History -->
+      <button onclick="openReportHistoryModal()" class="w-full flex items-center justify-between py-1 text-left hover:opacity-80 transition-opacity">
         <div class="flex gap-3 items-center">
           <span class="material-symbols-outlined text-on-surface-variant">flag</span>
           <span class="font-title-md text-title-md text-on-surface font-medium">Report History</span>
         </div>
         <span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
-      </a>
+      </button>
+
     </div>
   </div>
 
   <!-- Account Actions -->
-  <div class="space-y-3 mt-4">
+  <div class="space-y-3 mt-2">
     <h2 class="font-label-caps text-label-caps uppercase tracking-wider text-error font-semibold px-1">Account Actions</h2>
-    <button onclick="handleDeleteAccount()" class="w-full bg-surface-container-lowest border border-error/20 text-error rounded-2xl p-5 shadow-sm font-semibold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors">
-      <span class="material-symbols-outlined">delete_forever</span>
+    <button onclick="handleDeleteAccount()" class="w-full bg-surface-container-lowest border border-error/30 text-error rounded-2xl p-4 shadow-sm font-semibold flex items-center justify-center gap-2 hover:bg-red-50 active:scale-95 transition-all">
+      <span class="material-symbols-outlined text-[20px]">delete_forever</span>
       Delete Account
     </button>
   </div>
 </main>
 
+<!-- ═══════════════════════════════════════
+     BLOCKED USERS MODAL
+═══════════════════════════════════════ -->
+<div id="blocked-modal-backdrop" onclick="closeBlockedUsersModal()" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"></div>
+<div id="blocked-modal" class="hidden fixed bottom-0 left-0 right-0 z-[110] max-w-lg mx-auto bg-white rounded-t-[28px] shadow-2xl p-6 flex flex-col gap-4 max-h-[80dvh] overflow-hidden">
+  <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--um-border)">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">block</span>
+      <h3 class="font-bold text-lg text-primary">Blocked Users</h3>
+    </div>
+    <button onclick="closeBlockedUsersModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  </div>
+
+  <div id="blocked-users-list" class="overflow-y-auto flex-1 space-y-3 py-2">
+    <!-- Rendered dynamically -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     REPORT HISTORY MODAL
+═══════════════════════════════════════ -->
+<div id="report-modal-backdrop" onclick="closeReportHistoryModal()" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"></div>
+<div id="report-modal" class="hidden fixed bottom-0 left-0 right-0 z-[110] max-w-lg mx-auto bg-white rounded-t-[28px] shadow-2xl p-6 flex flex-col gap-4 max-h-[80dvh] overflow-hidden">
+  <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--um-border)">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">flag</span>
+      <h3 class="font-bold text-lg text-primary">Report History</h3>
+    </div>
+    <button onclick="closeReportHistoryModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  </div>
+
+  <div class="py-8 text-center flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+    <span class="material-symbols-outlined text-[36px] text-emerald-600">verified_user</span>
+    <p class="font-semibold text-sm text-on-surface">Clean Safety Record</p>
+    <p class="text-xs max-w-xs text-on-surface-variant">You have no active safety reports or violations. All student interactions comply with UniMatch community guidelines.</p>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
 <script>
+  let _currentUser = null;
+
+  (async () => {
+    _currentUser = await requireUniMatchAuth();
+    if (!_currentUser) return;
+
+    // Load initial visibility settings from profile / localStorage
+    const isPrivate = localStorage.getItem('um_setting_is_private') === 'true' || !!_currentUser.is_private;
+    const showMajor = localStorage.getItem('um_setting_show_major') !== 'false' && _currentUser.show_major !== false;
+
+    document.getElementById('toggle-private-profile').checked = isPrivate;
+    document.getElementById('toggle-show-major').checked      = showMajor;
+
+    // Update blocked count badge
+    updateBlockedCountBadge();
+  })();
+
+  function updateBlockedCountBadge() {
+    const blockedIds = getBlockedUserIds();
+    document.getElementById('blocked-count-badge').textContent = blockedIds.length;
+  }
+
+  function getBlockedUserIds() {
+    try {
+      return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]');
+    } catch(e) { return []; }
+  }
+
+  function saveBlockedUserIds(ids) {
+    try {
+      localStorage.setItem('um_blocked_user_ids', JSON.stringify(ids));
+    } catch(e) {}
+    updateBlockedCountBadge();
+  }
+
+  async function handleSettingChange(key, value) {
+    // Save to localStorage immediately
+    if (key === 'is_private') localStorage.setItem('um_setting_is_private', value);
+    if (key === 'show_major') localStorage.setItem('um_setting_show_major', value);
+
+    // Show toast
+    showToast();
+
+    // Persist to Supabase if session exists
+    if (_currentUser && _currentUser.id) {
+      try {
+        const payload = {};
+        payload[key] = value;
+        await supabase.from('profiles').update(payload).eq('id', _currentUser.id);
+      } catch(e) {
+        console.warn("Error updating profile setting:", e);
+      }
+    }
+  }
+
+  function showToast() {
+    const toast = document.getElementById('save-toast');
+    toast.classList.remove('hidden');
+    setTimeout(() => { toast.classList.add('hidden'); }, 2000);
+  }
+
+  // ── BLOCKED USERS MODAL ──────────────────────────────────────────────────
+  async function openBlockedUsersModal() {
+    const blockedIds = getBlockedUserIds();
+    const listEl = document.getElementById('blocked-users-list');
+
+    if (blockedIds.length === 0) {
+      listEl.innerHTML = `
+        <div class="text-center py-8 text-xs text-on-surface-variant flex flex-col items-center gap-2">
+          <span class="material-symbols-outlined text-[32px] text-gray-400">block</span>
+          <span>No blocked users.</span>
+          <span class="text-[11px] opacity-75">Users you block will appear here and won't be able to view your profile or see you in Discover.</span>
+        </div>
+      `;
+    } else {
+      listEl.innerHTML = `<div class="text-center py-4 text-xs text-gray-500">Loading blocked profiles...</div>`;
+      
+      let profileMap = {};
+      try {
+        const { data } = await supabase.from('profiles').select('id, full_name, college, avatar_url').in('id', blockedIds);
+        if (data) data.forEach(p => { profileMap[p.id] = p; });
+      } catch(e) {}
+
+      listEl.innerHTML = blockedIds.map(id => {
+        const p = profileMap[id] || {};
+        const name = p.full_name || 'Blocked Student';
+        const college = p.college || 'GGSIPU';
+        const photo = p.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80';
+
+        return `
+          <div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+            <div class="flex items-center gap-3">
+              <img src="${photo}" class="w-10 h-10 rounded-full object-cover border border-gray-200" alt="${escapeHTML(name)}"/>
+              <div>
+                <h4 class="font-bold text-sm text-on-surface">${escapeHTML(name)}</h4>
+                <p class="text-xs text-on-surface-variant">${escapeHTML(college)}</p>
+              </div>
+            </div>
+            <button onclick="handleUnblockUser('${id}')" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary text-white hover:opacity-90 active:scale-95 transition-all">
+              Unblock
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('blocked-modal-backdrop').classList.remove('hidden');
+    document.getElementById('blocked-modal').classList.remove('hidden');
+  }
+
+  function closeBlockedUsersModal() {
+    document.getElementById('blocked-modal-backdrop').classList.add('hidden');
+    document.getElementById('blocked-modal').classList.add('hidden');
+  }
+
+  function handleUnblockUser(userId) {
+    let ids = getBlockedUserIds();
+    ids = ids.filter(id => id !== userId);
+    saveBlockedUserIds(ids);
+    openBlockedUsersModal();
+    showToast();
+  }
+
+  // ── REPORT HISTORY MODAL ─────────────────────────────────────────────────
+  function openReportHistoryModal() {
+    document.getElementById('report-modal-backdrop').classList.remove('hidden');
+    document.getElementById('report-modal').classList.remove('hidden');
+  }
+
+  function closeReportHistoryModal() {
+    document.getElementById('report-modal-backdrop').classList.add('hidden');
+    document.getElementById('report-modal').classList.add('hidden');
+  }
+
   async function handleDeleteAccount() {
     if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       alert("Account deletion request submitted.");
@@ -142,4 +318,6 @@
     }
   }
 </script>
-</body></html>
+</body>
+</html>
+

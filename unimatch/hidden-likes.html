@@ -402,19 +402,28 @@
       _currentProfile = profile;
       _currentUserId = profile.id;
 
-      // Fetch admirers and mutual matches in parallel
+      await refreshAllData();
+    })();
+
+    async function refreshAllData() {
+      if (!_currentUserId) return;
       const [likesRes, matchesRes] = await Promise.all([
-        supabase.from('unimatch_likes').select('liker_id, action, created_at').eq('liked_user_id', profile.id).eq('action', 'like'),
-        supabase.from('unimatch_matches').select('*').or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`)
+        supabase.from('unimatch_likes').select('liker_id, action, created_at').eq('liked_user_id', _currentUserId).eq('action', 'like'),
+        supabase.from('unimatch_matches').select('*').or(`user1_id.eq.${_currentUserId},user2_id.eq.${_currentUserId}`)
       ]);
 
       const realLikes   = (likesRes   && likesRes.data)   || [];
       const realMatches = (matchesRes && matchesRes.data) || [];
 
-      // Collect all IDs to fetch profiles
-      const admirerIds    = realLikes.map(l => l.liker_id);
-      const matchPartnerIds = realMatches.map(m => m.user1_id === profile.id ? m.user2_id : m.user1_id);
-      const allIds = [...new Set([...admirerIds, ...matchPartnerIds])];
+      // Collect match partner IDs
+      const matchPartnerIds = realMatches.map(m => m.user1_id === _currentUserId ? m.user2_id : m.user1_id);
+      const matchPartnerSet = new Set(matchPartnerIds);
+
+      // Exclude admirers who are ALREADY in mutual matches
+      const pureAdmirerLikes = realLikes.filter(l => !matchPartnerSet.has(l.liker_id));
+
+      const admirerIds = pureAdmirerLikes.map(l => l.liker_id);
+      const allIds     = [...new Set([...admirerIds, ...matchPartnerIds])];
 
       let profileMap = {};
       if (allIds.length > 0) {
@@ -429,13 +438,19 @@
       }
 
       // Store globally for modal lookups
-      _allAdmirers = realLikes.map(l => ({ like: l, profile: profileMap[l.liker_id] || null }));
-      _allMatches  = realMatches.map(m => ({ match: m, profile: profileMap[m.user1_id === profile.id ? m.user2_id : m.user1_id] || null }));
+      _allAdmirers = pureAdmirerLikes.map(l => ({ like: l, profile: profileMap[l.liker_id] || null }));
+      _allMatches  = realMatches.map(m => ({ match: m, profile: profileMap[m.user1_id === _currentUserId ? m.user2_id : m.user1_id] || null }));
 
       // Render
       renderAdmirersGrid();
       renderMutualMatches();
-    })();
+    }
+
+    function getBlockedUserIds() {
+      try {
+        return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]');
+      } catch(e) { return []; }
+    }
 
     // ── RENDER ADMIRERS ────────────────────────────────────────────────────────
     function renderAdmirersGrid() {
@@ -443,9 +458,12 @@
       const countEl = document.getElementById('admirer-count-msg');
       const badge   = document.getElementById('admirer-badge');
 
-      badge.textContent = `${_allAdmirers.length} Admirer${_allAdmirers.length !== 1 ? 's' : ''}`;
+      const blockedIds = getBlockedUserIds();
+      const visibleAdmirers = _allAdmirers.filter(a => !blockedIds.includes(a.like.liker_id));
 
-      if (_allAdmirers.length === 0) {
+      badge.textContent = `${visibleAdmirers.length} Admirer${visibleAdmirers.length !== 1 ? 's' : ''}`;
+
+      if (visibleAdmirers.length === 0) {
         countEl.textContent = 'No admirers yet. Keep discovering to get noticed!';
         grid.innerHTML = `
           <div class="col-span-2 text-center py-10 text-xs rounded-2xl bg-white/60 border border-white/60" style="color: var(--um-text-muted)">
@@ -454,12 +472,11 @@
         return;
       }
 
-      countEl.innerHTML = `You have <strong style="color: var(--um-primary); font-weight:700;">${_allAdmirers.length} real admirer${_allAdmirers.length > 1 ? 's' : ''}</strong> waiting to connect.`;
+      countEl.innerHTML = `You have <strong style="color: var(--um-primary); font-weight:700;">${visibleAdmirers.length} real admirer${visibleAdmirers.length > 1 ? 's' : ''}</strong> waiting to connect.`;
 
-      const singleCol = _allAdmirers.length === 1 ? 'grid-cols-1 max-w-[200px] mx-auto' : 'grid-cols-2';
-      grid.className = `grid ${singleCol} gap-3`;
+      grid.className = 'grid grid-cols-2 gap-3';
 
-      grid.innerHTML = _allAdmirers.map((item, idx) => {
+      grid.innerHTML = visibleAdmirers.map((item, idx) => {
         const p       = item.profile || {};
         const likerId = item.like.liker_id;
         const isUnlocked = !!_unlockedAdmirers[likerId];
@@ -552,9 +569,16 @@
     function renderMutualMatches() {
       const list  = document.getElementById('mutual-matches-list');
       const badge = document.getElementById('match-badge-count');
-      badge.textContent = `${_allMatches.length} Match${_allMatches.length !== 1 ? 'es' : ''}`;
 
-      if (_allMatches.length === 0) {
+      const blockedIds = getBlockedUserIds();
+      const visibleMatches = _allMatches.filter(m => {
+        const partnerId = m.match.user1_id === _currentUserId ? m.match.user2_id : m.match.user1_id;
+        return !blockedIds.includes(partnerId);
+      });
+
+      badge.textContent = `${visibleMatches.length} Match${visibleMatches.length !== 1 ? 'es' : ''}`;
+
+      if (visibleMatches.length === 0) {
         list.innerHTML = `
           <div class="text-center py-6 text-xs bg-white/80 backdrop-blur-xl rounded-2xl p-4 border border-white/60" style="color: var(--um-text-muted)">
             Like students in the Discover feed. When both of you like each other, your mutual matches appear here!
@@ -564,7 +588,7 @@
 
       const now = new Date();
 
-      list.innerHTML = _allMatches.map((item, idx) => {
+      list.innerHTML = visibleMatches.map((item, idx) => {
         const m  = item.match;
         const p  = item.profile || {};
         const name    = p.full_name || 'Student Partner';
@@ -643,7 +667,7 @@
               <div class="flex-1 min-w-0">
                 <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: var(--um-primary)">AI Icebreaker</span>
                 <p class="text-[12px] font-medium leading-snug mt-0.5 ${isMyUnlocked ? '' : 'blur-[3px] select-none'}" style="color: var(--um-text)">
-                  ${isMyUnlocked ? escapeHTML(icebreakerText) : 'Unlock to reveal your personalized icebreaker question ✨'}
+                  ${isMyUnlocked ? escapeHTML(icebreakerText) : 'Unlock to reveal your personalized AI icebreaker question ✨'}
                 </p>
               </div>
             </div>
@@ -787,7 +811,7 @@
         icebreakerSection.classList.add('hidden');
 
         if (isUnlocked) {
-          contactEl.innerHTML = buildContactButtons(handle, phone, p.full_name || 'this student', null);
+          contactEl.innerHTML = buildLikeBackButtons(p);
         } else {
           contactEl.innerHTML = buildPaywallButton('admirer');
         }
@@ -845,7 +869,7 @@
             class="w-full py-4 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
             style="background: linear-gradient(135deg, var(--um-primary), #8B6B8A);">
             <span class="material-symbols-outlined text-[20px]">lock_open</span>
-            Unlock Profile & ${forType === 'admirer' ? 'Instagram' : 'Icebreaker & Instagram'} — ₹29
+            Unlock Profile — ₹29
           </button>
           <p class="text-[11px] text-center flex items-center justify-center gap-1" style="color: var(--um-text-muted)">
             <span class="material-symbols-outlined text-[14px]" style="color: var(--um-primary)">verified_user</span>
@@ -853,6 +877,75 @@
           </p>
         </div>
       `;
+    }
+
+    function buildLikeBackButtons(p) {
+      return `
+        <div class="flex flex-col gap-2.5 pb-2">
+          <div class="p-3.5 rounded-2xl flex items-center gap-2.5" style="background: rgba(176,80,112,0.08); border: 1px solid rgba(176,80,112,0.2);">
+            <span class="material-symbols-outlined text-[20px]" style="color: var(--um-primary); font-variation-settings:'FILL' 1;">favorite</span>
+            <div class="flex-1">
+              <p class="text-xs font-bold" style="color: var(--um-primary)">Profile Unlocked! 💕</p>
+              <p class="text-[11px]" style="color: var(--um-text-muted)">Like back to create a mutual match & reveal their AI Icebreaker & Instagram handle.</p>
+            </div>
+          </div>
+          <button id="like-back-btn" onclick="handleLikeBackFromModal()"
+            class="w-full py-4 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+            style="background: linear-gradient(135deg, var(--um-primary), #8B6B8A);">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">favorite</span>
+            Like Back 💕 — Create Match
+          </button>
+        </div>
+      `;
+    }
+
+    async function handleLikeBackFromModal() {
+      const likerId = _modalCurrentAdmirerId;
+      if (!likerId) return;
+
+      const btn = document.getElementById('like-back-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> Creating Match...`;
+      }
+
+      try {
+        let matchRecord = null;
+        if (typeof recordLike === 'function') {
+          matchRecord = await recordLike(_currentUserId, likerId, 'like');
+        } else {
+          await supabase.from('unimatch_likes').insert({ liker_id: _currentUserId, liked_user_id: likerId, action: 'like' });
+          const { data: m } = await supabase.from('unimatch_matches').select('*').or(`and(user1_id.eq.${_currentUserId},user2_id.eq.${likerId}),and(user1_id.eq.${likerId},user2_id.eq.${_currentUserId})`).maybeSingle();
+          matchRecord = m;
+        }
+
+        const matchId = matchRecord ? matchRecord.id : `match_${likerId}`;
+        
+        // Save unlock state for _currentUserId because they ALREADY paid ₹29 for this profile!
+        saveMatchUnlock(matchId);
+        try {
+          if (typeof unlockUniMatchForUser === 'function') {
+            await unlockUniMatchForUser(matchId, _currentUserId);
+          }
+        } catch(e) {}
+
+        // Reload data so Admirers and Matches lists update
+        await refreshAllData();
+
+        // Switch modal to match view
+        const matchItem = _allMatches.find(m => (m.match.user1_id === likerId || m.match.user2_id === likerId));
+        const pObj = _modalCurrentProfile || (matchItem ? matchItem.profile : {});
+        const mObj = matchItem ? matchItem.match : (matchRecord || { id: matchId, user1_id: _currentUserId, user2_id: likerId, user1_unlocked: true, user2_unlocked: false });
+
+        _modalType = 'match';
+        _modalCurrentMatchId = matchId;
+        _modalIsUnlocked = true;
+
+        renderModalContactSection('match', pObj, mObj);
+      } catch(err) {
+        console.error("Error creating match:", err);
+        location.reload();
+      }
     }
 
     function buildContactButtons(handle, phone, name, matchId) {

@@ -81,17 +81,17 @@
       <!-- Quick stats row -->
       <div style="display:flex;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--um-border);width:100%;justify-content:center;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span style="font-size:20px;font-weight:700;color:var(--um-primary);">12</span>
+          <span id="stat-admirers" style="font-size:20px;font-weight:700;color:var(--um-primary);">0</span>
           <span style="font-size:11px;color:var(--um-text-muted);font-weight:600;letter-spacing:0.04em;">ADMIRERS</span>
         </div>
         <div style="width:1px;background:var(--um-border);"></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span style="font-size:20px;font-weight:700;color:var(--um-primary);">5</span>
+          <span id="stat-likes-left" style="font-size:20px;font-weight:700;color:var(--um-primary);">5</span>
           <span style="font-size:11px;color:var(--um-text-muted);font-weight:600;letter-spacing:0.04em;">LIKES LEFT</span>
         </div>
         <div style="width:1px;background:var(--um-border);"></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span style="font-size:20px;font-weight:700;color:var(--um-primary);">3</span>
+          <span id="stat-matches" style="font-size:20px;font-weight:700;color:var(--um-primary);">0</span>
           <span style="font-size:11px;color:var(--um-text-muted);font-weight:600;letter-spacing:0.04em;">MATCHES</span>
         </div>
       </div>
@@ -226,6 +226,24 @@
       if (mainPhoto) {
         if (document.getElementById('profile-avatar')) document.getElementById('profile-avatar').src = mainPhoto;
         if (document.getElementById('header-avatar')) document.getElementById('header-avatar').src = mainPhoto;
+      }
+
+      // Fetch real stats from Supabase database
+      try {
+        const [likesRes, matchesRes] = await Promise.all([
+          supabase.from('unimatch_likes').select('liker_id', { count: 'exact', head: true }).eq('liked_user_id', profile.id).eq('action', 'like'),
+          supabase.from('unimatch_matches').select('id', { count: 'exact', head: true }).or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`)
+        ]);
+
+        const realAdmirers = (likesRes && likesRes.count) !== null ? likesRes.count : 0;
+        const realMatches = (matchesRes && matchesRes.count) !== null ? matchesRes.count : 0;
+        const likesInfo = typeof getDailyLikesInfo === 'function' ? getDailyLikesInfo(profile.id) : { remaining: 5 };
+
+        if (document.getElementById('stat-admirers')) document.getElementById('stat-admirers').textContent = realAdmirers;
+        if (document.getElementById('stat-likes-left')) document.getElementById('stat-likes-left').textContent = likesInfo.remaining;
+        if (document.getElementById('stat-matches')) document.getElementById('stat-matches').textContent = realMatches;
+      } catch (err) {
+        console.warn("Error loading profile stats:", err);
       }
     }
   })();

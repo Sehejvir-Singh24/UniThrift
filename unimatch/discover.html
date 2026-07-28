@@ -365,7 +365,8 @@
     }
 
     if (!error && candidates && candidates.length > 0) {
-      const otherCandidates = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true);
+      const blockedIds = (() => { try { return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]'); } catch { return []; } })();
+      const otherCandidates = candidates.filter(c => c.id !== myProfile.id && c.unimatch_profile_complete === true && !blockedIds.includes(c.id));
       const unswiped = otherCandidates.filter(c => !alreadySwiped.has(c.id));
 
       if (unswiped.length > 0) {
