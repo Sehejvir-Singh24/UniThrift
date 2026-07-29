@@ -27,14 +27,19 @@ function isSmtpConfigured() {
 // Helper: Get Nodemailer Transporter
 function getTransporter() {
   if (isSmtpConfigured()) {
+    const port = parseInt(process.env.SMTP_PORT || '587');
+    const secure = process.env.SMTP_SECURE === 'true' && port === 465;
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '465'),
-      secure: process.env.SMTP_SECURE !== 'false', // true for 465, false for 587
+      port: port,
+      secure: secure,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-      }
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
     });
   }
   return null;
@@ -126,13 +131,21 @@ app.post('/api/auth/send-otp', async (req, res) => {
         html: generateOtpEmailHtml(cleanEmail, otpCode)
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`[SMTP EMAIL SENT] OTP code sent successfully to ${cleanEmail}`);
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`[SMTP EMAIL SENT] OTP code sent successfully to ${cleanEmail}`);
 
-      return res.json({
-        success: true,
-        message: `Verification code sent to ${cleanEmail}`
-      });
+        return res.json({
+          success: true,
+          message: `Verification code sent to ${cleanEmail}`
+        });
+      } catch (smtpErr) {
+        console.error(`[SMTP ERROR] Failed to send email to ${cleanEmail}:`, smtpErr);
+        return res.status(500).json({
+          success: false,
+          error: `SMTP Error: ${smtpErr.message}`
+        });
+      }
     } else {
       // Dev Mode: SMTP not configured yet
       console.log(`\n==============================================`);
