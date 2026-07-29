@@ -146,6 +146,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
+  <script src="/scripts/auth-client.js"></script>
   <script>
     // Read ?mode param
     const urlParams = new URLSearchParams(window.location.search);
@@ -169,8 +170,12 @@
     });
 
     async function routeAfterAuth() {
-      if (typeof clearProfileCache === 'function') clearProfileCache();
-      const profile = await getProfile(true);
+      // Get profile from AuthClient if available, otherwise fallback to getProfile()
+      let profile = AuthClient.getUser();
+      if (!profile) {
+        if (typeof clearProfileCache === 'function') clearProfileCache();
+        profile = await getProfile(false);
+      }
       if (!profile) return;
 
       if (!profile.is_verified) {
@@ -221,25 +226,21 @@
       btn.classList.add('opacity-60', 'pointer-events-none');
       btnText.textContent = 'Sending...';
 
-      const { error } = await supabase.auth.signInWithOtp({ email });
-
-      if (error) {
-        let errMsg = error.message || '';
-        if (errMsg === '{}' || error.name === 'AuthRetryableFetchError' || error.status === 500) {
-          errMsg = 'Email rate limit reached or server email issue. Please try Google Sign-In or try again later.';
-        }
-        showError('Could not send sign-in link: ' + errMsg);
+      try {
+        await AuthClient.sendOtp(email, 'student');
+        
+        otpEmailSent = email;
+        document.getElementById('otp-email-display').textContent = email;
+        document.getElementById('email-form').classList.add('hidden');
+        document.getElementById('otp-form').classList.remove('hidden');
+        document.getElementById('otp-form').classList.add('flex');
+        clearError();
+      } catch (err) {
+        showError('Could not send sign-in link: ' + (err.message || 'Server error.'));
+      } finally {
         btn.classList.remove('opacity-60', 'pointer-events-none');
         btnText.textContent = 'Send Sign-In Link';
-        return;
       }
-
-      otpEmailSent = email;
-      document.getElementById('otp-email-display').textContent = email;
-      document.getElementById('email-form').classList.add('hidden');
-      document.getElementById('otp-form').classList.remove('hidden');
-      document.getElementById('otp-form').classList.add('flex');
-      clearError();
     }
 
     async function handleVerifyOtp() {
@@ -252,18 +253,14 @@
       const btn = document.getElementById('otp-btn-text');
       btn.textContent = 'Verifying...';
 
-      const { error } = await supabase.auth.verifyOtp({
-        email: otpEmailSent,
-        token,
-        type: 'email'
-      });
-
-      if (error) {
-        showError('Invalid or expired code. Please try again.');
+      try {
+        const data = await AuthClient.verifyOtp(otpEmailSent, token);
+        await routeAfterAuth();
+      } catch (err) {
+        showError(err.message || 'Invalid or expired code. Please try again.');
+      } finally {
         btn.textContent = 'Verify & Continue';
-        return;
       }
-      // onAuthStateChange will fire and route
     }
 
     function resetEmailForm() {
