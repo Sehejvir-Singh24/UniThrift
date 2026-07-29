@@ -401,7 +401,7 @@
             if (profile) {
                 if (profile.full_name) document.getElementById('fullname').value = profile.full_name;
                 if (profile.phone_number) document.getElementById('phone').value = profile.phone_number;
-                if (profile.college) document.getElementById('college').value = profile.college;
+                if (profile.college || profile.major) document.getElementById('college').value = profile.college || profile.major;
                 if (profile.enrollment_number) document.getElementById('enrollment').value = profile.enrollment_number;
                 if (profile.father_name) document.getElementById('father-name').value = profile.father_name;
                 if (profile.avatar_url && !croppedBlob) {
