@@ -186,19 +186,32 @@
           type="button"
           class="w-full h-[46px] bg-um-surface-container text-um-on-surface hover:bg-um-primary hover:text-um-on-primary text-[14px] font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all border border-um-outline-variant/50"
         >
-          <span id="email-verify-btn-text">Send Verification Link</span>
+          <span id="email-verify-btn-text">Send Verification Code</span>
           <span class="material-symbols-outlined text-[18px]">send</span>
         </button>
       </div>
 
-      <!-- Email Sent Success State -->
-      <div id="email-sent-state" class="hidden flex-col items-center gap-2 py-3 text-center">
-        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-          <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 1;">mark_email_read</span>
-        </div>
-        <p class="font-bold text-um-on-surface text-[14px]">Verification link sent!</p>
-        <p class="text-[12px] text-um-on-surface-variant">We sent a confirmation link to <strong id="sent-email-display" class="text-um-primary"></strong>.</p>
-        <button type="button" onclick="resetEmailPanel()" class="text-um-primary text-[12px] font-semibold underline mt-1">Use another email address</button>
+      <!-- OTP Input State -->
+      <div id="email-sent-state" class="hidden flex-col gap-3 text-center">
+        <p class="text-[13px] text-um-on-surface-variant">Code sent to <strong id="sent-email-display" class="text-um-primary"></strong></p>
+        <input
+          id="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          placeholder="000000"
+          class="w-full h-[46px] px-4 rounded-xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[18px] font-bold tracking-[0.4em] text-center focus:outline-none focus:border-um-primary focus:bg-white transition-colors placeholder:text-um-outline/50"
+        />
+        <button
+          id="verify-otp-btn"
+          onclick="handleVerifyOtp()"
+          type="button"
+          class="w-full h-[46px] bg-um-primary text-um-on-primary text-[14px] font-bold rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md"
+        >
+          <span id="verify-otp-btn-text">Verify & Continue</span>
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+        </button>
+        <button type="button" onclick="resetEmailPanel()" class="text-um-primary text-[12px] font-semibold mt-1">Use another email address</button>
       </div>
     </div>
 
@@ -212,6 +225,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
+  <script src="/scripts/auth-client.js"></script>
   <script>
     // Auth Guard
     (async () => {
@@ -299,6 +313,8 @@
       }
     }
 
+    let pendingOtpEmail = '';
+
     async function handleEmailVerify() {
       const email = document.getElementById('verify-email-input').value.trim();
       if (!email || !email.includes('@')) {
@@ -315,25 +331,47 @@
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error("Authentication required.");
 
-        await updateProfile({
-          unimatch_verify_email: email,
-          unimatch_verification_status: 'verified',
-          is_verified: true
-        });
+        await AuthClient.sendOtp(email, 'student');
+        pendingOtpEmail = email;
 
         document.getElementById('email-input-container').classList.add('hidden');
         document.getElementById('email-sent-state').classList.remove('hidden');
         document.getElementById('email-sent-state').classList.add('flex');
         document.getElementById('sent-email-display').textContent = email;
         clearError();
-
-        setTimeout(() => {
-          window.location.href = '/unimatch/auth/verified.html';
-        }, 1200);
       } catch (err) {
         showError('Verification error: ' + err.message);
         btn.disabled = false;
-        btnText.textContent = 'Send Verification Link';
+        btnText.textContent = 'Send Verification Code';
+      }
+    }
+
+    async function handleVerifyOtp() {
+      const otpInput = document.getElementById('otp-input').value.trim();
+      if (otpInput.length !== 6) {
+        showError('Please enter the 6-digit code.');
+        return;
+      }
+
+      const btn = document.getElementById('verify-otp-btn');
+      const btnText = document.getElementById('verify-otp-btn-text');
+      btn.disabled = true;
+      btnText.textContent = 'Verifying...';
+
+      try {
+        const data = await AuthClient.verifyOtp(pendingOtpEmail, otpInput);
+
+        await updateProfile({
+          unimatch_verify_email: pendingOtpEmail,
+          unimatch_verification_status: 'verified',
+          is_verified: true
+        });
+
+        window.location.href = '/unimatch/auth/verified.html';
+      } catch (err) {
+        showError(err.message || 'Invalid or expired code.');
+        btn.disabled = false;
+        btnText.textContent = 'Verify & Continue';
       }
     }
 
@@ -343,8 +381,10 @@
       document.getElementById('email-sent-state').classList.remove('flex');
       const btn = document.getElementById('email-verify-btn');
       btn.disabled = false;
-      document.getElementById('email-verify-btn-text').textContent = 'Send Verification Link';
+      document.getElementById('email-verify-btn-text').textContent = 'Send Verification Code';
       document.getElementById('verify-email-input').value = '';
+      document.getElementById('otp-input').value = '';
+      clearError();
     }
 
     function showError(msg) {

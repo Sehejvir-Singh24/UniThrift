@@ -331,36 +331,43 @@
             }
             
             signinBtn.classList.add('pointer-events-none');
-            btnText.innerText = 'Sending OTP code...';
+            btnText.innerText = isSignUp ? 'Creating account...' : 'Signing in...';
             btnIcon.innerText = 'progress_activity';
             btnIcon.classList.add('animate-spin');
             
             try {
-                // Call Node.js Nodemailer Auth Backend
-                const result = await AuthClient.sendOtp(email, role);
-
-                window.pendingEmail = email;
-                
-                let subtitleText = `We sent a 6-digit verification code to ${email}.`;
-                if (result.isDevMode && result.devOtp) {
-                  subtitleText += ` [Dev Code: ${result.devOtp}]`;
+                if (isSignUp) {
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                role: role
+                            }
+                        }
+                    });
+                    if (error) throw error;
+                    
+                    // Note: If email confirmations are enabled in Supabase, the user might need to check their email.
+                    // Assuming auto-confirm or they are logged in right away based on user's architecture.
+                    if (data?.session) {
+                        // handled by onAuthStateChange
+                    } else {
+                        showError("Please check your email for a confirmation link.");
+                    }
+                } else {
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (error) throw error;
+                    // handled by onAuthStateChange
                 }
-
-                document.getElementById('otp-subtitle').innerText = subtitleText;
-                document.getElementById('auth-form-container').classList.add('hidden');
-                document.getElementById('otp-container').classList.remove('hidden');
-                document.getElementById('otp-code').focus();
-                
-                // Revert main signup button state in case they cancel back
-                signinBtn.classList.remove('pointer-events-none');
-                btnText.innerText = originalText;
-                btnIcon.innerText = 'arrow_forward';
-                btnIcon.classList.remove('animate-spin');
             } catch (err) {
                 console.error("Auth error occurred:", err);
-                showError(err.message || 'Failed to send OTP. Is the auth server running?');
-                
-                // Revert button
+                showError(err.message || 'Authentication failed.');
+            } finally {
+                // Revert button if not redirected
                 signinBtn.classList.remove('pointer-events-none');
                 btnText.innerText = originalText;
                 btnIcon.innerText = 'arrow_forward';
@@ -370,43 +377,6 @@
     });
 
 
-    async function verifyOtpClick() {
-        const codeInput = document.getElementById('otp-code');
-        const code = codeInput.value.trim();
-        const errorDiv = document.getElementById('auth-error');
-        const verifyBtn = document.getElementById('verify-btn');
-        const verifyBtnText = document.getElementById('verify-btn-text');
-        const verifyBtnIcon = document.getElementById('verify-btn-icon');
-
-        if (code.length !== 6) {
-            errorDiv.innerText = "Please enter a valid 6-digit code.";
-            errorDiv.classList.remove('hidden');
-            return;
-        }
-
-        errorDiv.classList.add('hidden');
-        verifyBtn.classList.add('pointer-events-none', 'opacity-80');
-        verifyBtnText.innerText = 'Verifying...';
-
-        try {
-            const email = window.pendingEmail || sessionStorage.getItem('unithrift_pending_email');
-            const data = await AuthClient.verifyOtp(email, code);
-            
-            // Success! Trigger Onboarding Decision Matrix Redirect
-            AuthClient.handleAuthWorkflowRedirect(data.user);
-        } catch (err) {
-            errorDiv.innerText = err.message || "Verification failed. Please check the code and try again.";
-            errorDiv.classList.remove('hidden');
-            
-            verifyBtn.classList.remove('pointer-events-none', 'opacity-80');
-            verifyBtnText.innerText = 'Verify & Continue';
-        }
-    }
-
-    function cancelOtp() {
-        document.getElementById('otp-container').classList.add('hidden');
-        document.getElementById('auth-form-container').classList.remove('hidden');
-        document.getElementById('auth-error').classList.add('hidden');
-    }
+    // OTP logic removed for login.html
   </script>
 </div></main></body></html>

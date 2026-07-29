@@ -88,7 +88,7 @@
         <div class="flex-1 h-px bg-um-outline-variant"></div>
       </div>
 
-      <!-- Email OTP form -->
+      <!-- Email/Password form -->
       <div id="email-form" class="flex flex-col gap-3">
         <div class="relative">
           <input
@@ -100,38 +100,28 @@
           />
           <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-um-outline text-[20px]">mail</span>
         </div>
+        <div class="relative">
+          <input
+            id="password-input"
+            type="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            class="w-full h-[52px] px-4 pr-12 rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[15px] focus:outline-none focus:border-um-primary transition-colors placeholder:text-um-outline"
+          />
+          <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-um-outline text-[20px]">lock</span>
+        </div>
         <button
           id="email-btn"
-          onclick="handleEmailOtp()"
+          onclick="handleEmailLogin()"
           class="w-full h-[52px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
         >
-          <span id="email-btn-text">Send Sign-In Link</span>
-          <span class="material-symbols-outlined text-[20px]">send</span>
+          <span id="email-btn-text">Sign In</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
         </button>
       </div>
 
-      <!-- OTP verify form (hidden initially) -->
-      <div id="otp-form" class="hidden flex-col gap-3">
-        <p class="text-[14px] text-um-on-surface-variant text-center">We sent a code to <strong id="otp-email-display" class="text-um-on-surface"></strong></p>
-        <input
-          id="otp-input"
-          type="text"
-          inputmode="numeric"
-          maxlength="6"
-          placeholder="000000"
-          class="w-full h-[52px] px-4 rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[20px] font-bold text-center tracking-[0.4em] focus:outline-none focus:border-um-primary transition-colors"
-        />
-        <button
-          onclick="handleVerifyOtp()"
-          class="w-full h-[52px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-          style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
-        >
-          <span id="otp-btn-text">Verify & Continue</span>
-          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </button>
-        <button onclick="resetEmailForm()" class="text-um-primary text-[14px] font-semibold text-center">← Use a different email</button>
-      </div>
+      <!-- OTP verify form removed (no longer used for login) -->
 
     </div>
 
@@ -149,10 +139,13 @@
   <script src="/scripts/auth-client.js"></script>
   <script>
     // Read ?mode param
+    let isSignUp = false;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'signup') {
+      isSignUp = true;
       document.getElementById('page-title').textContent = 'Create account.';
       document.getElementById('page-subtitle').textContent = 'Join the exclusive student community.';
+      document.getElementById('email-btn-text').textContent = 'Sign Up';
     }
 
     // On load: if already authenticated, route accordingly
@@ -170,12 +163,8 @@
     });
 
     async function routeAfterAuth() {
-      // Get profile from AuthClient if available, otherwise fallback to getProfile()
-      let profile = AuthClient.getUser();
-      if (!profile) {
-        if (typeof clearProfileCache === 'function') clearProfileCache();
-        profile = await getProfile(false);
-      }
+      if (typeof clearProfileCache === 'function') clearProfileCache();
+      const profile = await getProfile(false);
       if (!profile) return;
 
       if (!profile.is_verified) {
@@ -212,65 +201,46 @@
       }
     }
 
-    let otpEmailSent = '';
-
-    async function handleEmailOtp() {
+    async function handleEmailLogin() {
       const email = document.getElementById('email-input').value.trim();
+      const password = document.getElementById('password-input').value;
       if (!email || !email.includes('@')) {
         showError('Please enter a valid email address.');
+        return;
+      }
+      if (!password || password.length < 6) {
+        showError('Password must be at least 6 characters.');
         return;
       }
 
       const btn = document.getElementById('email-btn');
       const btnText = document.getElementById('email-btn-text');
+      const originalText = btnText.textContent;
+      
       btn.classList.add('opacity-60', 'pointer-events-none');
-      btnText.textContent = 'Sending...';
+      btnText.textContent = isSignUp ? 'Creating account...' : 'Signing in...';
 
       try {
-        await AuthClient.sendOtp(email, 'student');
-        
-        otpEmailSent = email;
-        document.getElementById('otp-email-display').textContent = email;
-        document.getElementById('email-form').classList.add('hidden');
-        document.getElementById('otp-form').classList.remove('hidden');
-        document.getElementById('otp-form').classList.add('flex');
-        clearError();
+        if (isSignUp) {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          if (data?.session) {
+            // Handled by onAuthStateChange
+          } else {
+            showError("Please check your email for a confirmation link.");
+            btn.classList.remove('opacity-60', 'pointer-events-none');
+            btnText.textContent = originalText;
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          // Handled by onAuthStateChange
+        }
       } catch (err) {
-        showError('Could not send sign-in link: ' + (err.message || 'Server error.'));
-      } finally {
+        showError('Authentication failed: ' + (err.message || 'Server error.'));
         btn.classList.remove('opacity-60', 'pointer-events-none');
-        btnText.textContent = 'Send Sign-In Link';
+        btnText.textContent = originalText;
       }
-    }
-
-    async function handleVerifyOtp() {
-      const token = document.getElementById('otp-input').value.trim();
-      if (token.length !== 6) {
-        showError('Please enter the 6-digit code.');
-        return;
-      }
-
-      const btn = document.getElementById('otp-btn-text');
-      btn.textContent = 'Verifying...';
-
-      try {
-        const data = await AuthClient.verifyOtp(otpEmailSent, token);
-        await routeAfterAuth();
-      } catch (err) {
-        showError(err.message || 'Invalid or expired code. Please try again.');
-      } finally {
-        btn.textContent = 'Verify & Continue';
-      }
-    }
-
-    function resetEmailForm() {
-      document.getElementById('otp-form').classList.add('hidden');
-      document.getElementById('otp-form').classList.remove('flex');
-      document.getElementById('email-form').classList.remove('hidden');
-      document.getElementById('email-btn').classList.remove('opacity-60', 'pointer-events-none');
-      document.getElementById('email-btn-text').textContent = 'Send Sign-In Link';
-      document.getElementById('otp-input').value = '';
-      clearError();
     }
 
     function showError(msg) {
