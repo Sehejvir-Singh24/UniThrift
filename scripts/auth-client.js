@@ -3,7 +3,13 @@
 
 (function(window) {
   const CLOUD_API_URL = 'https://unithrift-n2my.onrender.com/api/auth';
-  const API_BASE_URL = window.UNITHRIFT_AUTH_API || CLOUD_API_URL;
+  const LOCAL_API_URL = 'http://localhost:5000/api/auth';
+  
+  // Use localhost when running locally, cloud URL when on live site
+  const API_BASE_URL = window.UNITHRIFT_AUTH_API || 
+    ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+      ? LOCAL_API_URL 
+      : CLOUD_API_URL);
   const TOKEN_KEY = 'unithrift_auth_token';
   const USER_KEY = 'unithrift_user';
 
