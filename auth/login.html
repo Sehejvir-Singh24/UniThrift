@@ -153,6 +153,7 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
+<script src="/scripts/auth-client.js"></script>
 <script>
     let isSignUp = false;
 
@@ -324,73 +325,40 @@
             // UI Loading state
             const originalText = btnText.innerText;
             
-            if (isSignUp && password !== confirmPasswordInput.value) {
+            if (isSignUp && password && password !== confirmPasswordInput.value) {
                 showError("Passwords do not match.");
                 return;
             }
             
             signinBtn.classList.add('pointer-events-none');
-            btnText.innerText = isSignUp ? 'Creating Account...' : 'Signing in...';
+            btnText.innerText = 'Sending OTP code...';
             btnIcon.innerText = 'progress_activity';
             btnIcon.classList.add('animate-spin');
             
             try {
-                let authResult;
+                // Call Node.js Nodemailer Auth Backend
+                const result = await AuthClient.sendOtp(email, role);
+
+                window.pendingEmail = email;
                 
-                if (isSignUp) {
-                    authResult = await supabase.auth.signUp({
-                        email,
-                        password,
-                        options: {
-                            data: { role } 
-                        }
-                    });
-                } else {
-                    authResult = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
+                let subtitleText = `We sent a 6-digit verification code to ${email}.`;
+                if (result.isDevMode && result.devOtp) {
+                  subtitleText += ` [Dev Code: ${result.devOtp}]`;
                 }
 
-                if (authResult.error) throw authResult.error;
-
-                if (isSignUp && !authResult.data.session) {
-                    // Transition to OTP view
-                    window.pendingEmail = email;
-                    document.getElementById('otp-subtitle').innerText = `We sent a 6-digit code to ${email}.`;
-                    document.getElementById('auth-form-container').classList.add('hidden');
-                    document.getElementById('otp-container').classList.remove('hidden');
-                    
-                    // Revert main signup button state in case they cancel back
-                    signinBtn.classList.remove('pointer-events-none');
-                    btnText.innerText = originalText;
-                    btnIcon.innerText = 'arrow_forward';
-                    btnIcon.classList.remove('animate-spin');
-                    return;
-                }
+                document.getElementById('otp-subtitle').innerText = subtitleText;
+                document.getElementById('auth-form-container').classList.add('hidden');
+                document.getElementById('otp-container').classList.remove('hidden');
+                document.getElementById('otp-code').focus();
                 
-                // If success, onAuthStateChange takes over
+                // Revert main signup button state in case they cancel back
+                signinBtn.classList.remove('pointer-events-none');
+                btnText.innerText = originalText;
+                btnIcon.innerText = 'arrow_forward';
+                btnIcon.classList.remove('animate-spin');
             } catch (err) {
                 console.error("Auth error occurred:", err);
-                let errMsg = err.message || '';
-                
-                if (errMsg === '{}' || err.name === 'AuthRetryableFetchError' || err.status === 500) {
-                    errMsg = 'Failed to send confirmation email. This is typically due to an SMTP configuration issue on the server. Please verify your custom SMTP settings.';
-                } else if (!errMsg) {
-                    errMsg = typeof err === 'string' ? err : JSON.stringify(err);
-                }
-
-                if (errMsg === '{}') {
-                    errMsg = 'An unexpected server error occurred. Please try again or check SMTP settings.';
-                }
-                
-                if (errMsg.includes('already registered') || errMsg.includes('already exists')) {
-                    showError('Email is already registered. Please Sign In.');
-                } else if (errMsg.includes('Invalid login')) {
-                    showError('Invalid email or password.');
-                } else {
-                    showError(errMsg || 'Something went wrong. Please try again.');
-                }
+                showError(err.message || 'Failed to send OTP. Is the auth server running?');
                 
                 // Revert button
                 signinBtn.classList.remove('pointer-events-none');
@@ -421,25 +389,13 @@
         verifyBtnText.innerText = 'Verifying...';
 
         try {
-            const { data, error } = await supabase.auth.verifyOtp({
-                email: window.pendingEmail,
-                token: code,
-                type: 'signup'
-            });
-
-            if (error) throw error;
+            const email = window.pendingEmail || sessionStorage.getItem('unithrift_pending_email');
+            const data = await AuthClient.verifyOtp(email, code);
             
-            // Success! The onAuthStateChange listener will automatically trigger and redirect them.
+            // Success! Trigger Onboarding Decision Matrix Redirect
+            AuthClient.handleAuthWorkflowRedirect(data.user);
         } catch (err) {
-            let errMsg = err.message || '';
-            if (errMsg === '{}' || err.name === 'AuthRetryableFetchError' || err.status === 500) {
-                errMsg = "Server SMTP/connection error. Verification could not be processed.";
-            } else if (!errMsg) {
-                errMsg = typeof err === 'string' ? err : "Verification failed. Please check the code and try again.";
-            }
-            if (errMsg === '{}') errMsg = "Verification failed. Please try again.";
-
-            errorDiv.innerText = errMsg;
+            errorDiv.innerText = err.message || "Verification failed. Please check the code and try again.";
             errorDiv.classList.remove('hidden');
             
             verifyBtn.classList.remove('pointer-events-none', 'opacity-80');

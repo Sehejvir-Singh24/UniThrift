@@ -33,6 +33,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
+<script src="/scripts/auth-client.js"></script>
 <div class="flex flex-col items-center mt-auto pb-4 transform transition-all duration-700 delay-300 translate-y-4 opacity-0" id="action-anim">
 <button class="w-full h-14 rounded-xl bg-primary text-on-primary font-title-md text-title-md shadow-[0_8px_24px_rgba(0,110,47,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100" disabled="" id="verify-btn">
                 Verify & Finish
@@ -152,17 +153,24 @@
                 return;
             }
 
-            const { data, error } = await supabase.auth.verifyOtp({
-                email,
-                token: code,
-                type: 'email'
-            });
-
-            if (error) { // Failure
+            try {
+                const data = await AuthClient.verifyOtp(email, code);
+                
+                // Success!
+                verifyBtn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Success!`;
+                verifyBtn.classList.replace('bg-primary', 'bg-primary-container');
+                verifyBtn.classList.replace('text-on-primary', 'text-on-primary-container');
+                
+                createConfetti();
+                
+                setTimeout(() => { 
+                    AuthClient.handleAuthWorkflowRedirect(data.user);
+                }, 1200);
+            } catch (err) { // Failure
                 verifyBtn.innerHTML = `Verify & Finish <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>`;
                 verifyBtn.disabled = false;
                 errorMessage.classList.remove('hidden');
-                errorMessage.innerText = error.message;
+                errorMessage.innerText = err.message || 'Invalid code. Please try again.';
                 inputs.forEach(i => {
                     i.classList.add('ring-2', 'ring-error', 'text-error');
                     i.value = '';
@@ -179,25 +187,6 @@
                     { transform: 'translateX(5px)' },
                     { transform: 'translateX(0)' }
                 ], { duration: 400, easing: 'ease-in-out' });
-            } else { // Success
-                verifyBtn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Success!`;
-                verifyBtn.classList.replace('bg-primary', 'bg-primary-container');
-                verifyBtn.classList.replace('text-on-primary', 'text-on-primary-container');
-                
-                createConfetti();
-                
-                // Fetch profile to route correctly
-                const profile = await getProfile();
-                
-                setTimeout(() => { 
-                    if (!profile || !profile.full_name || !profile.phone_number || !profile.college) {
-                        window.location.href = '/auth/profile_setup.html';
-                    } else if (!profile.is_verified && profile.verification_status !== 'pending') {
-                        window.location.href = '/auth/id_verification.html';
-                    } else {
-                        window.location.href = '/index.html'; 
-                    }
-                }, 1500);
             }
         });
 
