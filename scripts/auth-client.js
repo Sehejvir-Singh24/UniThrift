@@ -2,7 +2,11 @@
 // Connects frontend UI to Node.js Nodemailer Auth Backend
 
 (function(window) {
-  const API_BASE_URL = window.UNITHRIFT_AUTH_API || 'http://localhost:5000/api/auth';
+  const CLOUD_API_URL = 'https://unithrift-n2my.onrender.com/api/auth';
+  const API_BASE_URL = window.UNITHRIFT_AUTH_API || 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? 'http://localhost:5000/api/auth' 
+      : CLOUD_API_URL);
   const TOKEN_KEY = 'unithrift_auth_token';
   const USER_KEY = 'unithrift_user';
 
