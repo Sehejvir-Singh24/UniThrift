@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -658,10 +658,8 @@
 
   // OFFICIAL RAZORPAY CHECKOUT POPUP HANDLER
   async function unlockWithRazorpay(listingId) {
-    if (!_isLoggedIn) {
-      window.location.href = '/auth/login.html';
-      return;
-    }
+    const verified = await verifyAction();
+    if (!verified) return;
 
     const item = _allListings.find(l => l.id === listingId);
     if (!item) return;
@@ -812,15 +810,13 @@
   }
 
   function handlePostClick() {
-    if (!_isLoggedIn) {
-      window.location.href = '/auth/login.html';
-      return;
-    }
-    if (_myListingId) {
-      window.location.href = '/roommates/roommate_need_flat.html?edit=true';
-    } else {
-      window.location.href = '/roommates/roommate_need_flat.html';
-    }
+    verifyAction(() => {
+      if (_myListingId) {
+        window.location.href = '/roommates/roommate_need_flat.html?edit=true';
+      } else {
+        window.location.href = '/roommates/roommate_need_flat.html';
+      }
+    });
   }
 </script>
 <script src="/scripts/coming-soon.js"></script>

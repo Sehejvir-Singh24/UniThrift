@@ -301,11 +301,11 @@
         // Update profile
         await updateProfile({
           id_url: publicUrl,
-          unimatch_verification_status: 'verified',
-          is_verified: true
+          unimatch_verification_status: 'pending',
+          is_verified: false
         });
 
-        window.location.href = '/unimatch/auth/verified.html';
+        window.location.href = '/unimatch/auth/pending.html';
       } catch (err) {
         showError('Upload failed: ' + err.message);
         btn.disabled = false;
