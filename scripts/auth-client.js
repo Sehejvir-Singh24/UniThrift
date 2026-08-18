@@ -2,7 +2,7 @@
 // Connects frontend UI to Node.js Nodemailer Auth Backend
 
 (function(window) {
-  const CLOUD_API_URL = 'https://unithrift-n2my.onrender.com/api/auth';
+  const CLOUD_API_URL = 'https://api.unithrift.co.in/api/auth';
   const LOCAL_API_URL = 'http://localhost:5000/api/auth';
   
   // Use localhost when running locally, cloud URL when on live site

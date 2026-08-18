@@ -170,14 +170,21 @@ app.post('/api/auth/send-otp', async (req, res) => {
     // 1. Try Resend HTTP API (Port 443 - HTTPS - Never blocked by Render cloud)
     if (process.env.RESEND_API_KEY) {
       try {
-        await sendResendEmail(cleanEmail, `${otpCode} is your UniThrift verification code`, generateOtpEmailHtml(cleanEmail, otpCode));
-        console.log(`[RESEND EMAIL SENT] OTP code sent successfully to ${cleanEmail}`);
+        const result = await sendResendEmail(cleanEmail, `${otpCode} is your UniThrift verification code`, generateOtpEmailHtml(cleanEmail, otpCode));
+        console.log(`[RESEND EMAIL SENT] OTP code sent successfully to ${cleanEmail}`, result);
         return res.json({
           success: true,
           message: `Verification code sent to ${cleanEmail}`
         });
       } catch (resendErr) {
-        console.error(`[RESEND FAILED, FALLING BACK TO SMTP]:`, resendErr);
+        console.error(`[RESEND FAILED]:`, resendErr);
+        // If Resend failed, return explicit error or fallback with diagnostic info
+        if (!isSmtpConfigured()) {
+          return res.status(500).json({
+            success: false,
+            error: `Email delivery failed via Resend: ${resendErr.message || 'Check domain verification in Resend'}`
+          });
+        }
       }
     }
 
