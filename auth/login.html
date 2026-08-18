@@ -406,8 +406,8 @@
                     }
                 }
 
-                // 3. Complete redirect
-                AuthClient.handleAuthWorkflowRedirect(data.user, '/index.html');
+                // 3. Complete redirect directly to homepage
+                window.location.href = '/index.html';
             } catch (err) {
                 console.error("OTP verification error:", err);
                 showError(err.message || 'Invalid or expired OTP code.');

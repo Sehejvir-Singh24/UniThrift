@@ -137,24 +137,7 @@
         return;
       }
 
-      // Check Profile Completeness
-      const hasFullProfile = currentUser.full_name && currentUser.phone_number && currentUser.college;
-
-      if (!hasFullProfile) {
-        console.log('[AUTH WORKFLOW] Profile incomplete. Redirecting to Profile Setup...');
-        window.location.href = '/auth/profile_setup.html';
-        return;
-      }
-
-      // Check Student ID Verification Status
-      if (!currentUser.is_verified && currentUser.verification_status !== 'pending') {
-        console.log('[AUTH WORKFLOW] Student ID unverified. Redirecting to ID Verification...');
-        window.location.href = '/auth/id_verification.html';
-        return;
-      }
-
-      // Fully Onboarded! Redirect to target page or home
-      console.log('[AUTH WORKFLOW] Authenticated & Verified. Redirecting to destination...');
+      console.log('[AUTH WORKFLOW] Authenticated. Redirecting to:', defaultRedirect);
       window.location.href = defaultRedirect;
     },
 
