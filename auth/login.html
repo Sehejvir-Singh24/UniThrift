@@ -308,6 +308,9 @@
             errorDiv.classList.remove('hidden');
         }
 
+        let pendingEmail = '';
+        let pendingRole = 'customer';
+
         signinBtn.addEventListener('click', async () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -315,61 +318,101 @@
 
             errorDiv.classList.add('hidden');
             
-            // UI Loading state
-            const originalText = btnText.innerText;
-            
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError("Please enter a valid email address.");
+                return;
+            }
+
             if (isSignUp && password && password !== confirmPasswordInput.value) {
                 showError("Passwords do not match.");
                 return;
             }
             
+            const originalText = btnText.innerText;
             signinBtn.classList.add('pointer-events-none');
-            btnText.innerText = isSignUp ? 'Creating account...' : 'Signing in...';
+            btnText.innerText = 'Sending OTP code...';
             btnIcon.innerText = 'progress_activity';
             btnIcon.classList.add('animate-spin');
             
             try {
-                if (isSignUp) {
-                    const { data, error } = await supabase.auth.signUp({
-                        email,
-                        password,
-                        options: {
-                            data: {
-                                role: role
-                            }
-                        }
-                    });
-                    if (error) throw error;
-                    
-                    // Note: If email confirmations are enabled in Supabase, the user might need to check their email.
-                    // Assuming auto-confirm or they are logged in right away based on user's architecture.
-                    if (data?.session) {
-                        // handled by onAuthStateChange
-                    } else {
-                        showError("Please check your email for a confirmation link.");
-                    }
-                } else {
-                    const { data, error } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw error;
-                    // handled by onAuthStateChange
+                // Send OTP to email address via AuthClient SDK
+                await AuthClient.sendOtp(email, role);
+                pendingEmail = email;
+                pendingRole = role;
+
+                // Also attempt Supabase sign up in background if signing up
+                if (isSignUp && password) {
+                    try {
+                        await supabase.auth.signUp({
+                            email,
+                            password,
+                            options: { data: { role: role } }
+                        });
+                    } catch (sErr) { console.log('Supabase signup note:', sErr); }
+                } else if (password) {
+                    try {
+                        await supabase.auth.signInWithPassword({ email, password });
+                    } catch (sErr) { console.log('Supabase signin note:', sErr); }
                 }
+
+                // Switch UI to OTP step
+                document.getElementById('auth-form-container').classList.add('hidden');
+                const otpContainer = document.getElementById('otp-container');
+                otpContainer.classList.remove('hidden');
+                document.getElementById('otp-subtitle').innerText = `We sent a 6-digit verification code to ${email}`;
+                document.getElementById('otp-code').focus();
+
             } catch (err) {
-                console.error("Auth error occurred:", err);
-                showError(err.message || 'Authentication failed.');
+                console.error("Auth send OTP error:", err);
+                showError(err.message || 'Failed to send OTP code. Please try again.');
             } finally {
-                // Revert button if not redirected
                 signinBtn.classList.remove('pointer-events-none');
                 btnText.innerText = originalText;
                 btnIcon.innerText = 'arrow_forward';
                 btnIcon.classList.remove('animate-spin');
             }
         });
+
+        window.verifyOtpClick = async function() {
+            const otpCode = document.getElementById('otp-code').value.trim();
+            const verifyBtn = document.getElementById('verify-btn');
+            const verifyBtnText = document.getElementById('verify-btn-text');
+            const verifyBtnIcon = document.getElementById('verify-btn-icon');
+            const errorDiv = document.getElementById('auth-error');
+
+            if (!otpCode || otpCode.length !== 6) {
+                showError("Please enter the complete 6-digit code.");
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            const originalText = verifyBtnText.innerText;
+            verifyBtn.classList.add('pointer-events-none');
+            verifyBtnText.innerText = 'Verifying...';
+            verifyBtnIcon.innerText = 'progress_activity';
+            verifyBtnIcon.classList.add('animate-spin');
+
+            try {
+                const data = await AuthClient.verifyOtp(pendingEmail || emailInput.value.trim(), otpCode);
+                console.log('OTP verified successfully:', data);
+                
+                // Redirect user to next step based on onboarding status
+                AuthClient.handleAuthWorkflowRedirect(data.user, '/index.html');
+            } catch (err) {
+                console.error("OTP verification error:", err);
+                showError(err.message || 'Invalid or expired OTP code.');
+                verifyBtn.classList.remove('pointer-events-none');
+                verifyBtnText.innerText = originalText;
+                verifyBtnIcon.innerText = 'arrow_forward';
+                verifyBtnIcon.classList.remove('animate-spin');
+            }
+        };
+
+        window.cancelOtp = function() {
+            document.getElementById('otp-container').classList.add('hidden');
+            document.getElementById('auth-form-container').classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+        };
     });
-
-
-    // OTP logic removed for login.html
   </script>
 </div></main></body></html>

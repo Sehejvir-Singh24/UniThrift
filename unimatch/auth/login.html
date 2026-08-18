@@ -121,7 +121,31 @@
         </button>
       </div>
 
-      <!-- OTP verify form removed (no longer used for login) -->
+      <!-- OTP verify form -->
+      <div id="otp-form" class="hidden flex flex-col gap-3">
+        <p id="otp-subtitle-um" class="text-[13px] text-um-on-surface-variant text-center">We sent a 6-digit verification code to your email.</p>
+        <div class="relative">
+          <input
+            id="otp-input-um"
+            type="text"
+            placeholder="000000"
+            maxlength="6"
+            class="w-full h-[52px] px-4 text-center font-bold tracking-[0.5em] rounded-2xl bg-um-surface-container border border-um-outline-variant text-um-on-surface text-[18px] focus:outline-none focus:border-um-primary transition-colors"
+          />
+        </div>
+        <button
+          id="otp-btn-um"
+          onclick="handleOtpVerifyUniMatch()"
+          class="w-full h-[52px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          style="box-shadow: 0 4px 16px rgba(92,4,39,0.2);"
+        >
+          <span id="otp-btn-text-um">Verify &amp; Continue</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+        <button type="button" onclick="cancelOtpUniMatch()" class="text-[13px] text-um-primary font-semibold text-center mt-1 hover:underline">
+          Back to sign in
+        </button>
+      </div>
 
     </div>
 
@@ -140,6 +164,7 @@
   <script>
     // Read ?mode param
     let isSignUp = false;
+    let pendingEmail = '';
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'signup') {
       isSignUp = true;
@@ -151,7 +176,7 @@
     // On load: if already authenticated, route accordingly
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session && !AuthClient.getToken()) return;
       await routeAfterAuth();
     })();
 
@@ -164,7 +189,8 @@
 
     async function routeAfterAuth() {
       if (typeof clearProfileCache === 'function') clearProfileCache();
-      const profile = await getProfile(false);
+      const user = AuthClient.getUser();
+      const profile = user || (typeof getProfile === 'function' ? await getProfile(false) : null);
       if (!profile) return;
 
       if (!profile.is_verified) {
@@ -202,14 +228,11 @@
     }
 
     async function handleEmailLogin() {
+      clearError();
       const email = document.getElementById('email-input').value.trim();
       const password = document.getElementById('password-input').value;
       if (!email || !email.includes('@')) {
         showError('Please enter a valid email address.');
-        return;
-      }
-      if (!password || password.length < 6) {
-        showError('Password must be at least 6 characters.');
         return;
       }
 
@@ -218,29 +241,63 @@
       const originalText = btnText.textContent;
       
       btn.classList.add('opacity-60', 'pointer-events-none');
-      btnText.textContent = isSignUp ? 'Creating account...' : 'Signing in...';
+      btnText.textContent = 'Sending OTP code...';
 
       try {
-        if (isSignUp) {
-          const { data, error } = await supabase.auth.signUp({ email, password });
-          if (error) throw error;
-          if (data?.session) {
-            // Handled by onAuthStateChange
-          } else {
-            showError("Please check your email for a confirmation link.");
-            btn.classList.remove('opacity-60', 'pointer-events-none');
-            btnText.textContent = originalText;
-          }
-        } else {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
-          // Handled by onAuthStateChange
+        await AuthClient.sendOtp(email);
+        pendingEmail = email;
+
+        if (password) {
+          try {
+            if (isSignUp) {
+              await supabase.auth.signUp({ email, password });
+            } else {
+              await supabase.auth.signInWithPassword({ email, password });
+            }
+          } catch (sErr) { console.log('Supabase auth note:', sErr); }
         }
+
+        document.getElementById('email-form').classList.add('hidden');
+        document.getElementById('otp-form').classList.remove('hidden');
+        document.getElementById('otp-subtitle-um').textContent = `We sent a 6-digit verification code to ${email}`;
+        document.getElementById('otp-input-um').focus();
       } catch (err) {
-        showError('Authentication failed: ' + (err.message || 'Server error.'));
+        showError('Failed to send OTP code: ' + (err.message || 'Server error.'));
+      } finally {
         btn.classList.remove('opacity-60', 'pointer-events-none');
         btnText.textContent = originalText;
       }
+    }
+
+    async function handleOtpVerifyUniMatch() {
+      clearError();
+      const otpCode = document.getElementById('otp-input-um').value.trim();
+      if (!otpCode || otpCode.length !== 6) {
+        showError('Please enter the 6-digit verification code.');
+        return;
+      }
+
+      const btn = document.getElementById('otp-btn-um');
+      const btnText = document.getElementById('otp-btn-text-um');
+      const originalText = btnText.textContent;
+      btn.classList.add('opacity-60', 'pointer-events-none');
+      btnText.textContent = 'Verifying...';
+
+      try {
+        const data = await AuthClient.verifyOtp(pendingEmail || document.getElementById('email-input').value.trim(), otpCode);
+        console.log('UniMatch OTP Verified:', data);
+        await routeAfterAuth();
+      } catch (err) {
+        showError(err.message || 'Invalid or expired OTP code.');
+        btn.classList.remove('opacity-60', 'pointer-events-none');
+        btnText.textContent = originalText;
+      }
+    }
+
+    function cancelOtpUniMatch() {
+      document.getElementById('otp-form').classList.add('hidden');
+      document.getElementById('email-form').classList.remove('hidden');
+      clearError();
     }
 
     function showError(msg) {
