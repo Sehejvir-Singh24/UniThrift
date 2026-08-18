@@ -25,11 +25,19 @@ window.escapeHTML = function(str) {
 // Helper: Get Current User Profile (Cache-First for ultra-fast mobile navigation)
 let _cachedProfile = null;
 
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) return true;
+  if (window.AuthClient && AuthClient.getToken()) return true;
+  if (localStorage.getItem('unithrift_auth_token')) return true;
+  return false;
+}
+
 async function getProfile(forceRefresh = false) {
   if (!forceRefresh) {
     if (_cachedProfile) return _cachedProfile;
     try {
-      const stored = sessionStorage.getItem('unimatch_cached_profile');
+      const stored = sessionStorage.getItem('unimatch_cached_profile') || localStorage.getItem('unithrift_user');
       if (stored) {
         _cachedProfile = JSON.parse(stored);
         refreshProfileInBackground();
@@ -40,6 +48,14 @@ async function getProfile(forceRefresh = false) {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
+    // Check if user authenticated via AuthClient Email OTP
+    const localUser = (window.AuthClient && AuthClient.getUser()) || 
+                      (localStorage.getItem('unithrift_user') ? JSON.parse(localStorage.getItem('unithrift_user')) : null);
+    if (localUser) {
+      _cachedProfile = localUser;
+      return localUser;
+    }
+
     _cachedProfile = null;
     try { sessionStorage.removeItem('unimatch_cached_profile'); } catch (e) {}
     return null;
@@ -90,10 +106,10 @@ async function refreshProfileInBackground() {
 }
 
 // Helper: Require Authentication
-// Redirects to login if no session is active.
+// Redirects to login if no session or AuthClient token is active.
 async function requireAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  const isAuthed = await checkAuth();
+  if (!isAuthed) {
     window.location.href = '/auth/login.html';
     return false;
   }
@@ -103,8 +119,8 @@ async function requireAuth() {
 // Helper: Require UniMatch Authentication & Completed Setup
 // Validates session, verification status (shared with UniThrift), instagram handle, and unimatch profile completion.
 async function requireUniMatchAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  const isAuthed = await checkAuth();
+  if (!isAuthed) {
     window.location.href = '/unimatch/welcome.html';
     return null;
   }
@@ -113,7 +129,7 @@ async function requireUniMatchAuth() {
     window.location.href = '/unimatch/auth/login.html';
     return null;
   }
-  if (!profile.is_verified) {
+  if (!profile.is_verified && profile.verification_status !== 'pending' && profile.verification_status !== 'verified') {
     window.location.href = '/unimatch/auth/verify.html';
     return null;
   }
