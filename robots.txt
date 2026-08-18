@@ -1,0 +1,34 @@
+User-agent: *
+Allow: /
+
+# Core pages
+Allow: /index.html
+Allow: /splash.html
+Allow: /marketplace/
+Allow: /unimatch/
+Allow: /roommates/
+Allow: /pghostels/
+Allow: /core/
+
+# Block private/auth/admin areas from crawling
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /server/
+Disallow: /db/
+Disallow: /supabase/
+Disallow: /scripts/
+Disallow: /docs/
+Disallow: /unimatch/auth/
+Disallow: /unimatch/profile-setup/
+
+# Block specific transaction pages (no value to crawlers)
+Disallow: /marketplace/make_offer.html
+Disallow: /marketplace/counter_offer.html
+Disallow: /marketplace/offer_accepted.html
+Disallow: /marketplace/offer_received.html
+Disallow: /marketplace/add_photos.html
+Disallow: /unimatch/insta-exchange-request.html
+Disallow: /unimatch/insta-exchange-success.html
+Disallow: /unimatch/connection-success.html
+
+Sitemap: https://unithrift.co.in/sitemap.xml
