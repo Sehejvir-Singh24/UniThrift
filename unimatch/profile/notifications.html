@@ -119,6 +119,23 @@
           </div>
         </div>
       </div>
+
+      <!-- Email Delivery Settings -->
+      <div class="space-y-2">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-um-primary px-1">Email Delivery Settings</h2>
+        <div class="bg-white rounded-2xl p-4 card-shadow border border-um-outline-variant/30">
+          <div class="flex items-center justify-between">
+            <div class="pr-4">
+              <h3 class="text-sm font-bold text-um-on-surface">Real-Time Email Alerts</h3>
+              <p class="text-xs text-um-on-surface-variant mt-0.5">Receive email notifications for offers, matches, and messages on your registered email.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+              <input id="email-notif-toggle" type="checkbox" class="sr-only peer" checked onchange="localStorage.setItem('email_notifs_enabled', this.checked)">
+              <div class="w-11 h-6 bg-um-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-um-primary"></div>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
   </main>

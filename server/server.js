@@ -384,6 +384,102 @@ app.post('/api/auth/update-profile', (req, res) => {
   }
 });
 
+// Helper: Generate Notification HTML Email Template
+function generateNotificationEmailHtml(platform, title, message, actionUrl, actionText) {
+  const isUniMatch = (platform || '').toLowerCase() === 'unimatch';
+  const brandColor = isUniMatch ? '#5c0427' : '#006e2f';
+  const brandBg = isUniMatch ? '#fcf4f7' : '#f0fdf4';
+  const brandName = isUniMatch ? 'UniMatch' : 'UniThrift';
+  const tagline = isUniMatch ? 'Campus Match & Connections' : 'Campus Buy & Sell Marketplace';
+  const buttonText = actionText || (isUniMatch ? 'Open UniMatch' : 'View on UniThrift');
+  const targetUrl = actionUrl || (isUniMatch ? 'https://unithrift.co.in/unimatch/discover.html' : 'https://unithrift.co.in/marketplace/marketplace.html');
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f7f9fb; margin: 0; padding: 20px; color: #191c1e; }
+        .container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e0e3e5; }
+        .logo-container { text-align: center; margin-bottom: 24px; }
+        .logo { font-size: 26px; font-weight: 800; color: ${brandColor}; letter-spacing: -0.5px; text-decoration: none; }
+        .tagline { font-size: 12px; color: #757687; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        .content-card { background: ${brandBg}; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid ${brandColor}22; }
+        .title { font-size: 20px; font-weight: 700; color: #0b1c30; margin-top: 0; margin-bottom: 12px; }
+        .message { font-size: 15px; color: #3d4a3d; line-height: 1.6; margin-bottom: 20px; }
+        .cta-btn { display: inline-block; background-color: ${brandColor}; color: #ffffff !important; font-weight: 700; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 4px 12px ${brandColor}33; }
+        .footer { text-align: center; font-size: 12px; color: #757687; margin-top: 32px; border-top: 1px solid #f2f4f6; padding-top: 16px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo-container">
+          <div class="logo">${brandName}</div>
+          <div class="tagline">${tagline}</div>
+        </div>
+        <div class="content-card">
+          <h2 class="title">${title}</h2>
+          <p class="message">${message}</p>
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="${targetUrl}" class="cta-btn" target="_blank">${buttonText}</a>
+          </div>
+        </div>
+        <div class="footer">
+          You are receiving this notification from ${brandName}.<br/>
+          &copy; ${new Date().getFullYear()} ${brandName}. All rights reserved.
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+// Route: Send Notification Email
+app.post('/api/notify/send-email', async (req, res) => {
+  try {
+    const { to, title, message, platform, actionUrl, actionText } = req.body;
+
+    if (!to || !title || !message) {
+      return res.status(400).json({ success: false, error: 'Recipient email, title, and message are required.' });
+    }
+
+    const cleanEmail = to.trim().toLowerCase();
+    const html = generateNotificationEmailHtml(platform, title, message, actionUrl, actionText);
+    const subject = `[${(platform || 'UniThrift').toUpperCase()}] ${title}`;
+
+    // 1. Send via Resend API
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const result = await sendResendEmail(cleanEmail, subject, html);
+        console.log(`[NOTIFICATION EMAIL SENT - RESEND] To: ${cleanEmail} | Subject: ${subject}`);
+        return res.json({ success: true, message: `Notification email sent to ${cleanEmail}` });
+      } catch (resendErr) {
+        console.error('[NOTIFICATION RESEND FAILED]:', resendErr);
+      }
+    }
+
+    // 2. Fallback to Nodemailer SMTP
+    const transporter = getTransporter();
+    if (transporter) {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || `"UniThrift" <${process.env.SMTP_USER}>`,
+        to: cleanEmail,
+        subject: subject,
+        html: html
+      };
+      await transporter.sendMail(mailOptions);
+      console.log(`[NOTIFICATION EMAIL SENT - SMTP] To: ${cleanEmail}`);
+      return res.json({ success: true, message: `Notification email sent to ${cleanEmail}` });
+    }
+
+    return res.json({ success: true, message: `Notification queued (dev mode - no active mailer)` });
+  } catch (err) {
+    console.error('[NOTIFICATION EMAIL ERROR]', err);
+    res.status(500).json({ success: false, error: 'Failed to send notification email. ' + err.message });
+  }
+});
+
 // Serve frontend static files if requested
 app.use(express.static(path.join(__dirname, '..')));
 

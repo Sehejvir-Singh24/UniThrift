@@ -165,6 +165,33 @@
       sessionStorage.removeItem('unimatch_cached_profile');
       sessionStorage.removeItem('unithrift_pending_email');
       window.location.href = '/auth/login.html';
+    },
+
+    // 9. Send Real-Time Email Notification (UniThrift & UniMatch)
+    async sendEmailNotification({ to, title, message, platform = 'unithrift', actionUrl, actionText }) {
+      try {
+        if (!to || !to.includes('@')) return null;
+
+        const NOTIFY_API_URL = API_BASE_URL.replace('/api/auth', '/api/notify/send-email');
+        const response = await fetch(NOTIFY_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: to.trim().toLowerCase(),
+            title,
+            message,
+            platform,
+            actionUrl,
+            actionText
+          })
+        });
+
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.error('AuthClient.sendEmailNotification Error:', err);
+      }
+      return null;
     }
   };
 
