@@ -227,6 +227,8 @@
       }
     }
 
+    let pendingPassword = '';
+
     async function handleEmailLogin() {
       clearError();
       const email = document.getElementById('email-input').value.trim();
@@ -246,20 +248,12 @@
       try {
         await AuthClient.sendOtp(email);
         pendingEmail = email;
-
-        if (password) {
-          try {
-            if (isSignUp) {
-              await supabase.auth.signUp({ email, password });
-            } else {
-              await supabase.auth.signInWithPassword({ email, password });
-            }
-          } catch (sErr) { console.log('Supabase auth note:', sErr); }
-        }
+        pendingPassword = password;
 
         document.getElementById('email-form').classList.add('hidden');
         document.getElementById('otp-form').classList.remove('hidden');
         document.getElementById('otp-subtitle-um').textContent = `We sent a 6-digit verification code to ${email}`;
+        document.getElementById('otp-input-um').value = '';
         document.getElementById('otp-input-um').focus();
       } catch (err) {
         showError('Failed to send OTP code: ' + (err.message || 'Server error.'));
@@ -286,6 +280,17 @@
       try {
         const data = await AuthClient.verifyOtp(pendingEmail || document.getElementById('email-input').value.trim(), otpCode);
         console.log('UniMatch OTP Verified:', data);
+
+        if (pendingPassword) {
+          try {
+            if (isSignUp) {
+              await supabase.auth.signUp({ email: pendingEmail, password: pendingPassword });
+            } else {
+              await supabase.auth.signInWithPassword({ email: pendingEmail, password: pendingPassword });
+            }
+          } catch (sErr) { console.log('Supabase auth note:', sErr); }
+        }
+
         await routeAfterAuth();
       } catch (err) {
         showError(err.message || 'Invalid or expired OTP code.');

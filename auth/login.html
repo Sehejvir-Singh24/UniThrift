@@ -288,12 +288,13 @@
             toggleAuthMode();
         }
 
-        // Auto-redirect if already logged in
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (session) {
+        // Auto-redirect only on initial page load if user already has an active verified session
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && AuthClient.getToken() && AuthClient.getUser()) {
                 window.location.href = '/index.html'; 
             }
-        });
+        })();
 
         const errorDiv = document.getElementById('auth-error');
         const btnText = document.getElementById('btn-text');
@@ -309,6 +310,7 @@
         }
 
         let pendingEmail = '';
+        let pendingPassword = '';
         let pendingRole = 'customer';
 
         signinBtn.addEventListener('click', async () => {
@@ -338,28 +340,15 @@
                 // Send OTP to email address via AuthClient SDK
                 await AuthClient.sendOtp(email, role);
                 pendingEmail = email;
+                pendingPassword = password;
                 pendingRole = role;
 
-                // Also attempt Supabase sign up in background if signing up
-                if (isSignUp && password) {
-                    try {
-                        await supabase.auth.signUp({
-                            email,
-                            password,
-                            options: { data: { role: role } }
-                        });
-                    } catch (sErr) { console.log('Supabase signup note:', sErr); }
-                } else if (password) {
-                    try {
-                        await supabase.auth.signInWithPassword({ email, password });
-                    } catch (sErr) { console.log('Supabase signin note:', sErr); }
-                }
-
-                // Switch UI to OTP step
+                // Switch UI to OTP step (do NOT sign in or redirect yet)
                 document.getElementById('auth-form-container').classList.add('hidden');
                 const otpContainer = document.getElementById('otp-container');
                 otpContainer.classList.remove('hidden');
                 document.getElementById('otp-subtitle').innerText = `We sent a 6-digit verification code to ${email}`;
+                document.getElementById('otp-code').value = '';
                 document.getElementById('otp-code').focus();
 
             } catch (err) {
@@ -393,10 +382,31 @@
             verifyBtnIcon.classList.add('animate-spin');
 
             try {
+                // 1. Verify OTP code with backend
                 const data = await AuthClient.verifyOtp(pendingEmail || emailInput.value.trim(), otpCode);
                 console.log('OTP verified successfully:', data);
                 
-                // Redirect user to next step based on onboarding status
+                // 2. Synchronize Supabase authentication session if password was provided
+                if (pendingPassword) {
+                    try {
+                        if (isSignUp) {
+                            await supabase.auth.signUp({
+                                email: pendingEmail,
+                                password: pendingPassword,
+                                options: { data: { role: pendingRole } }
+                            });
+                        } else {
+                            await supabase.auth.signInWithPassword({
+                                email: pendingEmail,
+                                password: pendingPassword
+                            });
+                        }
+                    } catch (sErr) {
+                        console.log('Supabase sync note:', sErr);
+                    }
+                }
+
+                // 3. Complete redirect
                 AuthClient.handleAuthWorkflowRedirect(data.user, '/index.html');
             } catch (err) {
                 console.error("OTP verification error:", err);
