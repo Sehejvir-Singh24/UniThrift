@@ -128,20 +128,16 @@
       if (typeof clearProfileCache === 'function') clearProfileCache();
       let profile = await getProfile(true);
 
-      if (profile && !profile.is_verified) {
-        try {
-          await updateProfile({ is_verified: true, unimatch_verification_status: 'verified' });
-          profile = await getProfile(true);
-        } catch(e) {}
-      }
-
       setTimeout(() => {
         btnIcon.classList.remove('animate-spin');
         btn.classList.remove('opacity-60', 'pointer-events-none');
 
-        if (profile && profile.is_verified) {
+        const isApproved = profile && (profile.is_verified || profile.unimatch_verification_status === 'verified' || profile.verification_status === 'verified' || profile.role === 'admin');
+        const isRejected = profile && (profile.unimatch_verification_status === 'rejected' || profile.verification_status === 'rejected');
+
+        if (isApproved) {
           window.location.href = '/unimatch/auth/verified.html';
-        } else if (profile && profile.unimatch_verification_status === 'rejected') {
+        } else if (isRejected) {
           window.location.href = '/unimatch/auth/verify.html?rejected=true';
         } else {
           btnText.textContent = 'Still Pending';

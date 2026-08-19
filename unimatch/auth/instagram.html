@@ -180,12 +180,6 @@
       const profile = await getProfile();
       if (!profile) return;
 
-      // If not verified, send back
-      if (!profile.is_verified) {
-        window.location.href = '/unimatch/auth/verify.html';
-        return;
-      }
-
       // Detect UniThrift crossover: verified via UniThrift but no UniMatch profile yet
       if (profile.is_verified && !profile.unimatch_profile_complete) {
         const banner = document.getElementById('crossover-banner');

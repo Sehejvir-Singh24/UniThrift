@@ -193,16 +193,20 @@
       const profile = user || (typeof getProfile === 'function' ? await getProfile(false) : null);
       if (!profile) return;
 
-      if (!profile.is_verified) {
-        window.location.href = '/unimatch/auth/verify.html';
-        return;
-      }
       if (!profile.instagram_username) {
         window.location.href = '/unimatch/auth/instagram.html';
         return;
       }
       if (!profile.unimatch_profile_complete) {
         window.location.href = '/unimatch/profile-setup/basic-info.html';
+        return;
+      }
+      if (!profile.is_verified && profile.role !== 'admin') {
+        if (profile.verification_status === 'pending' || profile.unimatch_verification_status === 'pending') {
+          window.location.href = '/unimatch/auth/pending.html';
+          return;
+        }
+        window.location.href = '/unimatch/auth/verify.html';
         return;
       }
       window.location.href = '/unimatch/discover.html';

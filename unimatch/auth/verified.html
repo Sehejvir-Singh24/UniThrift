@@ -74,7 +74,8 @@
   <!-- CTA -->
   <div class="btn-anim w-full max-w-sm flex flex-col gap-3">
     <a
-      href="/unimatch/auth/instagram.html"
+      id="start-discovering-btn"
+      href="/unimatch/discover.html"
       class="w-full h-[56px] bg-um-primary text-um-on-primary text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
       style="box-shadow: 0 4px 20px rgba(92,4,39,0.25);"
     >
@@ -91,16 +92,23 @@
       if (!ok) { window.location.href = '/unimatch/auth/login.html'; return; }
 
       // Personalise with first name
-      const profile = await getProfile();
+      const profile = await getProfile(true);
       if (profile && profile.full_name) {
         const firstName = profile.full_name.split(' ')[0];
         document.getElementById('headline').textContent = `You're in, ${firstName}!`;
+      }
+      if (profile && !profile.unimatch_profile_complete) {
+        const btn = document.getElementById('start-discovering-btn');
+        if (btn) {
+          btn.href = !profile.instagram_username ? '/unimatch/auth/instagram.html' : '/unimatch/profile-setup/basic-info.html';
+          btn.innerHTML = `<span>Complete Profile Setup</span> <span class="material-symbols-outlined text-[20px]">arrow_forward</span>`;
+        }
       }
       // Stamp UniMatch-specific verification status
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         await supabase.from('profiles')
-          .update({ unimatch_verification_status: 'verified' })
+          .update({ unimatch_verification_status: 'verified', is_verified: true })
           .eq('id', session.user.id);
       }
     })();

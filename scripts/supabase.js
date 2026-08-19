@@ -117,7 +117,7 @@ async function requireAuth() {
 }
 
 // Helper: Require UniMatch Authentication & Completed Setup
-// Validates session, verification status (shared with UniThrift), instagram handle, and unimatch profile completion.
+// Validates session, instagram handle, profile setup, and student ID verification (evaluated last).
 async function requireUniMatchAuth() {
   const isAuthed = await checkAuth();
   if (!isAuthed) {
@@ -129,16 +129,20 @@ async function requireUniMatchAuth() {
     window.location.href = '/unimatch/auth/login.html';
     return null;
   }
-  if (!profile.is_verified && profile.verification_status !== 'pending' && profile.verification_status !== 'verified') {
-    window.location.href = '/unimatch/auth/verify.html';
-    return null;
-  }
   if (!profile.instagram_username) {
     window.location.href = '/unimatch/auth/instagram.html';
     return null;
   }
   if (!profile.unimatch_profile_complete) {
     window.location.href = '/unimatch/profile-setup/basic-info.html';
+    return null;
+  }
+  if (!profile.is_verified && profile.role !== 'admin') {
+    if (profile.verification_status === 'pending' || profile.unimatch_verification_status === 'pending') {
+      window.location.href = '/unimatch/auth/pending.html';
+      return null;
+    }
+    window.location.href = '/unimatch/auth/verify.html';
     return null;
   }
   return profile;
