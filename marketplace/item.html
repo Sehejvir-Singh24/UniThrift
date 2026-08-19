@@ -271,18 +271,20 @@
   let isSaved = false;
 
   saveBtn.addEventListener('click', () => {
-    isSaved = !isSaved;
-    if (isSaved) {
-      saveIcon.style.fontVariationSettings = "'FILL' 1";
-      saveIcon.classList.add('text-error');
-      saveBtn.classList.add('bg-error-container');
-      saveBtn.classList.remove('bg-surface-container');
-    } else {
-      saveIcon.style.fontVariationSettings = "'FILL' 0";
-      saveIcon.classList.remove('text-error');
-      saveBtn.classList.remove('bg-error-container');
-      saveBtn.classList.add('bg-surface-container');
-    }
+    requireLoginForAction(() => {
+      isSaved = !isSaved;
+      if (isSaved) {
+        saveIcon.style.fontVariationSettings = "'FILL' 1";
+        saveIcon.classList.add('text-error');
+        saveBtn.classList.add('bg-error-container');
+        saveBtn.classList.remove('bg-surface-container');
+      } else {
+        saveIcon.style.fontVariationSettings = "'FILL' 0";
+        saveIcon.classList.remove('text-error');
+        saveBtn.classList.remove('bg-error-container');
+        saveBtn.classList.add('bg-surface-container');
+      }
+    });
   });
 
   // Basic validation for offer input
