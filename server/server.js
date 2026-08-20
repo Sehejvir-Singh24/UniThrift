@@ -483,10 +483,34 @@ app.post('/api/notify/send-email', async (req, res) => {
 // Serve frontend static files if requested
 app.use(express.static(path.join(__dirname, '..')));
 
+// Automatic Self-Pinger to keep Render awake 24/7 (prevents 15-min idle spin down)
+const KEEP_ALIVE_URL = process.env.RENDER_EXTERNAL_URL 
+  ? `${process.env.RENDER_EXTERNAL_URL}/api/health` 
+  : 'https://unithrift-n2my.onrender.com/api/health';
+
+function startKeepAlive() {
+  // Start ping loop on cloud deployments (Render sets RENDER=true or PORT!=5000)
+  if (process.env.NODE_ENV === 'production' || process.env.RENDER || process.env.RENDER_EXTERNAL_URL || process.env.PORT) {
+    console.log(`[KEEP-ALIVE] 🔄 Auto-pinger activated for ${KEEP_ALIVE_URL} (every 10 min)`);
+    setInterval(async () => {
+      try {
+        const res = await fetch(KEEP_ALIVE_URL);
+        if (res.ok) {
+          console.log(`[KEEP-ALIVE] 🟢 Ping OK at ${new Date().toISOString()}`);
+        }
+      } catch (err) {
+        console.warn(`[KEEP-ALIVE] ⚠️ Ping error:`, err.message);
+      }
+    }, 10 * 60 * 1000); // 10 minutes
+  }
+}
+
 // Start Express Server
 app.listen(PORT, () => {
   console.log(`\n======================================================`);
   console.log(`🚀 UniThrift Auth Server running on http://localhost:${PORT}`);
   console.log(`📧 SMTP Email Status: ${isSmtpConfigured() ? 'CONFIGURED (Sending live emails)' : 'DEV MODE (Logging OTPs to terminal)'}`);
   console.log(`======================================================\n`);
+  startKeepAlive();
 });
+
