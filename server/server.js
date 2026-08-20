@@ -11,7 +11,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'unithrift_super_secret_jwt_key_202
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
+app.options('*', cors({ origin: true, credentials: true }));
 app.use(express.json());
+
 
 // In-Memory Storage (Can be connected to DB in production)
 const otpStore = new Map(); // key: email, value: { code, expiresAt, role }

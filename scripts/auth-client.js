@@ -5,11 +5,9 @@
   const CLOUD_API_URL = 'https://unithrift-n2my.onrender.com/api/auth';
   const LOCAL_API_URL = 'http://localhost:5000/api/auth';
   
-  // Use localhost when running locally, cloud URL when on live site
+  // Default to live Cloud Render backend so authentication works seamlessly in all environments (Live Server, Localhost, Production)
   const API_BASE_URL = window.UNITHRIFT_AUTH_API || 
-    ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
-      ? LOCAL_API_URL 
-      : CLOUD_API_URL);
+    (window.UNITHRIFT_USE_LOCAL ? LOCAL_API_URL : CLOUD_API_URL);
   const TOKEN_KEY = 'unithrift_auth_token';
   const USER_KEY = 'unithrift_user';
 
@@ -17,19 +15,37 @@
     // 1. Send OTP Code to Email
     async sendOtp(email, role = 'customer') {
       try {
-        const response = await fetch(`${API_BASE_URL}/send-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, role })
-        });
+        let response;
+        try {
+          response = await fetch(`${API_BASE_URL}/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim().toLowerCase(), role })
+          });
+        } catch (fetchErr) {
+          // If custom/local endpoint failed, fallback to Cloud Render backend
+          if (API_BASE_URL !== CLOUD_API_URL) {
+            console.warn('[AUTH CLIENT] Primary API failed, falling back to Cloud Render API...', fetchErr);
+            response = await fetch(`${CLOUD_API_URL}/send-otp`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email.trim().toLowerCase(), role })
+            });
+          } else {
+            throw fetchErr;
+          }
+        }
 
         const data = await response.json();
         if (!response.ok || !data.success) {
           throw new Error(data.error || 'Failed to send OTP code.');
         }
 
-        // Store pending email for OTP verification step
+        // Store pending email and optional dev code
         sessionStorage.setItem('unithrift_pending_email', email.trim().toLowerCase());
+        if (data.devOtp) {
+          sessionStorage.setItem('unithrift_dev_otp', data.devOtp);
+        }
         return data;
       } catch (err) {
         console.error('AuthClient.sendOtp Error:', err);
@@ -45,11 +61,24 @@
           throw new Error('Email address is missing. Please enter your email again.');
         }
 
-        const response = await fetch(`${API_BASE_URL}/verify-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: targetEmail, otp: otp.trim() })
-        });
+        let response;
+        try {
+          response = await fetch(`${API_BASE_URL}/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: targetEmail.trim().toLowerCase(), otp: otp.trim() })
+          });
+        } catch (fetchErr) {
+          if (API_BASE_URL !== CLOUD_API_URL) {
+            response = await fetch(`${CLOUD_API_URL}/verify-otp`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: targetEmail.trim().toLowerCase(), otp: otp.trim() })
+            });
+          } else {
+            throw fetchErr;
+          }
+        }
 
         const data = await response.json();
         if (!response.ok || !data.success) {
@@ -69,6 +98,7 @@
         throw err;
       }
     },
+
 
     // 3. Get Authenticated User Token
     getToken() {

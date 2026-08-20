@@ -250,14 +250,22 @@
       btnText.textContent = 'Sending OTP code...';
 
       try {
-        await AuthClient.sendOtp(email);
+        const otpRes = await AuthClient.sendOtp(email);
         pendingEmail = email;
         pendingPassword = password;
 
         document.getElementById('email-form').classList.add('hidden');
         document.getElementById('otp-form').classList.remove('hidden');
-        document.getElementById('otp-subtitle-um').textContent = `We sent a 6-digit verification code to ${email}`;
-        document.getElementById('otp-input-um').value = '';
+        
+        const subtitle = document.getElementById('otp-subtitle-um');
+        if (otpRes.isDevMode && otpRes.devOtp) {
+          subtitle.innerHTML = `We sent a code to <b>${email}</b>.<br/><span class="text-xs font-semibold text-um-primary bg-um-surface-container px-2 py-0.5 rounded-full inline-block mt-1">Demo Code: ${otpRes.devOtp}</span>`;
+          document.getElementById('otp-input-um').value = otpRes.devOtp;
+        } else {
+          subtitle.textContent = `We sent a 6-digit verification code to ${email}`;
+          document.getElementById('otp-input-um').value = '';
+        }
+        
         document.getElementById('otp-input-um').focus();
       } catch (err) {
         showError('Failed to send OTP code: ' + (err.message || 'Server error.'));
@@ -265,6 +273,7 @@
         btn.classList.remove('opacity-60', 'pointer-events-none');
         btnText.textContent = originalText;
       }
+
     }
 
     async function handleOtpVerifyUniMatch() {
