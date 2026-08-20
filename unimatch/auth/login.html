@@ -173,12 +173,6 @@
       document.getElementById('email-btn-text').textContent = 'Sign Up';
     }
 
-    // On load: if already authenticated, route accordingly
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session && !AuthClient.getToken()) return;
-      await routeAfterAuth();
-    })();
 
     // Listen for OAuth callback
     supabase.auth.onAuthStateChange(async (event, session) => {

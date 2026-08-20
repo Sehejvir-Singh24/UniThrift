@@ -290,15 +290,6 @@
             toggleAuthMode();
         }
 
-        // Auto-redirect only on initial page load if user already has an active verified session
-        (async () => {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if ((session || AuthClient.getToken()) && AuthClient.getUser()) {
-                    window.location.href = '/index.html'; 
-                }
-            } catch (e) {}
-        })();
 
         const errorDiv = document.getElementById('auth-error');
         const btnText = document.getElementById('btn-text');
