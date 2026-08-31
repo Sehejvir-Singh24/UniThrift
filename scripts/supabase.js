@@ -333,7 +333,7 @@ async function checkUniMatchNotifications(userId) {
 }
 
 // Helper: 24-Hour Daily Free Likes Manager
-const DAILY_FREE_LIKES = 5;
+const DAILY_FREE_LIKES = 10;
 const RESET_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 Hours
 
 function getDailyLikesInfo(userId) {
@@ -345,8 +345,8 @@ function getDailyLikesInfo(userId) {
     const raw = localStorage.getItem(key);
     if (raw) {
       const data = JSON.parse(raw);
-      if (now - data.last_reset >= RESET_INTERVAL_MS) {
-        const resetData = { remaining: DAILY_FREE_LIKES, last_reset: now };
+      if (data.limit !== DAILY_FREE_LIKES || now - data.last_reset >= RESET_INTERVAL_MS) {
+        const resetData = { remaining: DAILY_FREE_LIKES, last_reset: now, limit: DAILY_FREE_LIKES };
         localStorage.setItem(key, JSON.stringify(resetData));
         return resetData;
       }
@@ -354,7 +354,7 @@ function getDailyLikesInfo(userId) {
     }
   } catch (e) {}
 
-  const initData = { remaining: DAILY_FREE_LIKES, last_reset: now };
+  const initData = { remaining: DAILY_FREE_LIKES, last_reset: now, limit: DAILY_FREE_LIKES };
   try {
     localStorage.setItem(key, JSON.stringify(initData));
   } catch (e) {}

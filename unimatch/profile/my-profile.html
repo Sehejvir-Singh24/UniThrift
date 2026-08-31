@@ -86,7 +86,7 @@
         </div>
         <div style="width:1px;background:var(--um-border);"></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span id="stat-likes-left" style="font-size:20px;font-weight:700;color:var(--um-primary);">5</span>
+          <span id="stat-likes-left" style="font-size:20px;font-weight:700;color:var(--um-primary);">10</span>
           <span style="font-size:11px;color:var(--um-text-muted);font-weight:600;letter-spacing:0.04em;">LIKES LEFT</span>
         </div>
         <div style="width:1px;background:var(--um-border);"></div>
@@ -237,7 +237,7 @@
 
         const realAdmirers = (likesRes && likesRes.count) !== null ? likesRes.count : 0;
         const realMatches = (matchesRes && matchesRes.count) !== null ? matchesRes.count : 0;
-        const likesInfo = typeof getDailyLikesInfo === 'function' ? getDailyLikesInfo(profile.id) : { remaining: 5 };
+        const likesInfo = typeof getDailyLikesInfo === 'function' ? getDailyLikesInfo(profile.id) : { remaining: 10 };
 
         if (document.getElementById('stat-admirers')) document.getElementById('stat-admirers').textContent = realAdmirers;
         if (document.getElementById('stat-likes-left')) document.getElementById('stat-likes-left').textContent = likesInfo.remaining;
