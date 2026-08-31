@@ -58,7 +58,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/scripts/payu.js"></script>
 </head>
 <body class="bg-background font-body-lg text-on-background">
 
@@ -484,34 +484,8 @@
       const cost = days * 19;
       modal.classList.add('hidden');
 
-      const options = {
-        key: 'rzp_test_placeholder',
-        amount: cost * 100,
-        currency: 'INR',
-        name: 'UniThrift Marketplace',
-        description: `Boost (${days} Days): ${productTitle}`,
-        handler: async function(response) {
-          try {
-            await boostProductListing(productId, days);
-            alert(`⚡ Success! Your product is now boosted for ${days} days!`);
-            window.location.reload();
-          } catch(e) {
-            alert('Failed to update boost status: ' + e.message);
-          }
-        },
-        prefill: { name: 'UniThrift Student' },
-        theme: { color: '#006e2f' }
-      };
-
-      if (window.Razorpay) {
-        new Razorpay(options).open();
-      } else {
-        if (confirm(`Confirm ₹${cost} payment to Boost "${productTitle}" for ${days} days?`)) {
-          boostProductListing(productId, days)
-            .then(() => { alert(`⚡ Boosted for ${days} days!`); window.location.reload(); })
-            .catch(err => alert('Error: ' + err.message));
-        }
-      }
+      startPayUPayment({ purpose: 'boost', product_id: productId, days, return_path: '/marketplace/marketplace.html' })
+        .catch(err => alert('Unable to start PayU payment: ' + err.message));
     };
   }
 

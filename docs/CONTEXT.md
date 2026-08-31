@@ -26,12 +26,12 @@ The platform does NOT handle full payments, selling of products directly, or shi
 - Buyers can send custom price offers on listings before reserving.
 - Sellers have a dedicated dashboard (`core/offers.html`) to review received offers and can accept, counter, or reject them.
 
-### 4. Simplified Flatmates Directory & Razorpay ₹39 Contact Unlock
+### 4. Simplified Flatmates Directory & PayU ₹39 Contact Unlock
 - **Directory Pivot (`roommates/flatmates.html`):** Moved away from Tinder-style swiping deck for finding flatmates in favor of a clean, responsive listing directory board.
 - **Category Filter Tabs:** Toggle between `All Listings`, `Rooms Available 🏠` (`have_flat`), and `Seeking Room 🔍` (`need_flat`).
 - **Privacy & Public Info:** Room photos gallery, title, location, price/rent badge, and amenities/preferences chips (`✓ WiFi`, `✓ AC`, `✓ Laundry`) are **always visible** publicly.
 - **Blurred Contact Details:** Host/seeker name, profile avatar (rendered as `"Verified Student 🔒"`), full bio description, and contact links are **blurred and locked** by default.
-- **Razorpay ₹39 Instant Unlock:** Users tap **"🔒 Unlock Contact Details — ₹39"** to launch the official **Razorpay Checkout SDK Modal** (`amount: 3900`). Upon payment completion, host details instantly unblur, revealing direct **WhatsApp Chat** (`https://wa.me/...`) and **Call** (`tel:...`) buttons.
+- **PayU ₹39 Instant Unlock:** Users tap **"🔒 Unlock Contact Details — ₹39"** and complete PayU Hosted Checkout. PayU's server-validated response returns them to the app, where contact details are revealed.
 - **Multi-Photo Carousel & Fullscreen Lightbox:** Includes an interactive photo slider with thumbnail strip and fullscreen image viewer (`object-contain`) with zero cropping.
 
 ### 5. UniMatch Social & Dating Ecosystem
@@ -39,12 +39,13 @@ The platform does NOT handle full payments, selling of products directly, or shi
 - **Sunset Cloud Theme (`unimatch/unimatch-theme.css` & `unimatch/clouds-init.js`):** Warm sunset gradient background (`#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`) with 10 soft SVG cumulus clouds drifting across the screen.
 - **Non-Scrollable Discovery Feed:** `discover.html` features a fixed non-scrollable viewport (`top: 64px`, `bottom: 64px`, `100dvh`, `overflow: hidden`) fitting cards perfectly between the header and bottom nav with standardized 64px action buttons.
 - **Interest-Based Ranking Algorithm:** Ranks student profiles based on shared interest tag counts (`+1` point per common tag) while excluding self and non-preferred genders.
-- **Privacy-First Instagram Consent:** Instagram handles remain hidden until both users swipe right, complete an icebreaker, and mutually grant consent.
+- **Privacy-First Sharing:** Instagram handles are shown only to verified students after a mutual match.
+- **Free for Verified Students:** UniMatch does not charge for likes, admirer profiles, mutual matches, icebreakers, or Instagram sharing.
 
 ---
 
 ## Tech Stack
-- **Frontend:** Vanilla HTML/JS, Tailwind CSS (via CDN), Geist Font, Material Symbols, Cropper.js, Razorpay Checkout SDK.
+- **Frontend:** Vanilla HTML/JS, Tailwind CSS (via CDN), Geist Font, Material Symbols, Cropper.js, PayU Hosted Checkout.
 - **Backend / Database:** Supabase (PostgreSQL, Auth, Storage, Edge Functions).
-- **Payments:** Razorpay Payment Gateway integration (`/functions/v1/create-razorpay-order`).
+- **Payments:** PayU Hosted Checkout via signed Supabase Edge Functions.
 - **Design Aesthetic:** Premium glassmorphic interfaces, sunset cloud gradients, uncropped photo lightboxes, micro-animations, and responsive viewports.

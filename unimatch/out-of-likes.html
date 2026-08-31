@@ -61,20 +61,8 @@
   <!-- Typography -->
   <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-gap-sm font-bold">Daily Likes Reached</h2>
   <p class="font-body-md text-body-md text-on-surface-variant mb-section-margin max-w-[280px]">
-    You've used all 5 free likes for today. Discover more connections by unlocking premium likes.
+    You've used all 5 likes for today. Your likes reset tomorrow, so come back then to keep discovering.
   </p>
-
-  <!-- Offer Card -->
-  <div class="w-full bg-surface-container-lowest rounded-[24px] p-container-padding ambient-shadow mb-stack-gap-lg border border-surface-container-high/50 flex flex-col items-center">
-    <div class="flex items-center gap-2 mb-2">
-      <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-      <span class="font-title-md text-title-md text-on-surface font-semibold">Get 5 more likes</span>
-    </div>
-    <span class="font-display text-[32px] leading-tight text-primary font-bold mb-4">₹59</span>
-    <button onclick="handlePurchase()" class="w-full bg-primary text-on-primary font-button text-button py-4 rounded-full btn-interactive hover:opacity-90 font-semibold shadow-lg">
-      Purchase Likes
-    </button>
-  </div>
 
   <!-- Secondary Action -->
   <button onclick="location.href='/unimatch/discover.html'" class="w-full bg-transparent border-none text-on-surface-variant font-button text-button py-4 rounded-full btn-interactive hover:text-on-surface hover:bg-surface-container-low transition-colors font-medium">
@@ -93,10 +81,5 @@
     currentUserId = profile.id;
   })();
 
-  function handlePurchase() {
-    addExtraLikes(currentUserId, 5);
-    alert("Payment successful! 5 Extra Likes added to your daily balance.");
-    window.location.href = '/unimatch/discover.html';
-  }
 </script>
 </body></html>

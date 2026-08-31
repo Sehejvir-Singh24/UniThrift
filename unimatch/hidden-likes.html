@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -318,10 +317,6 @@
     let _allAdmirers   = [];  // { like, profile }
     let _allMatches    = [];  // { match, profile }
 
-    // unlock tracking (per-admirer by liker_id, per-match by match.id)
-    let _unlockedAdmirers = {};   // { likerId: true }
-    let _unlockedMatches  = {};   // { matchId: true }
-
     // modal state
     let _modalPhotos   = [];
     let _modalPhotoIdx = 0;
@@ -331,27 +326,6 @@
     let _modalType = 'match'; // 'match' or 'admirer'
 
     const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80';
-
-    // ── Load unlock state from localStorage ───────────────────────────────────
-    function loadUnlockState() {
-      try {
-        _unlockedAdmirers = JSON.parse(localStorage.getItem('um_unlocked_admirers') || '{}');
-        _unlockedMatches  = JSON.parse(localStorage.getItem('um_unlocked_matches')  || '{}');
-      } catch(e) {
-        _unlockedAdmirers = {};
-        _unlockedMatches  = {};
-      }
-    }
-
-    function saveAdmirerUnlock(likerId) {
-      _unlockedAdmirers[likerId] = true;
-      try { localStorage.setItem('um_unlocked_admirers', JSON.stringify(_unlockedAdmirers)); } catch(e) {}
-    }
-
-    function saveMatchUnlock(matchId) {
-      _unlockedMatches[matchId] = true;
-      try { localStorage.setItem('um_unlocked_matches', JSON.stringify(_unlockedMatches)); } catch(e) {}
-    }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
     function getProfilePhoto(p, idx = 0) {
@@ -396,7 +370,6 @@
 
     // ── MAIN INIT ──────────────────────────────────────────────────────────────
     (async () => {
-      loadUnlockState();
       const profile = await requireUniMatchAuth();
       if (!profile) return;
       _currentProfile = profile;
@@ -479,7 +452,7 @@
       grid.innerHTML = visibleAdmirers.map((item, idx) => {
         const p       = item.profile || {};
         const likerId = item.like.liker_id;
-        const isUnlocked = !!_unlockedAdmirers[likerId];
+        const isUnlocked = true;
         const photo   = getProfilePhoto(p);
         const name    = p.full_name  || 'Student';
         const college = p.college    || p.major || 'GGSIPU';
@@ -497,32 +470,16 @@
               <!-- Gradient overlay -->
               <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-              ${!isUnlocked ? `
-              <!-- Lock overlay CTA -->
-              <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/20 z-10" style="border-radius:16px;">
-                <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-                  <span class="material-symbols-outlined text-white text-[22px]" style="font-variation-settings:'FILL' 1;">lock</span>
-                </div>
-                <span class="text-white text-[11px] font-bold bg-black/40 backdrop-blur-md px-3 py-1 rounded-full">Reveal for ₹29</span>
-              </div>` : ''}
-
               <!-- Bottom info -->
               <div class="absolute bottom-0 left-0 right-0 p-3 z-10">
-                <p class="text-white font-bold text-sm leading-tight">${isUnlocked ? escapeHTML(name) : '••••••••'}</p>
+                <p class="text-white font-bold text-sm leading-tight">${escapeHTML(name)}</p>
                 <p class="text-white/80 text-[11px] mt-0.5">${escapeHTML(college)}</p>
-                ${isUnlocked && handle ? `<p class="text-pink-300 text-[11px] font-semibold mt-0.5">@${escapeHTML(handle)}</p>` : ''}
+                ${handle ? `<p class="text-pink-300 text-[11px] font-semibold mt-0.5">@${escapeHTML(handle)}</p>` : ''}
               </div>
 
-              ${isUnlocked ? `
-              <!-- Unlocked badge -->
               <div class="absolute top-2 right-2 z-10 bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-0.5">
-                <span class="material-symbols-outlined text-[12px]">lock_open</span> Unlocked
-              </div>` : `
-              <!-- Heart count badge -->
-              <div class="absolute top-2 left-2 z-10 bg-white/80 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1">
-                <span class="material-symbols-outlined text-[13px]" style="color: var(--um-primary); font-variation-settings:'FILL' 1;">favorite</span>
-                <span class="text-[10px] font-bold" style="color: var(--um-primary)">₹29</span>
-              </div>`}
+                <span class="material-symbols-outlined text-[12px]">verified</span> Verified
+              </div>
             </div>
           </div>
         `;
@@ -540,28 +497,6 @@
         profile: p,
         admirer: item,
         matchObj: null
-      });
-    }
-
-    // ── PAY TO REVEAL SPECIFIC ADMIRER ────────────────────────────────────────
-    async function payToRevealAdmirer(admIidx) {
-      const item = _allAdmirers[admIidx];
-      if (!item) return;
-      const p = item.profile || {};
-      const likerId = item.like.liker_id;
-
-      await openRazorpay({
-        amount: 29,
-        description: 'Reveal Admirer Profile — UniMatch',
-        receipt: `admirer_${likerId.slice(0, 8)}`,
-        onSuccess: async () => {
-          saveAdmirerUnlock(likerId);
-          renderAdmirersGrid();
-          // Auto-open profile
-          setTimeout(() => {
-            openProfileModal({ type: 'admirer', profile: p, admirer: item, matchObj: null });
-          }, 400);
-        }
       });
     }
 
@@ -596,7 +531,7 @@
         const photo   = getProfilePhoto(p);
         const handle  = (p.instagram_username || '').replace('@', '');
 
-        const isMyUnlocked = (m.user1_id === _currentUserId ? m.user1_unlocked : m.user2_unlocked) || !!_unlockedMatches[m.id];
+        const isMyUnlocked = true;
 
         // 10-minute delay logic
         const revealTime   = m.reveal_available_at ? new Date(m.reveal_available_at) : new Date(0);
@@ -653,9 +588,7 @@
                   ? `<div class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1" style="background: rgba(176,80,112,0.1); color: var(--um-primary);">
                        <span class="material-symbols-outlined text-[14px]">open_in_new</span> View
                      </div>`
-                  : `<div class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1" style="background: var(--um-primary); color: white;">
-                       <span class="material-symbols-outlined text-[14px]">lock_open</span> ₹29
-                     </div>`
+                  : ''
                 }
               </div>
             </div>
@@ -706,13 +639,8 @@
         _modalIcebreakerText = '';
       }
 
-      // Check unlock status
-      let isUnlocked = false;
-      if (type === 'admirer') {
-        isUnlocked = !!_unlockedAdmirers[_modalCurrentAdmirerId];
-      } else if (type === 'match' && matchObj) {
-        isUnlocked = (matchObj.user1_id === _currentUserId ? matchObj.user1_unlocked : matchObj.user2_unlocked) || !!_unlockedMatches[matchObj.id];
-      }
+      // All UniMatch profiles are free for verified students.
+      const isUnlocked = true;
       _modalIsUnlocked = isUnlocked;
 
       // Photos
@@ -720,9 +648,8 @@
       _modalPhotoIdx = 0;
       updateModalPhoto();
 
-      // Basic info (DONT show real name before paying!)
-      document.getElementById('modal-name').textContent    = isUnlocked ? (p.full_name || 'Student') : 'Verified Student 🔒';
-      document.getElementById('modal-college').textContent = isUnlocked ? ([p.college, p.major].filter(Boolean).join(' • ') || '') : `${p.college || 'GGSIPU'} • Locked Profile`;
+      document.getElementById('modal-name').textContent    = p.full_name || 'Student';
+      document.getElementById('modal-college').textContent = [p.college, p.major].filter(Boolean).join(' • ') || '';
 
       // Year chip
       if (p.year_of_study) {
@@ -750,12 +677,8 @@
 
       // Bio
       if (p.bio) {
-        document.getElementById('modal-bio').textContent = isUnlocked ? p.bio : '🔒 Bio & profile details are locked. Pay ₹29 to reveal full photos, name, bio, and Instagram handle.';
-        if (!isUnlocked) {
-          document.getElementById('modal-bio').classList.add('blur-[3px]', 'select-none');
-        } else {
-          document.getElementById('modal-bio').classList.remove('blur-[3px]', 'select-none');
-        }
+        document.getElementById('modal-bio').textContent = p.bio;
+        document.getElementById('modal-bio').classList.remove('blur-[3px]', 'select-none');
         document.getElementById('modal-bio-section').classList.remove('hidden');
       } else {
         document.getElementById('modal-bio-section').classList.add('hidden');
@@ -804,27 +727,19 @@
       const phone  = (p.phone_number || '').replace(/[^0-9]/g, '');
 
       if (type === 'admirer') {
-        const likerId    = _modalCurrentAdmirerId;
-        const isUnlocked = !!_unlockedAdmirers[likerId];
-
         // No icebreaker for admirers (no match yet)
         icebreakerSection.classList.add('hidden');
-
-        if (isUnlocked) {
-          contactEl.innerHTML = buildLikeBackButtons(p);
-        } else {
-          contactEl.innerHTML = buildPaywallButton('admirer');
-        }
+        contactEl.innerHTML = buildLikeBackButtons(p);
       } else {
         // Mutual match
         const m = matchObj || {};
-        const isMyUnlocked = (m.user1_id === _currentUserId ? m.user1_unlocked : m.user2_unlocked) || !!_unlockedMatches[m.id];
+        const isMyUnlocked = true;
 
         // Icebreaker - ALWAYS show for mutual matches
         const iceTxt = _modalIcebreakerText || m.icebreaker_prompt || DEFAULT_ICEBREAKER;
         _modalIcebreakerText = iceTxt;
-        document.getElementById('modal-icebreaker-text').textContent = isMyUnlocked ? iceTxt : '🔒 Unlock to reveal your personalized AI icebreaker question and Instagram handle!';
-        document.getElementById('modal-copy-btn').style.display = isMyUnlocked ? 'flex' : 'none';
+        document.getElementById('modal-icebreaker-text').textContent = iceTxt;
+        document.getElementById('modal-copy-btn').style.display = 'flex';
 
         // Common interests
         let commonList = [];
@@ -854,29 +769,8 @@
         icebreakerSection.classList.remove('hidden');
 
         // Contact
-        if (isMyUnlocked) {
-          contactEl.innerHTML = buildContactButtons(handle, phone, p.full_name || 'this student', m.id);
-        } else {
-          contactEl.innerHTML = buildPaywallButton('match');
-        }
+        contactEl.innerHTML = buildContactButtons(handle, phone, p.full_name || 'this student', m.id);
       }
-    }
-
-    function buildPaywallButton(forType) {
-      return `
-        <div class="flex flex-col gap-2 pb-2">
-          <button onclick="${forType === 'admirer' ? 'payToRevealFromModal()' : 'payToUnlockMatchFromModal()'}"
-            class="w-full py-4 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
-            style="background: linear-gradient(135deg, var(--um-primary), #8B6B8A);">
-            <span class="material-symbols-outlined text-[20px]">lock_open</span>
-            Unlock Profile — ₹29
-          </button>
-          <p class="text-[11px] text-center flex items-center justify-center gap-1" style="color: var(--um-text-muted)">
-            <span class="material-symbols-outlined text-[14px]" style="color: var(--um-primary)">verified_user</span>
-            One-time payment • Instant access • 100% verified students
-          </p>
-        </div>
-      `;
     }
 
     function buildLikeBackButtons(p) {
@@ -938,8 +832,8 @@
             .upsert({
               user1_id: user1,
               user2_id: user2,
-              user1_unlocked: user1 === _currentUserId,
-              user2_unlocked: user2 === _currentUserId,
+              user1_unlocked: true,
+              user2_unlocked: true,
               icebreaker_prompt: icebreakerData.prompt,
               common_interests: JSON.stringify(icebreakerData.common)
             }, { onConflict: 'user1_id,user2_id' })
@@ -951,27 +845,15 @@
 
         const matchId = matchRecord ? matchRecord.id : `match_${likerId}`;
         
-        // 3. Mark match as unlocked for _currentUserId because they ALREADY paid ₹29 for this profile!
-        saveMatchUnlock(matchId);
-        try {
-          if (typeof unlockUniMatchForUser === 'function') {
-            await unlockUniMatchForUser(matchId, _currentUserId);
-          } else if (matchRecord) {
-            const isUser1 = matchRecord.user1_id === _currentUserId;
-            const updatePayload = isUser1 ? { user1_unlocked: true } : { user2_unlocked: true };
-            await supabase.from('unimatch_matches').update(updatePayload).eq('id', matchRecord.id);
-          }
-        } catch(e) {}
-
-        // 4. Reload data so Admirers grid and Mutual Matches list update
+        // 3. Reload data so Admirers grid and Mutual Matches list update
         await refreshAllData();
 
-        // 5. Find updated match item
+        // 4. Find updated match item
         const matchItem = _allMatches.find(m => (m.match.user1_id === likerId || m.match.user2_id === likerId));
         const pObj = _modalCurrentProfile || (matchItem ? matchItem.profile : {});
         const mObj = matchItem ? matchItem.match : (matchRecord || { id: matchId, user1_id: _currentUserId, user2_id: likerId, user1_unlocked: true, user2_unlocked: false });
 
-        // 6. Switch modal to match view
+        // 5. Switch modal to match view
         _modalType = 'match';
         _modalCurrentMatchId = matchId;
         _modalIsUnlocked = true;
@@ -989,8 +871,8 @@
       return `
         <div class="flex flex-col gap-2.5 pb-2">
           <div class="p-3 rounded-xl flex items-center gap-2.5" style="background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);">
-            <span class="material-symbols-outlined text-[16px]" style="color: #16a34a;">lock_open</span>
-            <span class="text-xs font-semibold" style="color: #16a34a;">Profile unlocked! Instagram handle revealed ✓</span>
+            <span class="material-symbols-outlined text-[16px]" style="color: #16a34a;">verified</span>
+            <span class="text-xs font-semibold" style="color: #16a34a;">You matched — Instagram is now shared free ✓</span>
           </div>
           ${instaHref ? `
           <a href="${instaHref}" target="_blank"
@@ -1004,123 +886,6 @@
           </div>`}
         </div>
       `;
-    }
-
-    // ── PAYWALL ACTIONS ───────────────────────────────────────────────────────
-    async function payToRevealFromModal() {
-      // Find the admirer item
-      const item = _allAdmirers.find(a => a.like.liker_id === _modalCurrentAdmirerId);
-      if (!item) return;
-      const p = item.profile || {};
-      await openRazorpay({
-        amount: 29,
-        description: 'Reveal Admirer Profile — UniMatch',
-        receipt: `admirer_${_modalCurrentAdmirerId.slice(0,8)}`,
-        onSuccess: async () => {
-          saveAdmirerUnlock(_modalCurrentAdmirerId);
-          _modalIsUnlocked = true;
-          document.getElementById('modal-name').textContent = p.full_name || 'Student';
-          document.getElementById('modal-college').textContent = [p.college, p.major].filter(Boolean).join(' • ') || '';
-          if (p.bio) {
-            document.getElementById('modal-bio').textContent = p.bio;
-            document.getElementById('modal-bio').classList.remove('blur-[3px]', 'select-none');
-          }
-          updateModalPhoto();
-          renderAdmirersGrid();
-          // Refresh modal contact section
-          renderModalContactSection('admirer', p, null);
-        }
-      });
-    }
-
-    async function payToUnlockMatchFromModal() {
-      const item = _allMatches.find(it => it.match.id === _modalCurrentMatchId);
-      if (!item) return;
-      const m = item.match;
-      const p = item.profile || {};
-      await openRazorpay({
-        amount: 29,
-        description: 'Unlock Match & Icebreaker — UniMatch',
-        receipt: `match_${_modalCurrentMatchId.slice(0,8)}`,
-        onSuccess: async () => {
-          // Mark in DB
-          try {
-            if (typeof unlockUniMatchForUser === 'function') {
-              await unlockUniMatchForUser(_modalCurrentMatchId, _currentUserId);
-            }
-          } catch(e) { console.warn('DB unlock failed, using localStorage fallback'); }
-          saveMatchUnlock(_modalCurrentMatchId);
-          // Update local match object
-          const idx = _allMatches.findIndex(it => it.match.id === _modalCurrentMatchId);
-          if (idx !== -1) {
-            if (_allMatches[idx].match.user1_id === _currentUserId) {
-              _allMatches[idx].match.user1_unlocked = true;
-            } else {
-              _allMatches[idx].match.user2_unlocked = true;
-            }
-          }
-          _modalIsUnlocked = true;
-          document.getElementById('modal-name').textContent = p.full_name || 'Student';
-          document.getElementById('modal-college').textContent = [p.college, p.major].filter(Boolean).join(' • ') || '';
-          if (p.bio) {
-            document.getElementById('modal-bio').textContent = p.bio;
-            document.getElementById('modal-bio').classList.remove('blur-[3px]', 'select-none');
-          }
-          updateModalPhoto();
-          renderMutualMatches();
-          // Refresh modal
-          renderModalContactSection('match', p, _allMatches.find(it => it.match.id === _modalCurrentMatchId)?.match || m);
-        }
-      });
-    }
-
-    // ── RAZORPAY HELPER ───────────────────────────────────────────────────────
-    async function openRazorpay({ amount, description, receipt, onSuccess }) {
-      let keyId   = 'rzp_test_1DP5QUAHAWBqnB';
-      let orderId = null;
-
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const orderRes = await fetch(
-          'https://bwhvbynmqubjwgonsywd.supabase.co/functions/v1/create-razorpay-order',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session ? session.access_token : ''}`,
-              'apikey': 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G'
-            },
-            body: JSON.stringify({ amount, currency: 'INR', receipt })
-          }
-        );
-        if (orderRes.ok) {
-          const d = await orderRes.json();
-          if (d.keyId)  keyId   = d.keyId;
-          if (d.orderId) orderId = d.orderId;
-        }
-      } catch(e) { console.log('Order creation fallback:', e); }
-
-      const options = {
-        key:         keyId,
-        amount:      amount * 100,
-        currency:    'INR',
-        name:        'UniMatch',
-        description: description,
-        image:       'https://unithrift-blush.vercel.app/assets/logo.png',
-        prefill: {
-          name:    _currentProfile?.full_name    || '',
-          contact: _currentProfile?.phone_number || ''
-        },
-        theme: { color: '#B05070' },
-        handler: async function(response) {
-          console.log('Payment success:', response.razorpay_payment_id);
-          await onSuccess();
-        }
-      };
-      if (orderId) options.order_id = orderId;
-
-      const rzp = new Razorpay(options);
-      rzp.open();
     }
 
     // ── PHOTO CAROUSEL ────────────────────────────────────────────────────────

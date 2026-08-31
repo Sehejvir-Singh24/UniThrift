@@ -206,8 +206,9 @@ async function recordUniMatchAction(targetUserId, action) {
           user1_id: user1,
           user2_id: user2,
           reveal_available_at: revealAvailableAt,
-          user1_unlocked: false,
-          user2_unlocked: false,
+          // UniMatch is currently free for verified students.
+          user1_unlocked: true,
+          user2_unlocked: true,
           icebreaker_prompt: icebreakerData.prompt,
           common_interests: JSON.stringify(icebreakerData.common)
         }, { onConflict: 'user1_id,user2_id' });
@@ -319,7 +320,7 @@ async function checkUniMatchNotifications(userId) {
       await supabase.from('notifications').insert({
         user_id: userId,
         title: '🎉 You Have a New UniMatch!',
-        message: 'A student on campus matched with you! Tap to unlock their profile, Instagram & fun icebreaker question.',
+        message: 'A student on campus matched with you! Open UniMatch to see their profile, Instagram & fun icebreaker question.',
         type: 'unimatch_match'
       });
 
@@ -329,19 +330,6 @@ async function checkUniMatchNotifications(userId) {
   } catch (err) {
     console.warn("Error checking match notifications:", err);
   }
-}
-
-// Helper: Unlock Dual-Lock UniMatch for specific user after payment
-async function unlockUniMatchForUser(matchId, userId) {
-  const { data: match } = await supabase.from('unimatch_matches').select('*').eq('id', matchId).single();
-  if (!match) throw new Error("Match not found");
-
-  const isUser1 = match.user1_id === userId;
-  const updatePayload = isUser1 ? { user1_unlocked: true } : { user2_unlocked: true };
-
-  const { error } = await supabase.from('unimatch_matches').update(updatePayload).eq('id', matchId);
-  if (error) throw error;
-  return true;
 }
 
 // Helper: 24-Hour Daily Free Likes Manager

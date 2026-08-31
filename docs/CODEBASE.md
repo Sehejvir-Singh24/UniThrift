@@ -18,12 +18,12 @@ This document serves as the authoritative guide to the structure of the UniThrif
 
 - **`/marketplace` (UniThrift Marketplace & Transactions)**
   - `marketplace.html`: Primary product browsing grid with category filter chips, search, dismissible *"How UniThrift Marketplace Works 💡"* banner, dynamic **Sell / Manage FAB button**, and Seller Dashboard modal for boosting/editing active listings.
-  - `item.html`: Product details page with **25% Security Deposit** reservation flow calling Razorpay Edge Function (`/functions/v1/create-razorpay-order`).
+  - `item.html`: Product details page with a **25% Security Deposit** reservation flow through PayU Hosted Checkout.
   - `sell_item_details.html`: Form for posting items with live **Tiered Listing Fee Calculator** (First 2 free, 3rd+ listing fees ₹19/₹29/₹39) and **Per-Day Product Boosting Selector** (₹19/day, min 2 days).
   - `offer_received.html`: Dedicated seller processing screen for a received offer, enabling Accept, Reject, or Counter-offer.
 
 - **`/roommates` (Campus Flatmates Directory)**
-  - `flatmates.html`: Simplified flatmate directory board with category tabs (`All`, `Rooms Available 🏠`, `Seeking Room 🔍`), live location search, dismissible *"How Campus Flatmate Matching Works 💡"* banner, multi-photo carousel with fullscreen Lightbox viewer (`object-contain`), avatar initials fallbacks, and **Razorpay ₹39 Contact Unlock System**.
+  - `flatmates.html`: Simplified flatmate directory board with category tabs (`All`, `Rooms Available 🏠`, `Seeking Room 🔍`), live location search, dismissible *"How Campus Flatmate Matching Works 💡"* banner, multi-photo carousel with fullscreen Lightbox viewer (`object-contain`), avatar initials fallbacks, and **PayU ₹39 Contact Unlock System**.
   - `roommate_need_flat.html`: Listing creation and editing form with intelligent edit-mode pre-filling and dynamic area chips from user's `college` profile field.
   - `matches.html`: Flatmate matches and unlocks overview.
 
@@ -33,11 +33,11 @@ This document serves as the authoritative guide to the structure of the UniThrif
 
 - **`/unimatch` (Campus Social & Dating Ecosystem)**
   - `welcome.html`: Landing hero screen with warm gradient overlay, trust badges, and automated auth-routing script.
-  - `discover.html`: Primary full-screen discovery feed querying real database profiles (`unimatch_profile_complete = true`) with parallel `Promise.all` queries, locked ₹29 Instagram handle popups, mobile-proportioned cards (guaranteed 55% photo height), and neutral skeleton loading state.
+  - `discover.html`: Primary full-screen discovery feed querying real database profiles (`unimatch_profile_complete = true`) with parallel `Promise.all` queries, free mutual-match Instagram sharing, mobile-proportioned cards (guaranteed 55% photo height), and neutral skeleton loading state.
   - `icebreaker.html`: Bento grid selector featuring mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore) required before Instagram handle exchanges.
   - `insta-exchange-request.html` & `insta-exchange-success.html`: Privacy-first mutual agreement protocol for sharing Instagram handles.
   - `connection-success.html`: Celebratory match notification view with direct Instagram deep-linking (`instagram://user?...`).
-  - `hidden-likes.html`: Admirers & Mutual Matches directory featuring ₹29 ONE-TIME admirer profile unblur and locked Instagram handles (`@•••••••••`).
+  - `hidden-likes.html`: Free Admirers & Mutual Matches directory for verified students. Instagram handles are shared only after a mutual match.
   - `out-of-likes.html`: Daily swipe limit screen with return countdown timer.
   - `unimatch-theme.css`: UniMatch CSS token system (`--um-bg-gradient`, `--um-primary`, `--um-card`, HSL sunset palette `#F9DBD5`, `#F2C4B8`, `#E09898`, `#C8A8B8`).
   - `clouds-init.js`: Auto-injecting drifting SVG cumulus cloud animation layer.
@@ -98,4 +98,4 @@ This document serves as the authoritative guide to the structure of the UniThrif
 1. **Mobile Layout Integrity:** Never apply global `min-height` calculations or global `position: relative` to `body > *` as it breaks `position: fixed` headers and navigation bars.
 2. **PostgREST Joins:** Always disambiguate foreign key joins on `profiles` (e.g., `profiles!seller_id(full_name)` or `profiles!user_id(...)`) to prevent API errors.
 3. **Photo Viewers:** Always use uncropped Lightbox containers (`object-contain`) for photo viewing so student heads or room ceilings are never clipped.
-4. **Monetization Privacy:** On `flatmates.html`, public details (photos, rent, location, amenities chips) are always visible; contact details (name, avatar, description, call/chat buttons) are blurred until unlocked via **Razorpay Checkout SDK** (`amount: 3900`).
+4. **Monetization Privacy:** On `flatmates.html`, public details (photos, rent, location, amenities chips) are always visible; contact details (name, avatar, description, call/chat buttons) are blurred until a verified **PayU Hosted Checkout** payment completes.

@@ -40,8 +40,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
-<!-- OFFICIAL RAZORPAY CHECKOUT SDK -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/scripts/payu.js"></script>
 </head>
 <body class="bg-surface min-h-screen pb-24">
 
@@ -250,7 +249,7 @@
         <p id="modal-bio" class="text-sm text-on-surface leading-relaxed whitespace-pre-line transition-all"></p>
       </div>
 
-      <!-- Action Area: Contact Buttons vs Razorpay ₹39 Button -->
+      <!-- Action Area: Contact Buttons vs PayU ₹39 Button -->
       <div id="modal-contact-section" class="pt-2">
         <!-- Injected dynamically -->
       </div>
@@ -642,7 +641,7 @@
 
       contactSection.innerHTML = `
         <div class="flex flex-col gap-2">
-          <button onclick="unlockWithRazorpay('${item.id}')" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+          <button onclick="unlockWithPayU('${item.id}')" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
             <span class="material-symbols-outlined text-[20px]">lock_open</span>
             Unlock Contact Details — ₹39
           </button>
@@ -656,8 +655,8 @@
     document.getElementById('detail-modal').classList.remove('hidden');
   }
 
-  // OFFICIAL RAZORPAY CHECKOUT POPUP HANDLER
-  async function unlockWithRazorpay(listingId) {
+  // PayU Hosted Checkout redirect handler
+  async function unlockWithPayU(listingId) {
     const verified = await verifyAction();
     if (!verified) return;
 
@@ -667,76 +666,13 @@
     const btn = event?.currentTarget;
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Opening Razorpay...`;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Redirecting to PayU...`;
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const profile = await getProfile();
-
-      let keyId = 'rzp_test_1DP5QUAHAWBqnB';
-      let orderId = null;
-
-      try {
-        const orderRes = await fetch(
-          'https://bwhvbynmqubjwgonsywd.supabase.co/functions/v1/create-razorpay-order',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session ? session.access_token : ''}`,
-              'apikey': 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G'
-            },
-            body: JSON.stringify({
-              amount: 39,
-              currency: 'INR',
-              receipt: `unlock_${listingId.slice(0, 8)}`
-            })
-          }
-        );
-        if (orderRes.ok) {
-          const orderData = await orderRes.json();
-          if (orderData.keyId) keyId = orderData.keyId;
-          if (orderData.orderId) orderId = orderData.orderId;
-        }
-      } catch(e) {
-        console.log("Edge order fallback:", e);
-      }
-
-      const options = {
-        key: keyId,
-        amount: 3900,
-        currency: "INR",
-        name: "UniThrift",
-        description: `Unlock Contact Details — ${item.title || 'Flatmate Listing'}`,
-        image: "https://unithrift-blush.vercel.app/assets/logo.png",
-        prefill: {
-          name: profile?.full_name || '',
-          contact: profile?.phone_number || ''
-        },
-        theme: { color: "#006e2f" },
-        modal: {
-          ondismiss: function() {
-            if (btn) {
-              btn.disabled = false;
-              btn.innerHTML = `<span class="material-symbols-outlined text-[20px]">lock_open</span> Unlock Contact Details — ₹39`;
-            }
-          }
-        },
-        handler: async function(response) {
-          console.log("Payment successful:", response.razorpay_payment_id);
-          markListingAsUnlocked(listingId);
-          renderListings();
-          openModal(listingId);
-        }
-      };
-
-      if (orderId) options.order_id = orderId;
-
-      const rzp = new Razorpay(options);
-      rzp.open();
+      await startPayUPayment({ purpose: 'flatmate_unlock', listing_id: listingId });
     } catch (err) {
-      console.error("Razorpay Error:", err);
+      console.error("PayU Error:", err);
     } finally {
       if (btn) {
         btn.disabled = false;

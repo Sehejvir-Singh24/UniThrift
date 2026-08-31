@@ -4,6 +4,11 @@
 # working directory name when running `supabase init`.
 project_id = "Unithrift"
 
+# PayU sends its signed browser callback without a Supabase JWT. The function
+# validates PayU's reverse SHA-512 hash before changing any payment state.
+[functions.payu-return]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.
