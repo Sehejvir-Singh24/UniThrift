@@ -323,6 +323,7 @@
     let _modalIcebreakerText = '';
     let _modalCurrentMatchId = null;
     let _modalCurrentAdmirerId = null;
+    let _modalCurrentProfile = null;
     let _modalType = 'match'; // 'match' or 'admirer'
 
     const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=780&q=80';
@@ -627,6 +628,7 @@
       _modalType = type;
       _modalCurrentMatchId   = matchObj ? matchObj.id : null;
       _modalCurrentAdmirerId = admirer  ? admirer.like.liker_id : null;
+      _modalCurrentProfile   = p || {};
 
       if (type === 'match') {
         let prompt = matchObj ? matchObj.icebreaker_prompt : null;
@@ -804,6 +806,8 @@
       }
 
       try {
+        const pObj = _modalCurrentProfile || {};
+
         // 1. Call recordUniMatchAction to record like back and create mutual match in DB
         if (typeof recordUniMatchAction === 'function') {
           await recordUniMatchAction(likerId, 'like');
@@ -824,10 +828,10 @@
 
         if (!matchRecord) {
           const icebreakerData = typeof generateFunIcebreaker === 'function'
-            ? generateFunIcebreaker(_currentProfile?.interests, _modalCurrentProfile?.interests)
+            ? generateFunIcebreaker(_currentProfile?.interests, pObj?.interests)
             : { prompt: DEFAULT_ICEBREAKER, common: [] };
 
-          const { data: inserted } = await supabase
+          const { data: inserted, error: insertErr } = await supabase
             .from('unimatch_matches')
             .upsert({
               user1_id: user1,
@@ -840,6 +844,7 @@
             .select()
             .maybeSingle();
 
+          if (insertErr) console.warn("Match insert info:", insertErr);
           matchRecord = inserted;
         }
 
@@ -849,19 +854,27 @@
         await refreshAllData();
 
         // 4. Find updated match item
-        const matchItem = _allMatches.find(m => (m.match.user1_id === likerId || m.match.user2_id === likerId));
-        const pObj = _modalCurrentProfile || (matchItem ? matchItem.profile : {});
-        const mObj = matchItem ? matchItem.match : (matchRecord || { id: matchId, user1_id: _currentUserId, user2_id: likerId, user1_unlocked: true, user2_unlocked: false });
+        const matchItem = _allMatches.find(m => (m.match && (m.match.user1_id === likerId || m.match.user2_id === likerId)));
+        const finalPObj = (matchItem && matchItem.profile) ? matchItem.profile : pObj;
+        const finalMObj = matchItem ? matchItem.match : (matchRecord || { id: matchId, user1_id: _currentUserId, user2_id: likerId, user1_unlocked: true, user2_unlocked: true });
 
         // 5. Switch modal to match view
         _modalType = 'match';
         _modalCurrentMatchId = matchId;
         _modalIsUnlocked = true;
 
-        renderModalContactSection('match', pObj, mObj);
+        if (finalMObj && finalMObj.icebreaker_prompt) {
+          _modalIcebreakerText = finalMObj.icebreaker_prompt;
+        }
+
+        renderModalContactSection('match', finalPObj, finalMObj);
       } catch(err) {
         console.error("Error creating match:", err);
         await refreshAllData();
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">favorite</span> Like Back 💕 — Create Match`;
+        }
       }
     }
 
