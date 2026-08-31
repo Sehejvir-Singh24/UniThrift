@@ -407,7 +407,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Misc Utilities ── */
+/* ── Misc Utilities & Responsive Widescreen Overrides ── */
 .um-divider { border-top: 1px solid var(--um-border); margin: 12px 0; }
 .um-text-muted { color: var(--um-text-muted); }
 .um-text-light { color: var(--um-text-light); }
@@ -416,3 +416,16 @@ body {
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .pb-safe { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
 }
+
+@media (min-width: 768px) {
+  .um-header-content, .um-bottom-nav-content {
+    max-width: 920px;
+    padding: 0 24px;
+  }
+}
+@media (min-width: 1100px) {
+  .um-header-content, .um-bottom-nav-content {
+    max-width: 1060px;
+  }
+}
+
