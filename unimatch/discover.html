@@ -228,6 +228,16 @@
     .card-photo-container #card-img-backdrop {
       display: block !important;
     }
+
+    /* Mobile Discover is a profile feed: users scroll through complete photos
+       and the matching profile sections, while the Pass/Like controls stay put. */
+    #active-card .legacy-discover-layout {
+      display: none !important;
+    }
+
+    #active-card .hinge-profile-feed {
+      display: block;
+    }
   }
 
   /* The backdrop always uses the same cropped upload as the foreground image;
@@ -242,6 +252,110 @@
     object-position: center;
     filter: blur(18px) brightness(0.62);
     transform: scale(1.08);
+  }
+
+  .hinge-profile-feed {
+    display: none;
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    scrollbar-width: none;
+  }
+  .hinge-profile-feed::-webkit-scrollbar { display: none; }
+  .hinge-photo-block {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #251217;
+  }
+  .hinge-photo-block__backdrop {
+    position: absolute;
+    inset: -18px;
+    width: calc(100% + 36px);
+    height: calc(100% + 36px);
+    object-fit: cover;
+    filter: blur(20px) brightness(0.55);
+    transform: scale(1.08);
+  }
+  .hinge-photo-block__image {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+  }
+  .hinge-photo-block__count {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    color: #fff;
+    background: rgba(20, 8, 12, 0.62);
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .hinge-photo-block__hero-gradient {
+    position: absolute;
+    inset: 35% 0 0;
+    z-index: 2;
+    background: linear-gradient(transparent, rgba(18, 4, 9, 0.82));
+    pointer-events: none;
+  }
+  .hinge-profile-title {
+    position: absolute;
+    z-index: 3;
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    color: #fff;
+  }
+  .hinge-profile-title h2 { margin: 0; font-size: 29px; line-height: 1.08; letter-spacing: -0.02em; }
+  .hinge-profile-title p { margin: 6px 0 0; font-size: 13px; color: rgba(255,255,255,0.88); }
+  .hinge-profile-section {
+    padding: 22px 20px;
+    border-bottom: 1px solid var(--um-border);
+    background: #fff;
+  }
+  .hinge-profile-section__eyebrow {
+    margin: 0 0 7px;
+    color: var(--um-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hinge-profile-section__text {
+    margin: 0;
+    color: var(--um-text);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .hinge-interest-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .hinge-interest-tile {
+    min-height: 74px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 16px;
+    background: var(--um-primary-bg);
+    border: 1px solid var(--um-border);
+    color: var(--um-primary);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
   }
 </style>
 </head>
@@ -299,6 +413,12 @@
 
     <!-- Primary Active Card -->
     <article id="active-card" class="um-card card-swipe-enter" style="position:absolute;inset:0;overflow:hidden;display:flex;flex-direction:column;z-index:10;border-radius:28px;">
+
+      <!-- Mobile-first, Hinge-style profile feed. Rendered from the same saved profile data. -->
+      <div id="hinge-profile-feed" class="hinge-profile-feed" aria-live="polite"></div>
+
+      <!-- Existing compact card remains the desktop layout. -->
+      <div class="legacy-discover-layout" style="display:contents;">
 
       <!-- Photo Section -->
       <div class="card-photo-container" style="position:relative;flex:1 1 58%;min-height:55%;overflow:hidden;background:#f0d0d8;">
@@ -423,6 +543,7 @@
           </div>
         </div>
 
+      </div>
       </div>
     </article>
 
@@ -761,12 +882,68 @@
       ).join('');
     }
 
+    renderHingeProfile(p, nameAgeStr, majorYearStr, uniStr);
     renderThumbnails(p.photos || []);
     renderPhoto();
 
     card.classList.remove('card-swipe-enter');
     void card.offsetWidth;
     card.classList.add('card-swipe-enter');
+  }
+
+  function renderHingeProfile(profile, nameAgeStr, majorYearStr, uniStr) {
+    const feed = document.getElementById('hinge-profile-feed');
+    if (!feed) return;
+
+    const photos = (profile.photos || []).filter(Boolean);
+    const interests = (profile.interests || []).filter(Boolean);
+    const interestGroups = Array.from({ length: Math.max(photos.length, 1) }, () => []);
+    interests.forEach((interest, index) => interestGroups[index % interestGroups.length].push(interest));
+
+    const photoBlock = (url, index, isHero) => `
+      <section class="hinge-photo-block">
+        <img class="hinge-photo-block__backdrop" aria-hidden="true" alt="" src="${escapeHTML(url)}"/>
+        <img class="hinge-photo-block__image" src="${escapeHTML(url)}" alt="${escapeHTML(profile.name)} profile photo ${index + 1}"/>
+        <span class="hinge-photo-block__count">${index + 1} / ${photos.length}</span>
+        ${isHero ? `
+          <div class="hinge-photo-block__hero-gradient"></div>
+          <div class="hinge-profile-title">
+            <h2>${escapeHTML(nameAgeStr)}</h2>
+            <p>${escapeHTML(profile.major)}${profile.year ? ` · ${escapeHTML(profile.year)}` : ''}</p>
+          </div>
+        ` : ''}
+      </section>
+    `;
+
+    const intro = `
+      <section class="hinge-profile-section">
+        <p class="hinge-profile-section__eyebrow">${escapeHTML(profile.goal || 'Connecting')}</p>
+        <p class="hinge-profile-section__text">${escapeHTML(profile.bio || 'Verified student on UniMatch.')}</p>
+        <p style="margin:14px 0 0;color:var(--um-text-muted);font-size:13px;display:flex;gap:6px;align-items:center;">${majorYearStr}</p>
+        <p style="margin:7px 0 0;color:var(--um-text-light);font-size:12px;display:flex;gap:6px;align-items:center;">${uniStr}</p>
+      </section>
+    `;
+
+    const interestsSection = (group, sectionIndex) => !group.length ? '' : `
+      <section class="hinge-profile-section">
+        <p class="hinge-profile-section__eyebrow">${sectionIndex === 0 ? 'Interests & passions' : 'More of what they love'}</p>
+        <div class="hinge-interest-grid">
+          ${group.map(interest => `
+            <div class="hinge-interest-tile">
+              <span class="material-symbols-outlined" style="font-size:19px;">${getInterestIcon(interest)}</span>
+              <span>${escapeHTML(interest)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    `;
+
+    feed.innerHTML = photos.map((photo, index) => `
+      ${photoBlock(photo, index, index === 0)}
+      ${index === 0 ? intro : ''}
+      ${interestsSection(interestGroups[index], index)}
+    `).join('');
+    feed.scrollTop = 0;
   }
 
   function renderPhoto() {
