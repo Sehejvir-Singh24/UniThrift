@@ -6,6 +6,8 @@
   let deferredInstallPrompt = null;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isUniMatch = location.pathname === '/unimatch' || location.pathname.startsWith('/unimatch/');
+  const productName = isUniMatch ? 'UniMatch' : 'UniThrift';
 
   function removePrompt() {
     document.getElementById('unithrift-install-prompt')?.remove();
@@ -17,8 +19,8 @@
     card.innerHTML = `
       <button class="ut-install-close" aria-label="Close install instructions">×</button>
       <span class="ut-install-icon">⇧</span>
-      <strong>Add UniThrift to your Home Screen</strong>
-      <p>Tap <b>Share</b> in Safari, then choose <b>Add to Home Screen</b>.</p>
+      <strong>Add ${productName} to your Home Screen</strong>
+      <p>Tap <b>Share</b> in Safari, then choose <b>Add to Home Screen</b>. This shortcut will open ${productName}.</p>
     `;
     card.querySelector('.ut-install-close').addEventListener('click', removePrompt);
   }
@@ -35,7 +37,7 @@
     if (isStandalone || document.getElementById('unithrift-install-prompt')) return;
     const host = document.createElement('aside');
     host.id = 'unithrift-install-prompt';
-    host.setAttribute('aria-label', 'Install UniThrift');
+    host.setAttribute('aria-label', `Install ${productName}`);
     host.innerHTML = `
       <style>
         #unithrift-install-prompt{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483000;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -48,8 +50,8 @@
       <div class="ut-install-card">
         <button class="ut-install-close" aria-label="Dismiss install prompt">×</button>
         <span class="ut-install-icon">U</span>
-        <strong>Add UniThrift to your phone</strong>
-        <p>Open it like an app from your Home Screen.</p>
+        <strong>Add ${productName} to your phone</strong>
+        <p>Open ${productName} like an app from your Home Screen.</p>
         <button class="ut-install-action">Add shortcut</button>
       </div>
     `;

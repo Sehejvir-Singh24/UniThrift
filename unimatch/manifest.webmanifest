@@ -1,0 +1,20 @@
+{
+  "id": "/unimatch/",
+  "name": "UniMatch",
+  "short_name": "UniMatch",
+  "description": "A verified Delhi college student connection app by UniThrift.",
+  "lang": "en-IN",
+  "start_url": "/unimatch/",
+  "scope": "/unimatch/",
+  "display": "standalone",
+  "background_color": "#fff6f8",
+  "theme_color": "#b05070",
+  "icons": [
+    {
+      "src": "/assets/unithrift-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
