@@ -1,3 +1,14 @@
-# Temporary production launch gate.
-# The forced rewrite shadows every existing page while preserving the requested URL.
-/*  /launching-soon.html  200!
+# Temporary UniThrift launch gate.
+# Keep UniMatch public while the marketplace and the rest of UniThrift are paused.
+# Each forced rewrite preserves the requested URL and serves the standalone launch page.
+/                         /launching-soon.html  200!
+/index.html               /launching-soon.html  200!
+/splash.html              /launching-soon.html  200!
+/stitch_home.html         /launching-soon.html  200!
+/marketplace/*            /launching-soon.html  200!
+/roommates/*              /launching-soon.html  200!
+/pghostels/*              /launching-soon.html  200!
+/core/*                   /launching-soon.html  200!
+/auth/*                   /launching-soon.html  200!
+/admin/*                  /launching-soon.html  200!
+/payments/*               /launching-soon.html  200!

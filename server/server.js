@@ -487,7 +487,9 @@ app.post('/api/notify/send-email', async (req, res) => {
 // Temporary production launch gate. It is opt-in, never affects local development,
 // and leaves API endpoints registered above untouched for operational access.
 app.use((req, res, next) => {
-  if (!launchGateEnabled || !['GET', 'HEAD'].includes(req.method) || req.path.startsWith('/api/')) return next();
+  const isUniMatchRoute = req.path === '/unimatch' || req.path.startsWith('/unimatch/');
+
+  if (!launchGateEnabled || !['GET', 'HEAD'].includes(req.method) || req.path.startsWith('/api/') || isUniMatchRoute) return next();
 
   res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
