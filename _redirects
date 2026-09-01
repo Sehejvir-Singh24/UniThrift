@@ -1,0 +1,3 @@
+# Temporary production launch gate.
+# The forced rewrite shadows every existing page while preserving the requested URL.
+/*  /launching-soon.html  200!

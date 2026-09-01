@@ -8,6 +8,8 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'unithrift_super_secret_jwt_key_2026_campus_auth';
+const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.RENDER) || Boolean(process.env.RENDER_EXTERNAL_URL);
+const launchGateEnabled = isProduction && process.env.UNITHRIFT_LAUNCH_GATE === 'true';
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
@@ -482,6 +484,18 @@ app.post('/api/notify/send-email', async (req, res) => {
   }
 });
 
+// Temporary production launch gate. It is opt-in, never affects local development,
+// and leaves API endpoints registered above untouched for operational access.
+app.use((req, res, next) => {
+  if (!launchGateEnabled || !['GET', 'HEAD'].includes(req.method) || req.path.startsWith('/api/')) return next();
+
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Retry-After': '3600'
+  });
+  return res.status(503).sendFile(path.join(__dirname, '..', 'launching-soon.html'));
+});
+
 // Serve frontend static files if requested
 app.use(express.static(path.join(__dirname, '..')));
 
@@ -512,7 +526,7 @@ app.listen(PORT, () => {
   console.log(`\n======================================================`);
   console.log(`🚀 UniThrift Auth Server running on http://localhost:${PORT}`);
   console.log(`📧 SMTP Email Status: ${isSmtpConfigured() ? 'CONFIGURED (Sending live emails)' : 'DEV MODE (Logging OTPs to terminal)'}`);
+  console.log(`🚧 Launch Gate: ${launchGateEnabled ? 'ENABLED' : 'disabled'}`);
   console.log(`======================================================\n`);
   startKeepAlive();
 });
-

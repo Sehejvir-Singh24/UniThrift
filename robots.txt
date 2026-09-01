@@ -20,6 +20,10 @@ Disallow: /scripts/
 Disallow: /docs/
 Disallow: /unimatch/auth/
 Disallow: /unimatch/profile-setup/
+Disallow: /unimatch/discover.html
+Disallow: /unimatch/hidden-likes.html
+Disallow: /unimatch/icebreaker.html
+Disallow: /unimatch/out-of-likes.html
 
 # Block specific transaction pages (no value to crawlers)
 Disallow: /marketplace/make_offer.html

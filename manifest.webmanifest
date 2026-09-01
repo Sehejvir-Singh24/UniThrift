@@ -1,0 +1,34 @@
+{
+  "id": "/",
+  "name": "UniThrift",
+  "short_name": "UniThrift",
+  "description": "Campus marketplace and community for verified Delhi college students.",
+  "lang": "en-IN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f9ff",
+  "theme_color": "#006e2f",
+  "icons": [
+    {
+      "src": "/assets/unithrift-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Marketplace",
+      "short_name": "Marketplace",
+      "url": "/marketplace/marketplace.html",
+      "icons": [{ "src": "/assets/unithrift-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "UniMatch",
+      "short_name": "UniMatch",
+      "url": "/unimatch/",
+      "icons": [{ "src": "/assets/unithrift-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
