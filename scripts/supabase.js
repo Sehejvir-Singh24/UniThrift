@@ -9,7 +9,13 @@ const SUPABASE_ANON_KEY = 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G';
 // The UMD bundle exposes the library as window.supabase
 const supabaseLib = window.supabase || window.Supabase;
 if (!supabaseLib) { console.error('Supabase SDK not loaded! Check the CDN script tag.'); }
-window.supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 window.escapeHTML = function(str) {
   if (!str) return '';
@@ -26,39 +32,36 @@ window.escapeHTML = function(str) {
 let _cachedProfile = null;
 
 async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) return true;
-  if (window.AuthClient && AuthClient.getToken()) return true;
-  if (localStorage.getItem('unithrift_auth_token')) return true;
-  return false;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    return !!session;
+  } catch (error) {
+    console.warn('[AUTH] Unable to restore Supabase session:', error);
+    return false;
+  }
 }
 
 async function getProfile(forceRefresh = false) {
-  if (!forceRefresh) {
-    if (_cachedProfile) return _cachedProfile;
-    try {
-      const stored = sessionStorage.getItem('unimatch_cached_profile') || localStorage.getItem('unithrift_user');
-      if (stored) {
-        _cachedProfile = JSON.parse(stored);
-        refreshProfileInBackground();
-        return _cachedProfile;
-      }
-    } catch (e) {}
-  }
-
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    // Check if user authenticated via AuthClient Email OTP
-    const localUser = (window.AuthClient && AuthClient.getUser()) || 
-                      (localStorage.getItem('unithrift_user') ? JSON.parse(localStorage.getItem('unithrift_user')) : null);
-    if (localUser) {
-      _cachedProfile = localUser;
-      return localUser;
-    }
-
     _cachedProfile = null;
     try { sessionStorage.removeItem('unimatch_cached_profile'); } catch (e) {}
     return null;
+  }
+
+  if (!forceRefresh) {
+    if (_cachedProfile?.id === session.user.id) return _cachedProfile;
+    try {
+      const stored = sessionStorage.getItem('unimatch_cached_profile');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.id === session.user.id) {
+          _cachedProfile = parsed;
+          refreshProfileInBackground();
+          return _cachedProfile;
+        }
+      }
+    } catch (e) {}
   }
 
   const { data: profile, error } = await supabase
@@ -106,11 +109,46 @@ async function refreshProfileInBackground() {
 }
 
 // Helper: Require Authentication
-// Redirects to login if no session or AuthClient token is active.
+function rememberAuthDestination() {
+  const destination = `${window.location.pathname}${window.location.search}`;
+  if (!destination.includes('/auth/')) {
+    try { sessionStorage.setItem('unithrift_auth_return_to', destination); } catch (e) {}
+  }
+}
+
+function consumeAuthDestination(fallback) {
+  let destination = '';
+  try {
+    destination = sessionStorage.getItem('unithrift_auth_return_to') || '';
+    sessionStorage.removeItem('unithrift_auth_return_to');
+  } catch (e) {}
+  if (!destination.startsWith('/') || destination.startsWith('//') || destination.includes('/auth/')) return fallback;
+  return destination;
+}
+
+function clearLegacyAuthState() {
+  try {
+    localStorage.removeItem('unithrift_auth_token');
+    localStorage.removeItem('unithrift_user');
+  } catch (e) {}
+}
+
+async function signInWithEmailPassword(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  if (error) throw error;
+  if (!data.session) throw new Error('Sign in did not create a session. Please try again.');
+  clearLegacyAuthState();
+  clearProfileCache();
+  return data.session;
+}
+
+// Redirects to the correct platform login and remembers the interrupted page.
 async function requireAuth() {
   const isAuthed = await checkAuth();
   if (!isAuthed) {
-    window.location.href = '/auth/login.html';
+    rememberAuthDestination();
+    const loginPath = window.location.pathname.startsWith('/unimatch/') ? '/unimatch/auth/login.html' : '/auth/login.html';
+    window.location.replace(loginPath);
     return false;
   }
   return true;
@@ -121,7 +159,8 @@ async function requireAuth() {
 async function requireUniMatchAuth() {
   const isAuthed = await checkAuth();
   if (!isAuthed) {
-    window.location.href = '/unimatch/welcome.html';
+    rememberAuthDestination();
+    window.location.replace('/unimatch/auth/login.html');
     return null;
   }
   const profile = await getProfile();
@@ -397,14 +436,6 @@ async function resetUserSwipes(userId) {
   } catch (e) {
     console.error("Error resetting swipes:", e);
   }
-}
-
-// Helper: Check Authentication (non-redirecting)
-// Returns true if a session exists, false otherwise.
-// Use this on guest-browsable pages instead of requireAuth().
-async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  return !!session;
 }
 
 // Helper: Require Verified Seller
@@ -940,13 +971,19 @@ async function signInWithGoogle() {
 }
 
 // Helper: Sign Out
-async function logout() {
+async function logout(redirectPath = '') {
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.error("Error signing out:", error);
     throw error;
   }
-  window.location.href = '/auth/login.html';
+  clearLegacyAuthState();
+  clearProfileCache();
+  try { sessionStorage.removeItem('unithrift_auth_return_to'); } catch (e) {}
+  const loginPath = redirectPath || (window.location.pathname.startsWith('/unimatch/')
+    ? '/unimatch/auth/login.html'
+    : '/auth/login.html');
+  window.location.replace(loginPath);
 }
 
 // Helper: Get Pending Verifications (for Admins)

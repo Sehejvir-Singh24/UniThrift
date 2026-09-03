@@ -249,8 +249,7 @@
   })();
 
   async function handleLogout() {
-    await logout();
-    window.location.href = '/unimatch/welcome.html';
+    await logout('/unimatch/welcome.html');
   }
 </script>
 <script src="/unimatch/clouds-init.js"></script>

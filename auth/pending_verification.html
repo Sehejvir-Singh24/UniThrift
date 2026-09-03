@@ -46,9 +46,5 @@
         }, 1000);
     }
     
-    async function logout() {
-        await supabase.auth.signOut();
-        window.location.href = '/auth/login.html';
-    }
 </script>
 </body></html>

@@ -256,14 +256,12 @@
 
     function validateForm() {
         const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
-        let isValid = isEmailValid;
+        const isPasswordValid = passwordInput.value.length >= 6;
+        let isValid = isEmailValid && isPasswordValid;
         
         if (isSignUp) {
-            if (passwordInput.value.length > 0) {
-                const isPasswordValid = passwordInput.value.length >= 6;
-                const isConfirmPasswordValid = confirmPasswordInput.value === passwordInput.value;
-                isValid = isValid && isPasswordValid && isConfirmPasswordValid;
-            }
+            const isConfirmPasswordValid = confirmPasswordInput.value === passwordInput.value;
+            isValid = isValid && isConfirmPasswordValid;
         }
         
         signinBtn.classList.toggle('opacity-50', !isValid);
@@ -308,6 +306,18 @@
         let pendingPassword = '';
         let pendingRole = 'customer';
 
+        async function routeAfterSignIn() {
+            const destination = typeof consumeAuthDestination === 'function'
+                ? consumeAuthDestination('/index.html')
+                : '/index.html';
+            window.location.replace(destination);
+        }
+
+        // Do not leave an already authenticated user stranded on the login page.
+        checkAuth().then((isAuthenticated) => {
+            if (isAuthenticated) routeAfterSignIn();
+        }).catch(() => {});
+
         signinBtn.addEventListener('click', async () => {
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value;
@@ -320,7 +330,12 @@
                 return;
             }
 
-            if (isSignUp && password && password !== confirmPasswordInput.value) {
+            if (password.length < 6) {
+                showError("Password must be at least 6 characters.");
+                return;
+            }
+
+            if (isSignUp && password !== confirmPasswordInput.value) {
                 showError("Passwords do not match.");
                 return;
             }
@@ -332,24 +347,8 @@
             btnIcon.classList.add('animate-spin');
             
             try {
-                // 1. If password was provided and not in signup mode, try instant Supabase sign-in first
-                if (!isSignUp && password && password.length >= 6) {
-                    try {
-                        const { data: sData, error: sErr } = await supabase.auth.signInWithPassword({
-                            email,
-                            password
-                        });
-                        if (!sErr && sData.session) {
-                            console.log('[AUTH] Supabase direct password login successful!');
-                            window.location.href = '/index.html';
-                            return;
-                        }
-                    } catch (sErr) {
-                        console.log('[AUTH] Supabase password login fallback to OTP:', sErr.message);
-                    }
-                }
-
-                // 2. Send OTP to email address via AuthClient SDK
+                // The Render OTP verifies email ownership for both sign-in and
+                // signup. A real Supabase session is established only after it passes.
                 btnText.innerText = 'Sending OTP code...';
                 const otpRes = await AuthClient.sendOtp(email, role);
                 pendingEmail = email;
@@ -402,41 +401,36 @@
             verifyBtnIcon.innerText = 'progress_activity';
             verifyBtnIcon.classList.add('animate-spin');
 
+            let otpVerified = false;
             try {
-                // 1. Verify OTP code with backend
-                const data = await AuthClient.verifyOtp(pendingEmail || emailInput.value.trim(), otpCode);
-                console.log('OTP verified successfully:', data);
-                
-                // 2. Synchronize Supabase authentication session if password was provided
-                if (pendingPassword) {
-                    try {
-                        if (isSignUp) {
-                            await supabase.auth.signUp({
-                                email: pendingEmail,
-                                password: pendingPassword,
-                                options: { data: { role: pendingRole } }
-                            });
-                        } else {
-                            await supabase.auth.signInWithPassword({
-                                email: pendingEmail,
-                                password: pendingPassword
-                            });
-                        }
-                    } catch (sErr) {
-                        console.log('Supabase sync note:', sErr);
-                    }
+                await AuthClient.verifyOtp(pendingEmail || emailInput.value.trim(), otpCode, { persistSession: false });
+                otpVerified = true;
+                AuthClient.clearLocalSession();
+
+                if (!isSignUp) {
+                    await signInWithEmailPassword(pendingEmail, pendingPassword);
+                    await routeAfterSignIn();
+                    return;
                 }
 
-                // 3. Smart routing based on profile completeness
-                if (data.onboardingStep === 'profile_setup' || isSignUp || !data.user?.full_name) {
-                    window.location.href = '/auth/profile_setup.html';
-                } else if (data.onboardingStep === 'id_verification') {
-                    window.location.href = '/auth/id_verification.html';
-                } else {
-                    window.location.href = '/index.html';
+                const { data: signupData, error: signupError } = await supabase.auth.signUp({
+                    email: pendingEmail,
+                    password: pendingPassword,
+                    options: { data: { role: pendingRole } }
+                });
+                if (signupError) throw signupError;
+                if (!signupData.session) {
+                    throw new Error('Please confirm your email using the link we sent, then sign in.');
                 }
+                if (typeof clearProfileCache === 'function') clearProfileCache();
+                window.location.replace('/auth/profile_setup.html');
             } catch (err) {
                 console.error("OTP verification error:", err);
+                if (otpVerified) {
+                    document.getElementById('otp-container').classList.add('hidden');
+                    document.getElementById('auth-form-container').classList.remove('hidden');
+                    document.getElementById('otp-code').value = '';
+                }
                 showError(err.message || 'Invalid or expired OTP code.');
                 verifyBtn.classList.remove('pointer-events-none');
                 verifyBtnText.innerText = originalText;

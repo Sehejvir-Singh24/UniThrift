@@ -54,7 +54,7 @@
     },
 
     // 2. Verify 6-Digit OTP Code
-    async verifyOtp(email, otp) {
+    async verifyOtp(email, otp, options = {}) {
       try {
         const targetEmail = email || sessionStorage.getItem('unithrift_pending_email');
         if (!targetEmail) {
@@ -85,12 +85,13 @@
           throw new Error(data.error || 'Invalid or expired OTP code.');
         }
 
-        // Store Auth Session
-        localStorage.setItem(TOKEN_KEY, data.token);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-
-        // Sync with existing cached profile key for full site compatibility
-        sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(data.user));
+        // Login pages use the Render response only as an OTP proof, then create
+        // the real Supabase session used by protected pages and database policies.
+        if (options.persistSession !== false) {
+          localStorage.setItem(TOKEN_KEY, data.token);
+          localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+          sessionStorage.setItem('unimatch_cached_profile', JSON.stringify(data.user));
+        }
 
         return data;
       } catch (err) {
@@ -112,6 +113,14 @@
         if (stored) return JSON.parse(stored);
       } catch (e) {}
       return null;
+    },
+
+    // Remove the legacy custom-auth cache after Supabase establishes the real
+    // browser session used by database policies and protected pages.
+    clearLocalSession() {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      sessionStorage.removeItem('unimatch_cached_profile');
     },
 
     // 5. Fetch Fresh User Profile from Server

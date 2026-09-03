@@ -165,6 +165,8 @@
     // Read ?mode param
     let isSignUp = false;
     let pendingEmail = '';
+    let pendingPassword = '';
+    let isRouting = false;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'signup') {
       isSignUp = true;
@@ -174,37 +176,63 @@
     }
 
 
-    // Listen for OAuth callback
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    // Supabase warns against awaiting more auth calls inside this callback.
+    // Defer routing so OAuth and password sessions finish persisting first.
+    supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        await routeAfterAuth();
+        setTimeout(() => routeAfterAuth(), 0);
       }
     });
 
     async function routeAfterAuth() {
-      if (typeof clearProfileCache === 'function') clearProfileCache();
-      const user = AuthClient.getUser();
-      const profile = user || (typeof getProfile === 'function' ? await getProfile(false) : null);
-      if (!profile) return;
+      if (isRouting) return;
+      isRouting = true;
 
-      if (!profile.instagram_username) {
-        window.location.href = '/unimatch/auth/instagram.html';
-        return;
-      }
-      if (!profile.unimatch_profile_complete) {
-        window.location.href = '/unimatch/profile-setup/basic-info.html';
-        return;
-      }
-      if (!profile.is_verified && profile.role !== 'admin') {
-        if (profile.verification_status === 'pending' || profile.unimatch_verification_status === 'pending') {
-          window.location.href = '/unimatch/auth/pending.html';
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          isRouting = false;
           return;
         }
-        window.location.href = '/unimatch/auth/verify.html';
-        return;
+
+        if (typeof clearProfileCache === 'function') clearProfileCache();
+        const profile = typeof getProfile === 'function' ? await getProfile(true) : null;
+        if (!profile) {
+          isRouting = false;
+          showError('We could not load your account. Please try again.');
+          return;
+        }
+
+        if (!profile.instagram_username) {
+          window.location.replace('/unimatch/auth/instagram.html');
+          return;
+        }
+        if (!profile.unimatch_profile_complete) {
+          window.location.replace('/unimatch/profile-setup/basic-info.html');
+          return;
+        }
+        if (!profile.is_verified && profile.role !== 'admin') {
+          if (profile.verification_status === 'pending' || profile.unimatch_verification_status === 'pending') {
+            window.location.replace('/unimatch/auth/pending.html');
+            return;
+          }
+          window.location.replace('/unimatch/auth/verify.html');
+          return;
+        }
+        const destination = typeof consumeAuthDestination === 'function'
+          ? consumeAuthDestination('/unimatch/discover.html')
+          : '/unimatch/discover.html';
+        window.location.replace(destination);
+      } catch (error) {
+        isRouting = false;
+        showError(error.message || 'We could not finish signing you in. Please try again.');
       }
-      window.location.href = '/unimatch/discover.html';
     }
+
+    // Restore persisted sessions on refresh and after returning from OAuth.
+    checkAuth().then((isAuthenticated) => {
+      if (isAuthenticated) routeAfterAuth();
+    }).catch(() => {});
 
     async function handleGoogleSignIn() {
       const btn = document.getElementById('google-btn');
@@ -225,14 +253,16 @@
       }
     }
 
-    let pendingPassword = '';
-
     async function handleEmailLogin() {
       clearError();
       const email = document.getElementById('email-input').value.trim();
       const password = document.getElementById('password-input').value;
       if (!email || !email.includes('@')) {
         showError('Please enter a valid email address.');
+        return;
+      }
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters.');
         return;
       }
 
@@ -284,22 +314,34 @@
       btn.classList.add('opacity-60', 'pointer-events-none');
       btnText.textContent = 'Verifying...';
 
+      let otpVerified = false;
       try {
-        const data = await AuthClient.verifyOtp(pendingEmail || document.getElementById('email-input').value.trim(), otpCode);
-        console.log('UniMatch OTP Verified:', data);
+        await AuthClient.verifyOtp(pendingEmail || document.getElementById('email-input').value.trim(), otpCode, { persistSession: false });
+        otpVerified = true;
+        AuthClient.clearLocalSession();
 
-        if (pendingPassword) {
-          try {
-            if (isSignUp) {
-              await supabase.auth.signUp({ email: pendingEmail, password: pendingPassword });
-            } else {
-              await supabase.auth.signInWithPassword({ email: pendingEmail, password: pendingPassword });
-            }
-          } catch (sErr) { console.log('Supabase auth note:', sErr); }
+        if (!isSignUp) {
+          await signInWithEmailPassword(pendingEmail, pendingPassword);
+          await routeAfterAuth();
+          return;
         }
 
+        const { data: signupData, error: signupError } = await supabase.auth.signUp({
+          email: pendingEmail,
+          password: pendingPassword
+        });
+        if (signupError) throw signupError;
+        if (!signupData.session) {
+          throw new Error('Please confirm your email using the link we sent, then sign in.');
+        }
+        if (typeof clearProfileCache === 'function') clearProfileCache();
         await routeAfterAuth();
       } catch (err) {
+        if (otpVerified) {
+          document.getElementById('otp-form').classList.add('hidden');
+          document.getElementById('email-form').classList.remove('hidden');
+          document.getElementById('otp-input-um').value = '';
+        }
         showError(err.message || 'Invalid or expired OTP code.');
         btn.classList.remove('opacity-60', 'pointer-events-none');
         btnText.textContent = originalText;
