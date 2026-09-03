@@ -40,7 +40,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
-<script src="/scripts/payu.js"></script>
+<script src="/scripts/famgateway.js"></script>
 </head>
 <body class="bg-surface min-h-screen pb-24">
 
@@ -641,7 +641,7 @@
 
       contactSection.innerHTML = `
         <div class="flex flex-col gap-2">
-          <button onclick="unlockWithPayU('${item.id}')" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+          <button onclick="unlockWithFamGateway('${item.id}')" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
             <span class="material-symbols-outlined text-[20px]">lock_open</span>
             Unlock Contact Details — ₹39
           </button>
@@ -655,8 +655,8 @@
     document.getElementById('detail-modal').classList.remove('hidden');
   }
 
-  // PayU Hosted Checkout redirect handler
-  async function unlockWithPayU(listingId) {
+  // FamGateway hosted checkout redirect handler
+  async function unlockWithFamGateway(listingId) {
     const verified = await verifyAction();
     if (!verified) return;
 
@@ -666,13 +666,13 @@
     const btn = event?.currentTarget;
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Redirecting to PayU...`;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Opening secure UPI checkout...`;
     }
 
     try {
-      await startPayUPayment({ purpose: 'flatmate_unlock', listing_id: listingId });
+      await startFamGatewayPayment({ purpose: 'flatmate_unlock', listing_id: listingId });
     } catch (err) {
-      console.error("PayU Error:", err);
+      console.error("Payment error:", err);
     } finally {
       if (btn) {
         btn.disabled = false;

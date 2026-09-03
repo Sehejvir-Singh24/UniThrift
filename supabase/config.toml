@@ -9,6 +9,11 @@ project_id = "Unithrift"
 [functions.payu-return]
 verify_jwt = false
 
+# FamGateway signs callbacks with an HMAC header; its webhook therefore cannot
+# include a Supabase JWT and validates its own signature inside the function.
+[functions.fam-webhook]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.

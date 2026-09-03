@@ -53,7 +53,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
-  <script src="/scripts/payu.js"></script>
+  <script src="/scripts/famgateway.js"></script>
   <script>
     requireAuth();
   </script>
@@ -595,8 +595,8 @@
       const cost = days * 19;
       modal.classList.add('hidden');
 
-      startPayUPayment({ purpose: 'boost', product_id: productId, days, return_path: '/core/profile.html' })
-        .catch(err => alert('Unable to start PayU payment: ' + err.message));
+      startFamGatewayPayment({ purpose: 'boost', product_id: productId, days, return_path: '/core/profile.html' })
+        .catch(err => alert('Unable to start payment: ' + err.message));
     };
   }
 

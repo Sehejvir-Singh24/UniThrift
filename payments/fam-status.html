@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Confirming payment · UniThrift</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="/scripts/supabase.js"></script></head>
+<body class="min-h-screen grid place-items-center bg-slate-50 font-sans p-6"><main class="max-w-sm w-full bg-white rounded-3xl shadow p-7 text-center"><div id="icon" class="text-4xl mb-3">⏳</div><h1 id="title" class="text-xl font-bold text-slate-900">Confirming your payment</h1><p id="message" class="mt-2 text-sm text-slate-600">Please keep this page open while we verify your UPI payment.</p></main>
+<script>
+(async () => {
+  const txnid = new URLSearchParams(location.search).get('txnid'); const title = document.getElementById('title'), message = document.getElementById('message'), icon = document.getElementById('icon');
+  if (!txnid) { title.textContent = 'Payment reference missing'; message.textContent = 'Return to UniThrift and try again.'; icon.textContent = '⚠️'; return; }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { location.href = '/auth/login.html'; return; }
+  const FUNCTIONS_URL = 'https://bwhvbynmqubjwgonsywd.supabase.co/functions/v1', ANON_KEY = 'sb_publishable_rDDTMnU-KaDG941KB0gaYA_5dHnXX1G';
+  const finish = (payment) => { const metadata = payment.metadata || {}; if (payment.status === 'success') { if (payment.purpose === 'reservation') location.replace(`/core/chat.html?id=${metadata.reservation_id}`); else if (payment.purpose === 'flatmate_unlock') { const unlocked = JSON.parse(localStorage.getItem('unithrift_unlocked_flatmates') || '[]'); if (!unlocked.includes(metadata.listing_id)) { unlocked.push(metadata.listing_id); localStorage.setItem('unithrift_unlocked_flatmates', JSON.stringify(unlocked)); } location.replace('/roommates/flatmates.html'); } else if (payment.purpose === 'boost') location.replace(metadata.return_path || '/core/profile.html'); } else if (payment.status === 'manual_review') { title.textContent = 'Payment received'; message.textContent = 'Your payment needs a short manual check. Please keep your UTR for support.'; icon.textContent = 'ℹ️'; } else { title.textContent = 'Payment was not completed'; message.textContent = payment.failure_reason || 'No payment was confirmed. You can safely try again.'; icon.textContent = '⚠️'; } };
+  for (let attempt = 0; attempt < 60; attempt += 1) { const response = await fetch(`${FUNCTIONS_URL}/verify-fam-payment`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, apikey: ANON_KEY }, body: JSON.stringify({ txnid }) }); const result = await response.json().catch(() => ({})); if (result.payment) { finish(result.payment); return; } if (!result.pending) { title.textContent = 'Payment check failed'; message.textContent = result.error || 'Please try again or contact support.'; icon.textContent = '⚠️'; return; } await new Promise((resolve) => setTimeout(resolve, 5000)); }
+  title.textContent = 'Still confirming payment'; message.textContent = 'Your payment may take a moment to appear. Reopen this page shortly.'; icon.textContent = '⏳';
+})();
+</script></body></html>
