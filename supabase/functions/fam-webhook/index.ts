@@ -18,6 +18,10 @@ serve(async (req) => {
 
   try {
     const event = JSON.parse(rawBody);
+    // FamGateway's dashboard sends a signed synthetic success event when the
+    // merchant clicks "Test & Verify". Acknowledge it without touching payment
+    // records; real events must still match an order created by our backend.
+    if (event.is_test === true) return new Response('OK', { status: 200 });
     if (event.event !== 'payment.success') return new Response('Ignored', { status: 200 });
     const orderId = event.order_id || event.data?.order_id;
     if (!orderId) return new Response('Order missing', { status: 400 });

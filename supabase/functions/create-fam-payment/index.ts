@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 const appUrl = Deno.env.get('APP_URL') || 'https://unithrift.co.in';
-const gatewayBaseUrl = () => Deno.env.get('FAMGATEWAY_BASE_URL') || 'https://fam.aryanispe.in';
+const gatewayBaseUrl = () => Deno.env.get('FAMGATEWAY_BASE_URL') || 'https://famgateway.in';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });

@@ -6,7 +6,7 @@ FamGateway is a temporary UPI checkout integration for reservations, listing boo
 2. Set Supabase secrets (never commit them):
 
    ```sh
-   supabase secrets set FAMGATEWAY_API_KEY="replace-with-new-key" APP_URL="https://unithrift.co.in"
+   supabase secrets set FAMGATEWAY_API_KEY="replace-with-new-key" FAMGATEWAY_BASE_URL="https://famgateway.in" APP_URL="https://unithrift.co.in"
    ```
 
 3. Apply `db/famgateway_payment_migration.sql` after the existing payment migration.
@@ -19,6 +19,6 @@ FamGateway is a temporary UPI checkout integration for reservations, listing boo
    ```
 
 5. In FamGateway, configure the webhook URL as `https://bwhvbynmqubjwgonsywd.supabase.co/functions/v1/fam-webhook`.
-6. Test all three amounts with real low-value payments before enabling UniThrift routes. FamGateway adds a small unique decimal amount; customers must pay the exact amount shown at checkout.
+6. Test all three amounts with real low-value payments before enabling UniThrift routes. Customers must pay the exact payable amount shown at checkout.
 
 The temporary UniThrift launch gate currently blocks `/payments/` pages. Remove the launch gate before using this checkout in production.

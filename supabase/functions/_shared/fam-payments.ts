@@ -5,7 +5,7 @@ export type GatewayPayment = {
   amount: number | string;
 };
 
-const gatewayBaseUrl = () => Deno.env.get('FAMGATEWAY_BASE_URL') || 'https://fam.aryanispe.in';
+const gatewayBaseUrl = () => Deno.env.get('FAMGATEWAY_BASE_URL') || 'https://famgateway.in';
 
 export async function verifyFamGatewayOrder(orderId: string): Promise<GatewayPayment> {
   const apiKey = Deno.env.get('FAMGATEWAY_API_KEY');
