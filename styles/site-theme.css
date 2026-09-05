@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --site-font: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --site-green: #006e2f;
+  --site-ink: #0b1c30;
+  --site-background: #f8f9ff;
+}
+
+body, body[class] {
+  font-family: var(--site-font);
+  color: var(--site-ink);
+  background-color: var(--site-background);
+  -webkit-font-smoothing: antialiased;
+}
+/* Explicit fallbacks keep every generated typography utility consistent. */
+body [class*="font-"], button, input, textarea, select {
+  font-family: var(--site-font);
+}
+h1, h2, h3, h4 { letter-spacing: -0.025em; }
+/* Preserve icon font glyphs, including icons with font utility classes. */
+.material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; }
+.material-icons { font-family: 'Material Icons' !important; }
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 3px solid #006e2f80;
+  outline-offset: 4px;
+}
+/* Shared marketplace surfaces and controls. */
+.bg-primary { background-color: var(--site-green); }
+.text-primary { color: var(--site-green); }
+.bg-background, .bg-surface { background-color: var(--site-background); }
+.text-on-background, .text-on-surface { color: var(--site-ink); }
+
+@media (max-width: 359px) {
+  #platform-switcher-slot .platform-switcher a { padding-inline: 8px; }
+}

@@ -11,3 +11,6 @@ server/.env
 *.log
 .DS_Store
 Thumbs.db
+
+# Local browser audit artifacts
+test-results/

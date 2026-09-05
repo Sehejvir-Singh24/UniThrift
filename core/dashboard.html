@@ -55,20 +55,20 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/supabase.js"></script>
-</head>
+<link rel=stylesheet href=/styles/site-theme.css><link rel=stylesheet href=/styles/site-motion.css><script src=/scripts/site-motion.js defer></script></head>
 <body class="bg-background font-body-lg text-on-background min-h-screen flex flex-col pb-safe">
 
   <!-- Header -->
   <header class="fixed top-0 w-full z-50 glass pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-16 px-container-padding-mobile max-w-4xl mx-auto flex items-center justify-between">
+    <div class="h-16 px-container-padding-mobile md:px-6 max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
         <a href="/core/dashboard.html" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
           <img alt="Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0eOb2F6Md30ofj0pHfOQv0lc68S8BwbGyeixuA7oSccnEtECETfb1MHsHlVEVANbcmtzw1dSyv0V-1vxFLTYNyH1SUeK6D4WO_XePNnLCYEJmvp8chn7GB6qANcHECZnSk56Ja7jcZQzZUHaQ0xWd0alr2Un7ReUumzIEI63DFqIjj0P1iD3KVEpG2TnxpxO_uUaa_lXJUTS-vAIF1fftU0AAK49cmvwLPZtcy1KapRo2IFHqY_rQ8_DUIvHr18kB6XJJLp_cwNH"/>
-          <span class="font-title-md text-title-md text-on-surface font-bold">UniThrift</span>
+          <span class="hidden sm:inline font-title-md text-title-md text-on-surface font-bold">UniThrift</span>
         </a>
         <div id="platform-switcher-slot"></div>
       </div>
-      <a href="/core/profile.html" class="w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/20 hover:scale-105 transition-transform">
+      <a href="/core/profile.html" class="w-9 h-9 shrink-0 rounded-full overflow-hidden ring-2 ring-primary/20 hover:scale-105 transition-transform">
         <img id="header-avatar" alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP-dstOC5bgHNI3kEMkDDK4pN1_X0ipnzd1h5RGxwu7hftKs8Kh5iHhMrKREQrYRocawgw4ncImHVSVM9nNl55CV_SKMEvsWI_9y6iW078Y7gw8libWMPW2_i5tRLJEGolQG5FA04ciktp2pKFsrktqmnmwPDWXKxRxDiT2yLONHYwcfhstR74y7ZDaCN6qn2jddOMv5koe_xRFxvwKO1HISMW-uIgzD-ohsoRNtsY2H-23fOyKF3BK2RG3S6zd5O3EOcj6luIuoEA"/>
       </a>
     </div>
@@ -76,7 +76,7 @@
 
   <!-- Main Content -->
   <main class="pt-20 pb-28 bg-background min-h-screen">
-    <div class="flex flex-col w-full max-w-4xl mx-auto gap-stack-lg">
+    <div class="flex flex-col w-full max-w-7xl mx-auto gap-stack-lg md:px-1">
       
       <!-- Greeting & Search -->
       <div class="px-container-padding-mobile flex flex-col gap-3 mt-2">
@@ -200,7 +200,7 @@
 
   <!-- Bottom Navigation -->
   <nav class="fixed bottom-0 w-full z-50 pb-safe glass shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container">
-    <div class="flex justify-around items-center h-16 px-4 max-w-4xl mx-auto">
+    <div class="flex justify-around items-center h-16 px-4">
       <a aria-current="page" class="flex flex-col items-center gap-1 transition-colors text-primary font-bold" data-path="dashboard" href="/core/dashboard.html">
         <span class="material-symbols-outlined text-[24px]">dashboard</span>
         <span class="font-label-caps text-[11px]">Home</span>

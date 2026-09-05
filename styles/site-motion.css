@@ -1,0 +1,35 @@
+/* Content is visible by default, even if scripts or observers are unavailable. */
+@keyframes site-enter {
+  from { opacity: 0.5; translate: 0 12px; }
+  to { opacity: 1; translate: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main { animation: site-page-enter 420ms ease-out; }
+  .site-reveal { animation: site-enter 440ms ease-out both; }
+  :where(button, a, input, textarea, select) {
+    transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+  :where(button, a):active { filter: brightness(0.97); }
+}
+@keyframes site-page-enter {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :where(main a.rounded-xl, main a.rounded-2xl, main a.rounded-3xl, main article) {
+    transition: translate 220ms ease, box-shadow 220ms ease;
+  }
+  :where(main a.rounded-xl, main a.rounded-2xl, main a.rounded-3xl, main article):hover {
+    translate: 0 -3px;
+    box-shadow: 0 12px 28px #0b1c3012;
+  }
+  button:hover { box-shadow: 0 4px 14px #0b1c3010; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

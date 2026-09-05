@@ -61,12 +61,13 @@
       max-width: 520px !important;
       margin: 0 auto !important;
       transform: translateY(100%) !important;
+      visibility: hidden !important;
       transition: transform 0.3s cubic-bezier(0.32,0.72,0,1) !important;
       max-height: 90vh !important;
       overflow-y: auto !important;
       box-shadow: 0 -10px 40px rgba(0,0,0,0.2) !important;
     }
-    #rb-modal.rb-open { transform: translateY(0) !important; }
+    #rb-modal.rb-open { transform: translateY(0) !important; visibility: visible !important; }
 
     .rb-handle {
       width: 40px; height: 4px; border-radius: 2px;
@@ -121,7 +122,8 @@
       position: fixed !important; bottom: 100px !important; left: 50% !important; transform: translateX(-50%) translateY(20px) !important;
       z-index: 9999999 !important; background: #0F172A; color: white;
       padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500;
-      opacity: 0; transition: all 0.3s ease; white-space: nowrap;
+      opacity: 0; transition: all 0.3s ease; white-space: normal;
+      max-width: calc(100vw - 32px); width: max-content; box-sizing: border-box;
       display: flex; align-items: center; gap: 8px;
     }
     .rb-toast.show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }
