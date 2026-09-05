@@ -600,6 +600,7 @@ async function getBoostedProducts() {
       .select('*, profiles!seller_id(full_name)')
       .eq('is_boosted', true)
       .gt('boosted_until', nowStr)
+      .or('status.is.null,status.eq.Available')
       .order('boosted_until', { ascending: false });
 
     if (!error) {
@@ -618,6 +619,7 @@ async function getBoostedProducts() {
       .select('*')
       .eq('is_boosted', true)
       .gt('boosted_until', nowStr)
+      .or('status.is.null,status.eq.Available')
       .order('boosted_until', { ascending: false });
 
     if (!error) {
@@ -1091,6 +1093,28 @@ async function deleteProductAdmin(productId) {
     console.error("Error deleting product as admin:", error);
     throw error;
   }
+}
+
+// Helper: Boost or unboost a product as an admin.
+// Passing null for days removes the boost; otherwise the boost starts now.
+async function setProductBoostAdmin(productId, days = null) {
+  const normalizedDays = days === null ? null : Number.parseInt(days, 10);
+
+  if (normalizedDays !== null && (!Number.isInteger(normalizedDays) || normalizedDays < 1 || normalizedDays > 365)) {
+    throw new Error("Boost duration must be between 1 and 365 days.");
+  }
+
+  const { data, error } = await supabase.rpc('admin_set_product_boost', {
+    p_product_id: productId,
+    p_days: normalizedDays
+  });
+
+  if (error) {
+    console.error("Error changing product boost as admin:", error);
+    throw error;
+  }
+
+  return Array.isArray(data) ? data[0] : data;
 }
 
 // Helper: Create Roommate Listing

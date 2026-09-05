@@ -84,6 +84,7 @@ This document serves as the authoritative guide to the structure of the UniThrif
 - **`/db` (Database Schema Scripts & Migrations)**
   - `supabase_setup.sql`: Master definitions for `profiles` and `products` tables with RLS policies.
   - `boost_and_listing_fees_migration.sql`: Schema migration adding `is_boosted`, `boosted_at`, `boosted_until`, and `listing_fee_paid` columns to `products`, index `idx_products_boosted`, and public SELECT RLS policy.
+  - `admin_product_boost_migration.sql`: Adds the admin-only RPC used by the dashboard to boost or unboost marketplace products for a chosen duration.
   - `offers_migration.sql`: Schema and RLS policies for `offers` table.
   - `reservation_chat_setup.sql`: Tables for `reservations` and `meetups` tracking deposit checkout and meetup negotiation state machine.
   - `roommate_images_migration.sql`: Adds `images` (array) and `amenities` (array) to `roommate_listings` and sets up `roommate_images` storage bucket.

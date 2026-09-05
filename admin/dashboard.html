@@ -234,7 +234,7 @@
                     <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
                         <div>
                             <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Marketplace Listings</h2>
-                            <p class="font-body-lg text-body-lg text-secondary">Review and moderate products listed by students.</p>
+                            <p class="font-body-lg text-body-lg text-secondary">Review, boost, and moderate products listed by students.</p>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
                             <span id="market-count-badge" class="px-3 py-1 bg-surface-container-highest text-primary font-label-caps text-label-caps rounded-full">0 Listings</span>
@@ -761,6 +761,21 @@
                 const conditionClass = item.condition === 'Like New' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant';
                 const imageStyle = item.image_url ? `background-image: url('${item.image_url}')` : `background-color: var(--color-surface-container)`;
                 const imagePlaceholder = !item.image_url ? `<span class="material-symbols-outlined text-[48px] text-on-surface-variant/40">image_not_supported</span>` : '';
+                const boostUntil = item.boosted_until ? new Date(item.boosted_until) : null;
+                const isActivelyBoosted = Boolean(item.is_boosted && boostUntil && boostUntil.getTime() > Date.now());
+                const isAvailable = !item.status || item.status.toLowerCase() === 'available';
+                const boostStatus = isActivelyBoosted
+                    ? `<div class="mb-4 flex items-center justify-between gap-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2 text-primary">
+                           <span class="inline-flex items-center gap-1 font-label-caps text-label-caps font-bold"><span class="material-symbols-outlined text-base">bolt</span>Boosted</span>
+                           <span class="text-[11px] text-right">Until ${boostUntil.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                       </div>`
+                    : `<div class="mb-4 rounded-xl bg-surface-container-low px-3 py-2 font-body-sm text-xs text-on-surface-variant">Not currently boosted</div>`;
+
+                const boostAction = isActivelyBoosted
+                    ? `<button onclick="toggleProductBoost('${item.id}', true, this)" class="col-span-2 bg-amber-100 text-amber-800 hover:bg-amber-200 py-2.5 rounded-lg font-label-caps text-label-caps font-bold flex items-center justify-center gap-1 transition-colors disabled:opacity-60 disabled:cursor-wait"><span class="material-symbols-outlined text-base">bolt_off</span> Unboost Product</button>`
+                    : isAvailable
+                        ? `<button onclick="toggleProductBoost('${item.id}', false, this)" class="col-span-2 bg-primary text-on-primary hover:bg-on-primary-container py-2.5 rounded-lg font-label-caps text-label-caps font-bold flex items-center justify-center gap-1 transition-colors disabled:opacity-60 disabled:cursor-wait"><span class="material-symbols-outlined text-base">bolt</span> Boost Product</button>`
+                        : `<button disabled class="col-span-2 bg-surface-container text-on-surface-variant py-2.5 rounded-lg font-label-caps text-label-caps font-bold flex items-center justify-center gap-1 opacity-60 cursor-not-allowed"><span class="material-symbols-outlined text-base">block</span> ${escapeHTML(item.status || 'Unavailable')} — Cannot Boost</button>`;
 
                 card.innerHTML = `
                     <div>
@@ -773,16 +788,47 @@
                         </div>
                         <h3 class="font-title-md text-title-md text-on-surface mb-1 truncate">${escapeHTML(item.title)}</h3>
                         <p class="font-body-sm text-body-sm text-secondary mb-4">Uploaded by <span class="font-semibold text-on-surface">${escapeHTML(item.profiles?.full_name) || 'Student'}</span></p>
+                        ${boostStatus}
                     </div>
-                    <div class="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
-                        <button onclick="window.location.href='/marketplace/item.html?id=${item.id}'" class="flex-1 bg-surface-container hover:bg-surface-container-high text-on-surface py-2 rounded-lg font-label-caps text-label-caps transition-colors">View Page</button>
-                        <button onclick="deleteProductRequest('${item.id}')" class="flex-1 bg-error-container text-error py-2 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-1 hover:bg-error hover:text-on-error transition-colors">
+                    <div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                        ${boostAction}
+                        <button onclick="window.location.href='/marketplace/item.html?id=${item.id}'" class="bg-surface-container hover:bg-surface-container-high text-on-surface py-2 rounded-lg font-label-caps text-label-caps transition-colors">View Page</button>
+                        <button onclick="deleteProductRequest('${item.id}')" class="bg-error-container text-error py-2 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-1 hover:bg-error hover:text-on-error transition-colors">
                             <span class="material-symbols-outlined text-sm">delete</span> Delete
                         </button>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        async function toggleProductBoost(productId, isCurrentlyBoosted, button) {
+            let days = null;
+
+            if (isCurrentlyBoosted) {
+                if (!confirm('Remove this product from Trending Offers?')) return;
+            } else {
+                const answer = prompt('How many days should this product stay boosted? Enter 1 to 365 days.', '7');
+                if (answer === null) return;
+                days = Number.parseInt(answer.trim(), 10);
+                if (!Number.isInteger(days) || days < 1 || days > 365 || String(days) !== answer.trim()) {
+                    alert('Please enter a whole number between 1 and 365.');
+                    return;
+                }
+            }
+
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> Updating…';
+
+            try {
+                await setProductBoostAdmin(productId, days);
+                await loadMarketplace();
+            } catch (error) {
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                alert('Could not update boost: ' + (error.message || 'Unknown error'));
+            }
         }
 
         async function deleteProductRequest(productId) {
