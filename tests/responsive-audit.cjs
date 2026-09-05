@@ -5,7 +5,7 @@ const path = require('node:path');
 const http = require('node:http');
 const root = path.resolve(__dirname, '..');
 const out = path.join(root, 'test-results/responsive');
-const profile = { id: 'ui-test', full_name: 'Test Student', college: 'Delhi College', instagram_username: 'test', unimatch_profile_complete: true, is_verified: true, interests: ['Music', 'Reading'], role: process.env.AUDIT_ROLE || 'student' };
+const profile = { id: 'ui-test', full_name: 'Test Student', phone_number: '0000000000', father_name: 'Test Parent', college: 'Delhi College', instagram_username: 'test', unimatch_profile_complete: true, is_verified: true, interests: ['Music', 'Reading'], role: process.env.AUDIT_ROLE || 'student' };
 const sdk = `window.supabase={createClient(){const profile=${JSON.stringify(profile)};const query=new Proxy(function(){},{get(_,key){if(key==='then')return resolve=>resolve({data:[],error:null,count:0});if(key==='single'||key==='maybeSingle')return async()=>({data:profile,error:null});return ()=>query;}});return {auth:{getSession:async()=>({data:{session:{user:{id:profile.id,email:'test@example.invalid'}}}}),getUser:async()=>({data:{user:{id:profile.id}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:()=>query,rpc:async()=>({data:[],error:null}),channel:()=>query,removeChannel(){},storage:{from:()=>query}}}};`;
 async function run() {
  fs.mkdirSync(out,{recursive:true});
