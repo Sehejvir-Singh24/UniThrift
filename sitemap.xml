@@ -4,12 +4,52 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- UniMatch is the only publicly indexable product while UniThrift is launching soon. -->
+  <!-- Homepage -->
   <url>
-    <loc>https://unithrift.co.in/unimatch/</loc>
-    <lastmod>2026-09-01</lastmod>
+    <loc>https://unithrift.co.in/</loc>
+    <lastmod>2026-09-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+
+  <!-- UniMatch landing -->
+  <url>
+    <loc>https://unithrift.co.in/unimatch/</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- UniMatch welcome / signup -->
+  <url>
+    <loc>https://unithrift.co.in/unimatch/welcome.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Marketplace browse -->
+  <url>
+    <loc>https://unithrift.co.in/marketplace/marketplace.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Roommates / Flatmates -->
+  <url>
+    <loc>https://unithrift.co.in/roommates/flatmates.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- PG / Hostels -->
+  <url>
+    <loc>https://unithrift.co.in/pghostels/pghostels.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 
 </urlset>
