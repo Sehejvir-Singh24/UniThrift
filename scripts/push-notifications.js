@@ -115,9 +115,13 @@
   }
 
   // ── iOS Add-to-Home-Screen Instructions Bottom Sheet ─────────────────
+  // ── iOS Add-to-Home-Screen Instructions Bottom Sheet ─────────────────
   function showIOSGuideModal() {
     const existing = document.getElementById('ios-push-guide-modal');
     if (existing) existing.remove();
+
+    // Play feedback chime immediately
+    playNotificationChime();
 
     const isUniMatch = location.pathname.includes('/unimatch');
     const appName = isUniMatch ? 'UniMatch' : 'UniThrift';
@@ -125,10 +129,20 @@
 
     const modal = document.createElement('div');
     modal.id = 'ios-push-guide-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadeIn 0.2s ease;';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:99999999;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;padding:0;animation:utFadeIn 0.25s ease forwards;touch-action:manipulation;';
 
     modal.innerHTML = `
-      <div style="background:#FFFFFF;border-top-left-radius:28px;border-top-right-radius:28px;width:100%;max-width:440px;padding:24px 20px max(24px,env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:16px;animation:slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);">
+      <style>
+        @keyframes utFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes utSheetSlideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+      </style>
+      <div style="background:#FFFFFF;border-top-left-radius:28px;border-top-right-radius:28px;width:100%;max-width:440px;padding:24px 20px;padding-bottom:max(28px,env(safe-area-inset-bottom,28px));box-shadow:0 -10px 40px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:16px;animation:utSheetSlideUp 0.32s cubic-bezier(0.16,1,0.3,1) forwards;">
         <div style="width:40px;height:4px;border-radius:2px;background:#e0dcdb;margin:0 auto -4px;"></div>
         
         <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -137,70 +151,96 @@
               <span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'FILL' 1;">notifications_active</span>
             </div>
             <div>
-              <h3 style="font-size:17px;font-weight:700;color:#1a1c1b;margin:0;">Get Alerts on iPhone 🔔</h3>
-              <p style="font-size:12px;color:#7a6d70;margin:1px 0 0;">Lock-screen alerts for likes & matches</p>
+              <h3 style="font-size:17px;font-weight:700;color:#1a1c1b;margin:0;">Lock-Screen Alerts on iPhone 🔔</h3>
+              <p style="font-size:12px;color:#7a6d70;margin:1px 0 0;">Never miss a like, match, or chat</p>
             </div>
           </div>
-          <button id="close-ios-modal-btn" style="background:#f4f3f1;border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#554245;">
+          <button id="close-ios-modal-btn" type="button" style="background:#f4f3f1;border:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#554245;-webkit-tap-highlight-color:transparent;">
             <span class="material-symbols-outlined" style="font-size:18px;">close</span>
           </button>
         </div>
 
         <div style="background:#faf8f7;border-radius:18px;padding:16px;border:1px solid #ebd9dc;display:flex;flex-direction:column;gap:14px;">
           <p style="font-size:13px;color:#443336;margin:0;line-height:1.45;">
-            Apple iOS requires web apps to be added to your <b>Home Screen</b> to allow instant lock-screen notifications.
+            Apple Safari requires adding <b>${appName}</b> to your <b>Home Screen</b> to allow system lock-screen push alerts:
           </p>
 
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:30px;height:30px;border-radius:50%;background:#ffffff;border:1.5px solid ${primaryColor};color:${primaryColor};font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
-            <div style="font-size:13px;color:#1a1c1b;">
-              Tap the <b>Share</b> icon <span style="display:inline-block;padding:2px 6px;background:#eee;border-radius:6px;font-weight:bold;font-size:12px;">📤</span> at the bottom of Safari.
+            <div style="font-size:13px;color:#1a1c1b;line-height:1.35;">
+              Tap Safari's <b>Share</b> button <span style="display:inline-block;padding:2px 7px;background:#e8e5e5;border-radius:6px;font-weight:bold;font-size:12px;">📤</span> (bottom bar).
             </div>
           </div>
 
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:30px;height:30px;border-radius:50%;background:#ffffff;border:1.5px solid ${primaryColor};color:${primaryColor};font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
-            <div style="font-size:13px;color:#1a1c1b;">
-              Scroll down and tap <b>Add to Home Screen</b> <span style="display:inline-block;padding:2px 6px;background:#eee;border-radius:6px;font-weight:bold;font-size:12px;">➕</span>.
+            <div style="font-size:13px;color:#1a1c1b;line-height:1.35;">
+              Scroll down and tap <b>Add to Home Screen</b> <span style="display:inline-block;padding:2px 7px;background:#e8e5e5;border-radius:6px;font-weight:bold;font-size:12px;">➕</span>.
             </div>
           </div>
 
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:30px;height:30px;border-radius:50%;background:#ffffff;border:1.5px solid ${primaryColor};color:${primaryColor};font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
-            <div style="font-size:13px;color:#1a1c1b;">
-              Open <b>${appName}</b> from your Home Screen & tap <b>Enable Alerts</b>!
+            <div style="font-size:13px;color:#1a1c1b;line-height:1.35;">
+              Open <b>${appName}</b> from your Home Screen & enjoy instant alerts!
             </div>
           </div>
         </div>
 
-        <button id="got-it-ios-modal-btn" style="width:100%;padding:14px;border-radius:999px;background:${primaryColor};color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.18);">
+        <button id="got-it-ios-modal-btn" type="button" style="width:100%;padding:14px;border-radius:999px;background:${primaryColor};color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.18);-webkit-tap-highlight-color:transparent;">
           Got it! 👍
         </button>
       </div>
     `;
 
     document.body.appendChild(modal);
-    modal.querySelector('#close-ios-modal-btn').onclick = () => modal.remove();
-    modal.querySelector('#got-it-ios-modal-btn').onclick = () => modal.remove();
-    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+    const closeModal = () => {
+      modal.remove();
+    };
+
+    const closeBtn = modal.querySelector('#close-ios-modal-btn');
+    const gotItBtn = modal.querySelector('#got-it-ios-modal-btn');
+
+    if (closeBtn) {
+      closeBtn.onclick = closeModal;
+      closeBtn.ontouchend = (e) => { e.preventDefault(); closeModal(); };
+    }
+    if (gotItBtn) {
+      gotItBtn.onclick = closeModal;
+      gotItBtn.ontouchend = (e) => { e.preventDefault(); closeModal(); };
+    }
+    modal.onclick = (e) => { if (e.target === modal) closeModal(); };
   }
 
   // ── Request System Notification Permission ──────────────────────────
   async function requestPushPermission() {
     // 1. If on iOS in standard Safari browser (not standalone PWA)
     if (isIOS && !isStandalone) {
+      localStorage.setItem('um_notifications_enabled', 'true');
+      document.getElementById('notif-smart-prompt')?.remove();
+      
+      showInAppToast({
+        title: 'Alerts Activated! 💕',
+        message: 'Tap Share (📤) then "Add to Home Screen" to receive alerts while your screen is locked.',
+        icon: 'notifications_active',
+        duration: 5500
+      });
+
       showIOSGuideModal();
-      return { success: false, reason: 'ios_safari_requires_homescreen' };
+      return { success: true, mode: 'ios_guide' };
     }
 
     // 2. If Notification API is not available
     if (!('Notification' in window)) {
+      localStorage.setItem('um_notifications_enabled', 'true');
+      document.getElementById('notif-smart-prompt')?.remove();
       showInAppToast({
-        title: 'Notifications Unsupported',
-        message: 'Your browser does not support web push. Notifications will appear in-app.',
-        icon: 'notifications_off'
+        title: 'In-App Alerts Active! 🔔',
+        message: 'You will receive audio chimes & alerts while using UniThrift.',
+        icon: 'notifications'
       });
-      return { success: false, reason: 'unsupported' };
+      return { success: true, mode: 'in_app_only' };
     }
 
     try {
@@ -308,44 +348,47 @@
       promptEl.id = 'notif-smart-prompt';
       promptEl.style.cssText = `
         position: fixed;
-        bottom: max(78px, calc(env(safe-area-inset-bottom) + 68px));
-        left: 16px;
-        right: 16px;
+        top: max(68px, calc(env(safe-area-inset-top, 0px) + 58px));
+        left: 12px;
+        right: 12px;
         max-width: 440px;
         margin: 0 auto;
-        z-index: 9999;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        z-index: 9999999;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.9);
         border-radius: 20px;
         padding: 12px 14px;
-        box-shadow: 0 10px 30px rgba(92, 4, 39, 0.16);
+        box-shadow: 0 10px 30px rgba(92, 4, 39, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06);
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        animation: utToastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: utToastSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
       `;
 
       const isUniMatch = location.pathname.includes('/unimatch');
       const accentBg = isUniMatch ? '#5c0427' : '#006e2f';
 
       promptEl.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-          <div style="width:36px;height:36px;border-radius:50%;background:${accentBg};color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${accentBg};color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 8px rgba(0,0,0,0.15);">
             <span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'FILL' 1;">notifications_active</span>
           </div>
-          <div style="min-width:0;">
-            <div style="font-size:12.5px;font-weight:700;color:#1a1c1b;line-height:1.2;">Turn on Alerts 🔔</div>
-            <div style="font-size:11px;color:#7a6d70;line-height:1.2;margin-top:2px;">Get instant match & like alerts</div>
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#1a1c1b;line-height:1.2;">Turn on Alerts 🔔</div>
+            <div style="font-size:11.5px;color:#7a6d70;line-height:1.2;margin-top:2px;">Get instant match & like alerts</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          <button id="enable-notifs-quick-btn" style="background:${accentBg};color:white;border:none;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;">
+          <button id="enable-notifs-quick-btn" type="button" style="background:${accentBg};color:white;border:none;border-radius:999px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">
             Enable
           </button>
-          <button id="dismiss-notifs-prompt-btn" style="background:transparent;border:none;color:#887275;padding:4px;cursor:pointer;display:flex;align-items:center;">
+          <button id="dismiss-notifs-prompt-btn" type="button" style="background:transparent;border:none;color:#887275;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;">
             <span class="material-symbols-outlined" style="font-size:18px;">close</span>
           </button>
         </div>
@@ -353,14 +396,27 @@
 
       document.body.appendChild(promptEl);
 
-      promptEl.querySelector('#enable-notifs-quick-btn').onclick = () => {
+      const activatePrompt = (e) => {
+        if (e && e.target && e.target.closest('#dismiss-notifs-prompt-btn')) return;
+        if (e && e.cancelable) e.preventDefault();
         requestPushPermission();
       };
-      promptEl.querySelector('#dismiss-notifs-prompt-btn').onclick = () => {
-        localStorage.setItem('um_notif_prompt_dismissed', Date.now().toString());
-        promptEl.remove();
-      };
-    }, 2500);
+
+      promptEl.addEventListener('click', activatePrompt);
+      promptEl.addEventListener('touchend', activatePrompt);
+
+      const dismissBtn = promptEl.querySelector('#dismiss-notifs-prompt-btn');
+      if (dismissBtn) {
+        const dismissPrompt = (e) => {
+          if (e && e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          localStorage.setItem('um_notif_prompt_dismissed', Date.now().toString());
+          promptEl.remove();
+        };
+        dismissBtn.addEventListener('click', dismissPrompt);
+        dismissBtn.addEventListener('touchend', dismissPrompt);
+      }
+    }, 1800);
   }
 
   // ── Realtime Listener & Notification Poller ──────────────────────────

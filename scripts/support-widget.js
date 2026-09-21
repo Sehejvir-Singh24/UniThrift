@@ -22,11 +22,11 @@
   style.textContent = `
     #rb-fab {
       position: fixed !important;
-      bottom: 85px !important;
-      right: 20px !important;
-      z-index: 999999 !important;
-      width: 52px !important;
-      height: 52px !important;
+      bottom: 145px !important;
+      right: 16px !important;
+      z-index: 99998 !important;
+      width: 48px !important;
+      height: 48px !important;
       border-radius: 50% !important;
       background: linear-gradient(135deg, #B05070, #7C3AED) !important;
       color: white !important;
@@ -37,7 +37,7 @@
       justify-content: center !important;
       box-shadow: 0 6px 24px rgba(112,26,117,0.45) !important;
       transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-      font-size: 22px !important;
+      font-size: 20px !important;
     }
     #rb-fab:hover { transform: scale(1.1) !important; box-shadow: 0 8px 32px rgba(112,26,117,0.6) !important; }
     #rb-fab:active { transform: scale(0.95) !important; }
