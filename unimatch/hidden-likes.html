@@ -98,7 +98,12 @@
     /* ── Copy icebreaker button feedback ── */
     .copy-success { background: rgba(34, 197, 94, 0.15) !important; border-color: rgba(34, 197, 94, 0.4) !important; color: #16a34a !important; }
   </style>
-<link rel=stylesheet href=/styles/site-motion.css><script src=/scripts/site-motion.js defer></script></head>
+<link rel=stylesheet href=/styles/site-motion.css><script src=/scripts/site-motion.js defer></script>  <link rel="manifest" href="/unimatch/manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="/assets/unithrift-app-icon.svg"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="UniMatch"/>
+</head>
 <body class="text-um-on-surface min-h-screen flex flex-col relative pb-24">
 
   <!-- ═══════════════════════════════════
@@ -979,5 +984,6 @@
     });
   </script>
   <script src="/scripts/support-widget.js" defer></script>
+  <script src="/scripts/push-notifications.js" defer></script>
 </body>
 </html>

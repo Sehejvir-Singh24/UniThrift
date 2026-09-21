@@ -38,6 +38,13 @@ CREATE POLICY "Users can insert their own likes"
   TO authenticated
   WITH CHECK ( auth.uid() = liker_id );
 
+DROP POLICY IF EXISTS "Users can update their own likes" ON public.unimatch_likes;
+CREATE POLICY "Users can update their own likes"
+  ON public.unimatch_likes FOR UPDATE
+  TO authenticated
+  USING ( auth.uid() = liker_id )
+  WITH CHECK ( auth.uid() = liker_id );
+
 DROP POLICY IF EXISTS "Users can delete their own likes" ON public.unimatch_likes;
 CREATE POLICY "Users can delete their own likes"
   ON public.unimatch_likes FOR DELETE

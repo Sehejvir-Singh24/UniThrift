@@ -187,6 +187,44 @@ async function requireUniMatchAuth() {
   return profile;
 }
 
+// UniMatch Pass Cooldown: 24 hours (1 day) in milliseconds
+const UNIMATCH_PASS_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
+function getLocalPasses(userId) {
+  if (!userId) return {};
+  try {
+    const raw = localStorage.getItem(`um_passes_${userId}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function recordLocalPass(userId, targetUserId) {
+  if (!userId || !targetUserId) return;
+  try {
+    const passes = getLocalPasses(userId);
+    passes[targetUserId] = Date.now();
+    // Prune entries older than 48 hours to keep local storage compact
+    const now = Date.now();
+    for (const id in passes) {
+      if (now - passes[id] > 48 * 60 * 60 * 1000) {
+        delete passes[id];
+      }
+    }
+    localStorage.setItem(`um_passes_${userId}`, JSON.stringify(passes));
+  } catch (e) {
+    console.warn("Could not write local pass:", e);
+  }
+}
+
+function clearLocalPasses(userId) {
+  if (!userId) return;
+  try {
+    localStorage.removeItem(`um_passes_${userId}`);
+  } catch (e) {}
+}
+
 // Helper: Record UniMatch Like or Pass & Check Mutual Match
 // Returns { isMatch: boolean, matchedProfile?: object }
 async function recordUniMatchAction(targetUserId, action) {
@@ -196,15 +234,26 @@ async function recordUniMatchAction(targetUserId, action) {
   const likerId = session.user.id;
   if (!targetUserId || targetUserId === likerId) return { isMatch: false };
 
-  // 1. Record the action in unimatch_likes (upsert)
+  const nowIso = new Date().toISOString();
+
+  // If action is pass, save locally immediately to suppress for at least 1 day (24 hours)
+  if (action === 'pass') {
+    recordLocalPass(likerId, targetUserId);
+  }
+
+  // 1. Record the action in unimatch_likes (upsert with updated timestamp)
   try {
-    await supabase
+    const { error: upsertErr } = await supabase
       .from('unimatch_likes')
       .upsert({
         liker_id: likerId,
         liked_user_id: targetUserId,
-        action: action
+        action: action,
+        created_at: nowIso
       }, { onConflict: 'liker_id,liked_user_id' });
+    if (upsertErr) {
+      console.warn("Could not save action to unimatch_likes:", upsertErr);
+    }
   } catch (err) {
     console.warn("Could not save action to unimatch_likes:", err);
   }
@@ -233,8 +282,8 @@ async function recordUniMatchAction(targetUserId, action) {
 
       // Fetch profiles in parallel to extract common interests & generate fun icebreaker
       const [{ data: p1 }, { data: p2 }] = await Promise.all([
-        supabase.from('profiles').select('full_name, interests, major').eq('id', user1).maybeSingle(),
-        supabase.from('profiles').select('full_name, interests, major').eq('id', user2).maybeSingle()
+        supabase.from('profiles').select('email, full_name, interests, major').eq('id', user1).maybeSingle(),
+        supabase.from('profiles').select('email, full_name, interests, major').eq('id', user2).maybeSingle()
       ]);
 
       const icebreakerData = generateFunIcebreaker(p1?.interests, p2?.interests);
@@ -245,12 +294,40 @@ async function recordUniMatchAction(targetUserId, action) {
           user1_id: user1,
           user2_id: user2,
           reveal_available_at: revealAvailableAt,
-          // UniMatch is currently free for verified students.
           user1_unlocked: true,
           user2_unlocked: true,
           icebreaker_prompt: icebreakerData.prompt,
           common_interests: JSON.stringify(icebreakerData.common)
         }, { onConflict: 'user1_id,user2_id' });
+
+      // Notify both users of mutual match in public.notifications
+      await Promise.all([
+        supabase.from('notifications').insert({
+          user_id: targetUserId,
+          title: "It's a Match! 🎉💕",
+          message: 'You and another student both connected! Open UniMatch to break the ice.',
+          type: 'unimatch_match'
+        }),
+        supabase.from('notifications').insert({
+          user_id: likerId,
+          title: "It's a Match! 🎉💕",
+          message: 'You and another student both connected! Open UniMatch to break the ice.',
+          type: 'unimatch_match'
+        })
+      ]).catch(() => {});
+
+      // Dispatch real-time email alert to target user so their phone lock-screen rings
+      const targetUserEmail = (targetUserId === user1 ? p1?.email : p2?.email);
+      if (targetUserEmail && window.AuthClient && typeof window.AuthClient.sendEmailNotification === 'function') {
+        window.AuthClient.sendEmailNotification({
+          to: targetUserEmail,
+          title: "It's a Match! 🎉💕",
+          message: "You have a new mutual match on UniMatch! Open UniMatch now to break the ice and exchange Instagram handles.",
+          platform: 'unimatch',
+          actionUrl: 'https://unithrift.co.in/unimatch/hidden-likes.html',
+          actionText: 'View Your Match'
+        }).catch(() => {});
+      }
 
       // Fetch target profile info for return
       const { data: matchedProfile } = await supabase
@@ -265,6 +342,28 @@ async function recordUniMatchAction(targetUserId, action) {
         revealAvailableAt,
         matchedProfile: matchedProfile || null
       };
+    } else {
+      // Single Like: Send discreet notification + email alert to target user
+      await supabase.from('notifications').insert({
+        user_id: targetUserId,
+        title: 'Someone liked your profile! 💕',
+        message: 'A student from your campus just liked you on UniMatch! Open UniMatch to see who it is.',
+        type: 'unimatch_like'
+      }).catch(() => {});
+
+      // Email alert for lock-screen notification (especially effective on iOS iPhones)
+      supabase.from('profiles').select('email, full_name').eq('id', targetUserId).maybeSingle().then(({ data: tp }) => {
+        if (tp && tp.email && window.AuthClient && typeof window.AuthClient.sendEmailNotification === 'function') {
+          window.AuthClient.sendEmailNotification({
+            to: tp.email,
+            title: 'Someone liked your profile! 💕',
+            message: 'A verified student on campus just liked your profile on UniMatch! Open UniMatch now to see who liked you.',
+            platform: 'unimatch',
+            actionUrl: 'https://unithrift.co.in/unimatch/hidden-likes.html',
+            actionText: 'See Who Liked You'
+          }).catch(() => {});
+        }
+      }).catch(() => {});
     }
   } catch (err) {
     console.warn("Error checking mutual match:", err);
@@ -436,6 +535,7 @@ async function resetUserSwipes(userId) {
   } catch (e) {
     console.error("Error resetting swipes:", e);
   }
+  clearLocalPasses(userId);
 }
 
 // Helper: Require Verified Seller
@@ -878,6 +978,25 @@ async function submitOffer(productId, sellerId, amount, message = '') {
     console.error("Error submitting offer:", error);
     throw error;
   }
+
+  // Notify seller via email alert (fires lock-screen notification on iPhone/Android)
+  try {
+    const [{ data: sellerProfile }, { data: product }] = await Promise.all([
+      supabase.from('profiles').select('email, full_name').eq('id', sellerId).maybeSingle(),
+      supabase.from('products').select('title').eq('id', productId).maybeSingle()
+    ]);
+    if (sellerProfile && sellerProfile.email && window.AuthClient && typeof window.AuthClient.sendEmailNotification === 'function') {
+      const buyerName = session.user.user_metadata?.full_name || 'A student';
+      window.AuthClient.sendEmailNotification({
+        to: sellerProfile.email,
+        title: `New Offer: ₹${amount} on "${product?.title || 'your listing'}"! 🏷️`,
+        message: `${buyerName} just made an offer of ₹${amount} on "${product?.title || 'your listing'}". Check your Activity Hub to accept or counter.`,
+        platform: 'unithrift',
+        actionUrl: 'https://unithrift.co.in/core/activity.html',
+        actionText: 'View Offer'
+      }).catch(() => {});
+    }
+  } catch (e) {}
 }
 
 // Helper: Get Received Offers (for Sellers)
@@ -951,8 +1070,39 @@ async function updateOfferStatus(offerId, status, counterAmount = null) {
     throw updateError;
   }
 
-  // If accepted, we do NOT automatically mark the product as Sold anymore.
-  // The buyer must now go to the item page and pay the 25% deposit to Reserve it.
+  // Notify buyer via email alert (fires lock-screen notification on iPhone/Android)
+  try {
+    const [{ data: buyerProfile }, { data: product }] = await Promise.all([
+      supabase.from('profiles').select('email').eq('id', offer.buyer_id).maybeSingle(),
+      supabase.from('products').select('title').eq('id', offer.product_id).maybeSingle()
+    ]);
+    if (buyerProfile && buyerProfile.email && window.AuthClient && typeof window.AuthClient.sendEmailNotification === 'function') {
+      const prodTitle = product?.title || 'your item';
+      let title = `Offer ${status}: "${prodTitle}"`;
+      let msg = `Your offer for "${prodTitle}" is now marked as ${status}.`;
+      let actionUrl = 'https://unithrift.co.in/core/activity.html';
+      let actionText = 'Check Status';
+
+      if (status === 'Accepted') {
+        title = `🎉 Offer Accepted for "${prodTitle}"!`;
+        msg = `Great news! The seller accepted your offer of ₹${offer.offer_amount}. Go to the listing to pay the deposit and lock in your reservation!`;
+        actionUrl = `https://unithrift.co.in/marketplace/item.html?id=${offer.product_id}`;
+        actionText = 'Reserve Now';
+      } else if (status === 'Countered') {
+        title = `Counter-Offer Received on "${prodTitle}"`;
+        msg = `The seller has countered with ₹${offer.offer_amount}. Tap to view and respond.`;
+      }
+
+      window.AuthClient.sendEmailNotification({
+        to: buyerProfile.email,
+        title,
+        message: msg,
+        platform: 'unithrift',
+        actionUrl,
+        actionText
+      }).catch(() => {});
+    }
+  } catch (e) {}
 
   return offer;
 }

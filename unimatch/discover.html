@@ -4,6 +4,12 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <title>UniMatch - Discover</title>
+<link rel="manifest" href="/unimatch/manifest.webmanifest"/>
+<link rel="icon" href="/assets/unithrift-app-icon.svg" type="image/svg+xml"/>
+<link rel="apple-touch-icon" href="/assets/unithrift-app-icon.svg"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="UniMatch"/>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
@@ -554,7 +560,7 @@
       </div>
       <div>
         <h3 style="font-size:22px;font-weight:700;color:var(--um-text);margin:0 0 6px;">You're all caught up! 🎉</h3>
-        <p id="empty-state-msg" style="font-size:14px;color:var(--um-text-muted);margin:0;line-height:1.5;">You have swiped through all available student profiles in your feed.</p>
+        <p id="empty-state-msg" style="font-size:14px;color:var(--um-text-muted);margin:0;line-height:1.5;">You have reviewed all available profiles. Profiles you pass will take at least a day to reappear, or you can reset below anytime.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:240px;margin-top:8px;">
         <button onclick="handleResetSwipes()" class="um-btn-primary" style="padding:12px 20px;font-size:14px;">
@@ -764,30 +770,40 @@
     };
   }
 
-  function buildFeedProfiles(allCandidates, myProfile, likedIds, passedIds, mutualLikerIds) {
+  const PASS_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours (1 day)
+
+  function buildFeedProfiles(allCandidates, myProfile, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds) {
     const myPreferredGender = myProfile.preferred_gender || 'Everyone';
     const blockedIds = (() => { try { return JSON.parse(localStorage.getItem('um_blocked_user_ids') || '[]'); } catch { return []; } })();
 
+    // Filter out: self, incomplete profiles, blocked users, liked users, and users passed within the last 24 hours
     const base = allCandidates.filter(c =>
       c.id !== myProfile.id &&
       c.unimatch_profile_complete === true &&
       !blockedIds.includes(c.id) &&
-      !likedIds.has(c.id)
+      !likedIds.has(c.id) &&
+      !recentPassedIds.has(c.id)
     );
 
     let genderFiltered = base.filter(c => isGenderMatch(c.gender, myPreferredGender));
     if (genderFiltered.length === 0 && base.length > 0) genderFiltered = base;
 
-    const unswiped = genderFiltered.filter(c => !passedIds.has(c.id) && !likedIds.has(c.id));
-    const passed   = genderFiltered.filter(c =>  passedIds.has(c.id));
+    // Fresh candidates that have never been swiped
+    const unswiped = genderFiltered.filter(c => !expiredPassedIds.has(c.id));
+    // Recycled candidates who were passed at least 1 day ago
+    const recycled = genderFiltered.filter(c => expiredPassedIds.has(c.id));
 
     const score = c => scoreProfile(c, myProfile, mutualLikerIds);
     const sort  = arr => arr.map(c => ({ ...c, _score: score(c) })).sort((a, b) => b._score - a._score);
 
-    return [...sort(unswiped), ...sort(passed)].map(mapToCardProfile);
+    // Fresh profiles first; profiles passed >1 day ago appear afterwards as recycled options
+    return [...sort(unswiped), ...sort(recycled)].map(mapToCardProfile);
   }
 
   let currentUserId = null;
+  const likedIds         = new Set();
+  const recentPassedIds  = new Set();
+  const expiredPassedIds = new Set();
 
   (async () => {
     const myProfile = await requireUniMatchAuth();
@@ -798,23 +814,40 @@
     remainingLikes = likesInfo.remaining;
     document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
 
-    let likedIds       = new Set();
-    let passedIds      = new Set();
     let mutualLikerIds = new Set();
     let candidates = [];
     let error = null;
 
+    // 1. Populate recent passes from local storage immediately (< 24 hours)
+    const now = Date.now();
+    const localPasses = typeof getLocalPasses === 'function' ? getLocalPasses(currentUserId) : {};
+    Object.entries(localPasses).forEach(([targetId, passTime]) => {
+      if (now - passTime < PASS_COOLDOWN_MS) {
+        recentPassedIds.add(targetId);
+      }
+    });
+
     try {
       const [mySwipesRes, theirLikesRes, candidatesRes] = await Promise.all([
-        supabase.from('unimatch_likes').select('liked_user_id, action').eq('liker_id', myProfile.id),
+        supabase.from('unimatch_likes').select('liked_user_id, action, created_at').eq('liker_id', myProfile.id),
         supabase.from('unimatch_likes').select('liker_id').eq('liked_user_id', myProfile.id).eq('action', 'like'),
         supabase.from('profiles').select('*').eq('unimatch_profile_complete', true)
       ]);
 
       if (mySwipesRes && mySwipesRes.data) {
         mySwipesRes.data.forEach(l => {
-          if (l.action === 'like') likedIds.add(l.liked_user_id);
-          else                     passedIds.add(l.liked_user_id);
+          if (l.action === 'like') {
+            likedIds.add(l.liked_user_id);
+          } else if (l.action === 'pass') {
+            const passTime = l.created_at ? new Date(l.created_at).getTime() : 0;
+            if (passTime > 0 && (now - passTime) < PASS_COOLDOWN_MS) {
+              // Crossed less than 24 hours ago -> Hide
+              recentPassedIds.add(l.liked_user_id);
+            } else if (!recentPassedIds.has(l.liked_user_id)) {
+              // Crossed at least 1 day ago -> Can reappear as recycled fallback
+              expiredPassedIds.add(l.liked_user_id);
+            }
+          }
         });
       }
       if (theirLikesRes && theirLikesRes.data) {
@@ -827,7 +860,7 @@
     }
 
     if (!error && candidates && candidates.length > 0) {
-      DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {}, likedIds, passedIds, mutualLikerIds);
+      DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {}, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds);
     }
 
     renderCard(0);
@@ -836,6 +869,9 @@
   async function handleResetSwipes() {
     if (currentUserId) {
       await resetUserSwipes(currentUserId);
+      if (typeof clearLocalPasses === 'function') {
+        clearLocalPasses(currentUserId);
+      }
       location.reload();
     }
   }
@@ -1064,6 +1100,10 @@
   async function handlePass() {
     const p = DISCOVERY_PROFILES[cardIndex];
     if (p && p.id) {
+      recentPassedIds.add(p.id);
+      if (typeof recordLocalPass === 'function' && currentUserId) {
+        recordLocalPass(currentUserId, p.id);
+      }
       recordUniMatchAction(p.id, 'pass').catch(() => {});
     }
     const card = document.getElementById('active-card');
@@ -1098,6 +1138,7 @@
     card.classList.add('card-like-out');
 
     if (p && p.id) {
+      likedIds.add(p.id);
       recordUniMatchAction(p.id, 'like').catch(() => {});
     }
 
@@ -1161,5 +1202,6 @@
 </script>
 <script src="/unimatch/clouds-init.js"></script>
 <script src="/scripts/support-widget.js" defer></script>
+<script src="/scripts/push-notifications.js" defer></script>
 </body>
 </html>

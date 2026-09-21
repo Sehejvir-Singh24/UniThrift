@@ -90,12 +90,14 @@ Rationale: UniMatch is campus-first. Same-university people are more relevant.
 ```
 e.g. Both want "Study Partner" → more compatible → shown higher.
 
-### Priority 3 — Already-Liked Exclusion
+### Priority 3 — Already-Liked Exclusion & 24h Pass Cooldown
 ```
 Filter out profiles where:
-  EXISTS in unimatch_likes WHERE liker_id = me AND liked_user_id = candidate.id
+  - Liked: EXISTS in unimatch_likes WHERE liker_id = me AND liked_user_id = candidate.id AND action = 'like' (Permanently excluded)
+  - Passed (<24h): EXISTS in unimatch_likes WHERE liker_id = me AND liked_user_id = candidate.id AND action = 'pass' AND (now - created_at) < 24 hours (Suppressed for 1 day)
 ```
-Once you swipe right or pass on someone, they shouldn't reappear.
+- When you like someone, they never reappear in Discover.
+- When you pass (cross) someone, they enter a 24-hour (1 day) cooldown and will not reappear for at least 24 hours. Once 24 hours have elapsed, they can reappear as a recycled fallback candidate at the end of the feed.
 
 ### Priority 4 — Mutual Like Boost (Hidden Admirers)
 ```

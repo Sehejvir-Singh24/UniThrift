@@ -524,11 +524,22 @@ function startKeepAlive() {
 }
 
 // Start Express Server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`🚀 UniThrift Auth Server running on http://localhost:${PORT}`);
+  console.log(`🚀 UniThrift Server running on http://localhost:${PORT}`);
   console.log(`📧 SMTP Email Status: ${isSmtpConfigured() ? 'CONFIGURED (Sending live emails)' : 'DEV MODE (Logging OTPs to terminal)'}`);
   console.log(`🚧 Launch Gate: ${launchGateEnabled ? 'ENABLED' : 'disabled'}`);
   console.log(`======================================================\n`);
   startKeepAlive();
 });
+
+if (!isProduction && PORT != 3000) {
+  try {
+    const auxServer = app.listen(3000, () => {
+      console.log(`🚀 UniThrift also available on http://localhost:3000`);
+    });
+    auxServer.on('error', (err) => {
+      console.log(`Port 3000 notice: ${err.message}`);
+    });
+  } catch (e) {}
+}
