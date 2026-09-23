@@ -69,8 +69,13 @@
   --um-radius-full:   9999px;
 }
 
-/* ── Base Reset ── */
-* { -webkit-tap-highlight-color: transparent; }
+/* ── Base Reset & Mobile Touch Acceleration ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
 html { scroll-behavior: smooth; }
 body {
   /* Animated cloud gradient background */
@@ -80,6 +85,7 @@ body {
   font-family: var(--um-font-body);
   color: var(--um-text);
   min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── Logo ── */
@@ -106,6 +112,8 @@ body {
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
   border-bottom: 1px solid rgba(220, 168, 180, 0.4);
   box-shadow: 0 2px 20px rgba(140, 80, 100, 0.08);
+  transform: translateZ(0);
+  will-change: transform;
 }
 .um-header-content {
   display: flex;
@@ -168,6 +176,7 @@ body {
   border-radius: var(--um-radius-lg);
   box-shadow: 0 12px 36px rgba(140, 80, 100, 0.16), 0 2px 8px rgba(140, 80, 100, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.85);
+  transform: translateZ(0);
 }
 .um-card-stack-behind {
   background: rgba(212, 168, 180, 0.45);
@@ -311,6 +320,8 @@ body {
   backdrop-filter: blur(24px) saturate(1.5);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
   box-shadow: 0 -4px 24px rgba(140, 80, 100, 0.12);
+  transform: translateZ(0);
+  will-change: transform;
 }
 .um-bottom-nav-content {
   display: flex;
@@ -337,7 +348,7 @@ body {
 .um-nav-item.active { color: var(--um-primary); }
 .um-nav-item:hover:not(.active) { color: var(--um-text-muted); background: rgba(192, 48, 74, 0.05); }
 
-/* ── Inputs ── */
+/* ── Inputs & Mobile iOS Zoom Prevention ── */
 .um-input {
   width: 100%;
   background: rgba(255, 252, 252, 0.8);
@@ -352,6 +363,11 @@ body {
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   appearance: none;
+}
+@media (max-width: 640px) {
+  .um-input, input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 .um-input:focus { border-color: var(--um-primary); box-shadow: 0 0 0 3px rgba(176, 80, 112, 0.12); }
 .um-input::placeholder { color: var(--um-text-light); }
@@ -428,4 +444,3 @@ body {
     max-width: 1060px;
   }
 }
-

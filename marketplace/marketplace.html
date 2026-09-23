@@ -244,14 +244,14 @@
 
   function renderProductCard(p) {
     const img = p.image_url
-      ? `<img src="${escapeHTML(p.image_url)}" alt="${escapeHTML(p.title)}" class="w-full h-full object-cover"/>`
+      ? `<img src="${escapeHTML(p.image_url)}" alt="${escapeHTML(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"/>`
       : `<div class="w-full h-full flex items-center justify-center text-4xl bg-surface-container">📦</div>`;
     const boostBadge = p.is_boosted
       ? `<span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">⚡ Featured</span>`
       : '';
     const sellerName = (p.profiles && p.profiles.full_name) ? escapeHTML(p.profiles.full_name) : 'Campus Seller';
     return `
-      <div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-outline-variant/20 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group relative" onclick="window.location.href='/marketplace/item.html?id=${escapeHTML(p.id)}'">
+      <div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-outline-variant/20 hover:shadow-md active:scale-98 transition-all cursor-pointer group relative touch-manipulation" onclick="window.location.href='/marketplace/item.html?id=${escapeHTML(p.id)}'">
         <div class="relative w-full aspect-square overflow-hidden bg-surface-container">
           ${img}
           ${boostBadge}

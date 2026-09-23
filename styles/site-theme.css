@@ -7,29 +7,50 @@
   --site-background: #f8f9ff;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body, body[class] {
   font-family: var(--site-font);
   color: var(--site-ink);
   background-color: var(--site-background);
   -webkit-font-smoothing: antialiased;
+  -webkit-overflow-scrolling: touch;
 }
-/* Explicit fallbacks keep every generated typography utility consistent. */
-body [class*="font-"], button, input, textarea, select {
+
+/* Touch responsiveness optimization for mobile screens */
+button, a, input, select, textarea {
   font-family: var(--site-font);
+  touch-action: manipulation;
 }
+
 h1, h2, h3, h4 { letter-spacing: -0.025em; }
+
+/* GPU Acceleration for smooth mobile headers and navbars */
+header, nav, .fixed, .glass {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 /* Preserve icon font glyphs, including icons with font utility classes. */
 .material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; }
 .material-icons { font-family: 'Material Icons' !important; }
+
 :where(a, button, input, textarea, select):focus-visible {
   outline: 3px solid #006e2f80;
   outline-offset: 4px;
 }
+
 /* Shared marketplace surfaces and controls. */
 .bg-primary { background-color: var(--site-green); }
 .text-primary { color: var(--site-green); }
 .bg-background, .bg-surface { background-color: var(--site-background); }
 .text-on-background, .text-on-surface { color: var(--site-ink); }
+
+/* Hide scrollbar helper */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 @media (max-width: 359px) {
   #platform-switcher-slot .platform-switcher a { padding-inline: 8px; }
