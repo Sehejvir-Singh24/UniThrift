@@ -4,28 +4,16 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
   <title>See who likes you - UniMatch</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <!-- Performance: preconnect critical origins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="preconnect" href="https://bwhvbynmqubjwgonsywd.supabase.co"/>
+  <!-- Combined font request (one round-trip instead of two) -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
   <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            "um-primary": "#B05070",
-            "um-primary-container": "#7a1f3d",
-            "um-on-primary": "#ffffff",
-            "um-surface": "#faf9f7",
-            "um-surface-container": "#efeeec",
-            "um-on-surface": "#1a1c1b",
-            "um-on-surface-variant": "#7A4858",
-            "um-outline-variant": "#dac0c4",
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Tailwind: preload trick so it doesn't block first paint -->
+  <link rel="preload" href="https://cdn.tailwindcss.com" as="script"/>
+  <script src="https://cdn.tailwindcss.com" async></script>
   <style>
     body {
       background: var(--um-bg-gradient);

@@ -5,7 +5,7 @@
    Soft Lavender #B8A8B8 · Deep Mauve #8B6B8A
    ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+/* Fonts are loaded via <link> tags in HTML head for faster non-blocking delivery */
 
 /* ── Cloud gradient keyframes (slow drift) ── */
 @keyframes cloudDrift {
