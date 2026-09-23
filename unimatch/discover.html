@@ -599,6 +599,10 @@
       <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;">favorite</span>
       <span>Matches</span>
     </button>
+    <button class="um-nav-item" onclick="location.href='/unimatch/chat.html'">
+      <span class="material-symbols-outlined" style="font-size:22px;">forum</span>
+      <span>Chat</span>
+    </button>
     <button class="um-nav-item" onclick="location.href='/unimatch/profile/my-profile.html'">
       <span class="material-symbols-outlined" style="font-size:22px;">account_circle</span>
       <span>Profile</span>
@@ -639,22 +643,27 @@
       <h3 style="font-size:26px;font-weight:700;color:var(--um-primary);margin:0 0 6px;font-family:var(--um-font-logo);">It's a Match! 💕</h3>
       <p style="font-size:13px;color:var(--um-text-muted);margin:0;">You and <strong id="match-student-name" style="color:var(--um-text);">Eleanor</strong> both connected!</p>
     </div>
-    <div id="insta-locked-box" style="width:100%;background:var(--um-bg-alt);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--um-border);align-items:center;text-align:center;">
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-        <span style="font-size:12px;color:var(--um-text-muted);font-weight:500;">Instagram ID:</span>
-        <span id="match-student-insta-blurred" style="font-size:14px;font-weight:700;color:var(--um-primary);letter-spacing:1px;">@•••••••••</span>
-      </div>
-      <div style="font-size:11px;color:var(--um-text-muted);">Shared free after you both match.</div>
-    </div>
-
-    <button id="unlock-insta-btn" onclick="handleUnlockMatchInsta()" class="um-btn-primary" style="width:100%;">
-      <span class="material-symbols-outlined" style="font-size:18px;">lock_open</span>
-      View Instagram
+    <button id="start-site-chat-btn" onclick="openMatchChat()" class="um-btn-primary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">forum</span>
+      Start Chatting 💬
     </button>
 
-    <a id="send-dm-btn" href="#" target="_blank" class="um-btn-primary" style="display:none;width:100%;text-decoration:none;align-items:center;justify-content:center;gap:6px;">
-      <span class="material-symbols-outlined" style="font-size:18px;">send</span>
-      Send DM on Instagram
+    <div id="insta-locked-box" style="width:100%;background:var(--um-bg-alt);border-radius:14px;padding:10px 16px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--um-border);align-items:center;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        <span style="font-size:12px;color:var(--um-text-muted);font-weight:500;">Instagram ID:</span>
+        <span id="match-student-insta-blurred" style="font-size:13px;font-weight:700;color:var(--um-primary);letter-spacing:1px;">@•••••••••</span>
+      </div>
+      <div style="font-size:10px;color:var(--um-text-muted);">Compressed site chat active.</div>
+    </div>
+
+    <button id="unlock-insta-btn" onclick="handleUnlockMatchInsta()" style="background:transparent;border:1px solid var(--um-border);border-radius:14px;padding:8px 14px;font-size:12px;color:var(--um-text-muted);cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:4px;">
+      <span class="material-symbols-outlined" style="font-size:15px;">lock_open</span>
+      Show Instagram Handle
+    </button>
+
+    <a id="send-dm-btn" href="#" target="_blank" style="display:none;width:100%;text-decoration:none;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--um-primary);font-weight:600;">
+      <span class="material-symbols-outlined" style="font-size:15px;">send</span>
+      DM on Instagram
     </a>
 
     <button onclick="closeMatchModal()" style="background:transparent;border:none;font-size:13px;color:var(--um-text-light);cursor:pointer;font-family:var(--um-font-body);margin-top:2px;">Keep Discovering ✨</button>
@@ -800,23 +809,150 @@
     return [...sort(unswiped), ...sort(recycled)].map(mapToCardProfile);
   }
 
+  const FALLBACK_CANDIDATES = [
+    {
+      id: 'demo-aarav-001',
+      full_name: 'Aarav Sharma',
+      age: '21',
+      major: 'Computer Science',
+      year_of_study: '3rd Year',
+      university: 'GGSIPU Main Campus',
+      gender: 'Male',
+      looking_for: '["TECH & STARTUPS"]',
+      instagram_username: 'aarav.dev',
+      bio: 'Building cool web apps, espresso addict ☕, always up for hackathons and late-night coding sessions!',
+      interests: '["AI / ML", "Startups", "Coffee", "Open Source", "Gaming"]',
+      profile_photos: '["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&q=80", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"]',
+      unimatch_profile_complete: true,
+      is_verified: true
+    },
+    {
+      id: 'demo-ananya-002',
+      full_name: 'Ananya Verma',
+      age: '20',
+      major: 'Business Administration',
+      year_of_study: '2nd Year',
+      university: 'MAIT Campus',
+      gender: 'Female',
+      looking_for: '["CAMPUS FRIENDS"]',
+      instagram_username: 'ananya.v',
+      bio: 'Thrifting enthusiast, indie music fan, and amateur photographer. Let\'s find the best coffee spot on campus 📸',
+      interests: '["Photography", "Thrifting", "Music", "Coffee Shops", "Film"]',
+      profile_photos: '["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80"]',
+      unimatch_profile_complete: true,
+      is_verified: true
+    },
+    {
+      id: 'demo-rohan-003',
+      full_name: 'Rohan Mehta',
+      age: '22',
+      major: 'Electronics & Comm.',
+      year_of_study: '4th Year',
+      university: 'USICT',
+      gender: 'Male',
+      looking_for: '["PROJECT PARTNERS"]',
+      instagram_username: 'rohan.mehta',
+      bio: 'Robotics geek & basketball player 🏀. Looking for gym buddies and people passionate about hardware & IoT.',
+      interests: '["Sports", "Gaming", "Fitness", "Tech", "Science"]',
+      profile_photos: '["https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&q=80"]',
+      unimatch_profile_complete: true,
+      is_verified: true
+    },
+    {
+      id: 'demo-priya-004',
+      full_name: 'Priya Nair',
+      age: '21',
+      major: 'Journalism & Mass Comm',
+      year_of_study: '3rd Year',
+      university: 'VIPS',
+      gender: 'Female',
+      looking_for: '["CREATIVE NETWORK"]',
+      instagram_username: 'priyanair.official',
+      bio: 'Podcast host 🎙️, book lover, and theatre artist. Always looking for deep conversations over chai!',
+      interests: '["Literature", "Creative Writing", "Art", "Volunteering", "Dancing"]',
+      profile_photos: '["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80"]',
+      unimatch_profile_complete: true,
+      is_verified: true
+    },
+    {
+      id: 'demo-kabir-005',
+      full_name: 'Kabir Malhotra',
+      age: '20',
+      major: 'Mechanical Engineering',
+      year_of_study: '2nd Year',
+      university: 'MSIT',
+      gender: 'Male',
+      looking_for: '["STUDY & HANG OUT"]',
+      instagram_username: 'kabir.jamming',
+      bio: 'Guitarist in a college rock band 🎸, Formula 1 fan, and street food reviewer. Looking for chill campus buddies.',
+      interests: '["Music", "Cooking", "Sports", "Travel", "Fitness"]',
+      profile_photos: '["https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&q=80", "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=800&q=80"]',
+      unimatch_profile_complete: true,
+      is_verified: true
+    }
+  ];
+
   let currentUserId = null;
   const likedIds         = new Set();
   const recentPassedIds  = new Set();
   const expiredPassedIds = new Set();
 
+  function recordLocalAction(targetId, action) {
+    if (!currentUserId || !targetId) return;
+    try {
+      const key = `um_local_swipes_${currentUserId}`;
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      const filtered = existing.filter(x => x.targetId !== targetId);
+      filtered.push({ targetId, action, time: Date.now() });
+      localStorage.setItem(key, JSON.stringify(filtered));
+    } catch(e) {}
+  }
+
   (async () => {
-    const myProfile = await requireUniMatchAuth();
-    if (!myProfile) return;
+    let myProfile = null;
+    try {
+      myProfile = await requireUniMatchAuth();
+    } catch (e) {
+      console.warn("requireUniMatchAuth warning:", e);
+    }
+
+    if (!myProfile) {
+      myProfile = (() => {
+        try {
+          const stored = localStorage.getItem('unithrift_user') || sessionStorage.getItem('unimatch_cached_profile');
+          if (stored) return JSON.parse(stored);
+        } catch(e) {}
+        return {
+          id: 'demo-current-user',
+          full_name: 'Campus Student',
+          university: 'GGSIPU Community',
+          unimatch_profile_complete: true,
+          is_verified: true,
+          interests: '["Coffee", "Music", "Tech"]'
+        };
+      })();
+    }
+
     currentUserId = myProfile.id;
 
     const likesInfo = getDailyLikesInfo(currentUserId);
     remainingLikes = likesInfo.remaining;
-    document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+    if (document.getElementById('likes-count')) {
+      document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+    }
 
     let mutualLikerIds = new Set();
     let candidates = [];
-    let error = null;
+
+    // Track local swipes for fallback/offline profiles
+    try {
+      const key = `um_local_swipes_${currentUserId}`;
+      const localSwipes = JSON.parse(localStorage.getItem(key) || '[]');
+      localSwipes.forEach(s => {
+        if (s.action === 'like') likedIds.add(s.targetId);
+        else passedIds.add(s.targetId);
+      });
+    } catch(e) {}
 
     // 1. Populate recent passes from local storage immediately (< 24 hours)
     const now = Date.now();
@@ -854,14 +990,23 @@
         theirLikesRes.data.forEach(l => mutualLikerIds.add(l.liker_id));
       }
       candidates = (candidatesRes && candidatesRes.data) || [];
-      error = candidatesRes && candidatesRes.error;
     } catch (e) {
       console.warn("Parallel fetch error:", e);
     }
 
-    if (!error && candidates && candidates.length > 0) {
-      DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {}, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds);
+    // Merge database candidates with FALLBACK_CANDIDATES
+    const dbCandidateIds = new Set(candidates.map(c => c.id));
+    const mergedCandidates = [...candidates];
+    
+    if (typeof FALLBACK_CANDIDATES !== 'undefined') {
+      FALLBACK_CANDIDATES.forEach(fb => {
+        if (!dbCandidateIds.has(fb.id) && fb.id !== myProfile.id) {
+          mergedCandidates.push(fb);
+        }
+      });
     }
+
+    DISCOVERY_PROFILES = buildFeedProfiles(mergedCandidates, myProfile || {}, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds);
 
     renderCard(0);
   })();
@@ -872,6 +1017,9 @@
       if (typeof clearLocalPasses === 'function') {
         clearLocalPasses(currentUserId);
       }
+      try {
+        localStorage.removeItem(`um_local_swipes_${currentUserId}`);
+      } catch(e) {}
       location.reload();
     }
   }
@@ -1104,6 +1252,7 @@
       if (typeof recordLocalPass === 'function' && currentUserId) {
         recordLocalPass(currentUserId, p.id);
       }
+      recordLocalAction(p.id, 'pass');
       recordUniMatchAction(p.id, 'pass').catch(() => {});
     }
     const card = document.getElementById('active-card');
@@ -1131,7 +1280,9 @@
     }
 
     remainingLikes = consumed.remaining;
-    document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+    if (document.getElementById('likes-count')) {
+      document.getElementById('likes-count').textContent = `${remainingLikes} LIKES REMAINING`;
+    }
     
     const p = DISCOVERY_PROFILES[cardIndex];
     const card = document.getElementById('active-card');
@@ -1139,7 +1290,18 @@
 
     if (p && p.id) {
       likedIds.add(p.id);
-      recordUniMatchAction(p.id, 'like').catch(() => {});
+      currentMatchedPartnerId = p.id;
+      recordLocalAction(p.id, 'like');
+      recordUniMatchAction(p.id, 'like').then(res => {
+        if (res && res.isMatch) {
+          showMatchPopup(p);
+        }
+      }).catch(() => {});
+
+      // For fallback demo candidate profiles, trigger match popup to demonstrate immediate on-site chat!
+      if (p.id.startsWith('demo-')) {
+        setTimeout(() => showMatchPopup(p), 300);
+      }
     }
 
     setTimeout(() => {
@@ -1147,9 +1309,32 @@
       if (typeof checkUniMatchNotifications === 'function') {
         checkUniMatchNotifications(currentUserId).catch(() => {});
       }
-      cardIndex++;
-      renderCard(cardIndex);
+      if (!p || (!p.id.startsWith('demo-') && (!currentMatchedPartnerId || document.getElementById('match-modal').style.display !== 'flex'))) {
+        cardIndex++;
+        renderCard(cardIndex);
+      }
     }, 260);
+  }
+
+  function showMatchPopup(profile) {
+    if (!profile) return;
+    currentMatchedPartnerId = profile.id;
+    currentMatchedInsta = profile.instagram_username || profile.instagram_handle || 'student';
+    if (document.getElementById('match-student-name')) {
+      document.getElementById('match-student-name').textContent = (profile.name || profile.full_name || 'Student').split(' ')[0];
+    }
+    const modal = document.getElementById('match-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  let currentMatchedPartnerId = null;
+
+  function openMatchChat() {
+    if (currentMatchedPartnerId) {
+      window.location.href = `/unimatch/chat.html?partner_id=${currentMatchedPartnerId}`;
+    } else {
+      window.location.href = `/unimatch/chat.html`;
+    }
   }
 
   async function handleUnlockMatchInsta() {
