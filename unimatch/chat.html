@@ -164,7 +164,7 @@
   <div style="display:flex;align-items:center;gap:6px;">
     <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;background:rgba(34,197,94,0.12);color:#16a34a;padding:4px 10px;border-radius:12px;display:flex;align-items:center;gap:4px;">
       <span class="material-symbols-outlined" style="font-size:13px;">lock</span>
-      Compressed
+      Private & Verified
     </span>
   </div>
 </header>
@@ -179,14 +179,8 @@
     </div>
     <h4 style="font-size:16px;font-weight:700;color:var(--um-primary);margin:0;">You & <span id="welcome-partner-name">Partner</span> Matched! 💕</h4>
     <p style="font-size:12px;color:var(--um-text-muted);margin:0;max-width:340px;">
-      Start chatting on UniMatch! All messages are compressed on-the-fly to keep backend storage ultra-lightweight.
+      Start chatting on UniMatch! All chat connections are private, student-verified, and secure.
     </p>
-
-    <!-- Storage Compression Metric Indicator -->
-    <div id="compression-metric-pill" style="font-size:11px;font-weight:600;color:var(--um-primary);background:white;padding:4px 12px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-top:4px;display:flex;align-items:center;gap:4px;">
-      <span class="material-symbols-outlined" style="font-size:14px;">bolt</span>
-      Backend Storage: <strong>Compressed ~65%</strong>
-    </div>
   </div>
 
   <!-- Icebreaker Suggestions Horizontal Bar -->
@@ -362,31 +356,15 @@
       const isMine = m.sender_id === _currentUserId;
       const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
-      const origText = m.text || '';
-      const compText = m.compressed_text || '';
-      const stats = UniMatchChatEngine.getCompressionStats(origText, compText);
-      totalOrigBytes += stats.origBytes;
-      totalCompBytes += stats.compBytes;
-
       return `
         <div class="${isMine ? 'msg-bubble-sent' : 'msg-bubble-recv'}">
           <div style="font-size:14px;line-height:1.45;">${escapeHTML(m.text)}</div>
           <div class="msg-time">
             <span>${timeStr}</span>
-            <span class="material-symbols-outlined" style="font-size:11px;" title="Compressed Storage Payload (Saved ~${stats.savingsPercentage}%)">bolt</span>
           </div>
         </div>
       `;
     }).join('');
-
-    // Update overall compression metric indicator
-    if (totalOrigBytes > 0 && document.getElementById('compression-metric-pill')) {
-      const overallSavings = Math.max(0, Math.round((1 - totalCompBytes / totalOrigBytes) * 100));
-      document.getElementById('compression-metric-pill').innerHTML = `
-        <span class="material-symbols-outlined" style="font-size:14px;">bolt</span>
-        Backend Storage: <strong>Compressed ~${overallSavings}% space savings</strong>
-      `;
-    }
 
     scrollToBottom();
   }
