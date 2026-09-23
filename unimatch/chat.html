@@ -435,20 +435,6 @@
 
   const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80";
 
-  // Purge any legacy demo messages from localStorage
-  (function purgeDemoLocalStorage() {
-    try {
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.includes('demo-')) {
-          keysToRemove.push(k);
-        }
-      }
-      keysToRemove.forEach(k => localStorage.removeItem(k));
-    } catch(e) {}
-  })();
-
   (async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paramPartner = urlParams.get('partner_id') || urlParams.get('user_id');
@@ -465,7 +451,7 @@
           if (stored) return JSON.parse(stored);
         } catch(e) {}
         return {
-          id: 'real-user',
+          id: 'user_default',
           full_name: 'Campus Student',
           university: 'GGSIPU'
         };
@@ -481,10 +467,59 @@
     }
   })();
 
-  // Helper to fetch real matches
+  // Helper to fetch profile by ID with local cache fallback
+  async function fetchProfileById(partnerId) {
+    if (!partnerId) return null;
+
+    // 1. Check local cache
+    try {
+      const cached = localStorage.getItem(`um_profile_${partnerId}`);
+      if (cached) return JSON.parse(cached);
+    } catch(e) {}
+
+    // 2. Check local unlocked matches
+    try {
+      const keys = [`um_unlocked_matches_${_currentUserId}`, 'unimatch_unlocked_matches'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            const found = parsed.find(p => p && (p.id === partnerId || p.liker_id === partnerId));
+            if (found) {
+              const prof = found.profile || found;
+              localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(prof));
+              return prof;
+            }
+          }
+        }
+      }
+    } catch(e) {}
+
+    // 3. Check Supabase profiles
+    if (window.supabase) {
+      try {
+        const { data } = await supabase.from('profiles').select('*').eq('id', partnerId).single();
+        if (data) {
+          localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(data));
+          return data;
+        }
+      } catch(e) {}
+    }
+
+    // 4. Default fallback profile
+    return {
+      id: partnerId,
+      full_name: 'Matched Student',
+      major: 'GGSIPU Campus',
+      avatar_url: DEFAULT_AVATAR
+    };
+  }
+
+  // Helper to fetch real mutual matches for stories row
   async function fetchRealMutualMatches() {
-    const matches = [];
-    if (!_currentUserId) return matches;
+    const matchesMap = new Map();
+    if (!_currentUserId) return [];
 
     // 1. Try Supabase matches table
     if (window.supabase) {
@@ -498,7 +533,9 @@
         if (dbMatches && dbMatches.length > 0) {
           const partnerIds = dbMatches.map(m => m.user1_id === _currentUserId ? m.user2_id : m.user1_id);
           const { data: profiles } = await supabase.from('profiles').select('*').in('id', partnerIds);
-          if (profiles) matches.push(...profiles);
+          if (profiles) {
+            profiles.forEach(p => matchesMap.set(p.id, p));
+          }
         }
       } catch(e) {}
     }
@@ -509,19 +546,114 @@
       if (localUnlocked) {
         const parsed = JSON.parse(localUnlocked);
         if (Array.isArray(parsed)) {
-          parsed.forEach(p => {
-            if (p && p.id && !matches.some(m => m.id === p.id)) {
-              matches.push(p);
+          parsed.forEach(item => {
+            const p = item.profile || item;
+            if (p && p.id && !matchesMap.has(p.id)) {
+              matchesMap.set(p.id, p);
             }
           });
         }
       }
     } catch(e) {}
 
-    return matches;
+    return Array.from(matchesMap.values());
   }
 
-  // ── INBOX RENDERING ──
+  // ── INBOX RENDERING: FETCH ALL ACTIVE CONVERSATIONS (LOCAL + DB) ──
+  async function getAllActiveConversations() {
+    const convosMap = new Map();
+
+    // 1. Scan LocalStorage for all chat stores involving _currentUserId or any um_chat_store_
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('um_chat_store_') || key.startsWith('unimatch_chat_'))) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const msgs = JSON.parse(raw);
+            if (Array.isArray(msgs) && msgs.length > 0) {
+              const lastMsgObj = msgs[msgs.length - 1];
+              
+              // Determine partner ID
+              let partnerId = null;
+              if (lastMsgObj.sender_id && lastMsgObj.receiver_id) {
+                partnerId = (lastMsgObj.sender_id === _currentUserId) ? lastMsgObj.receiver_id : lastMsgObj.sender_id;
+              } else {
+                // Extract from key: um_chat_store_ID1_ID2
+                const parts = key.replace('um_chat_store_', '').replace('unimatch_chat_', '').split('_');
+                partnerId = parts.find(p => p !== _currentUserId) || parts[0];
+              }
+
+              if (partnerId) {
+                let text = lastMsgObj.text;
+                if (!text && lastMsgObj.compressed_text && window.UniMatchChatEngine) {
+                  text = UniMatchChatEngine.decompressText(lastMsgObj.compressed_text);
+                }
+                text = (lastMsgObj.sender_id === _currentUserId ? 'You: ' : '') + (text || 'Message sent');
+                
+                const dateObj = new Date(lastMsgObj.created_at || Date.now());
+
+                convosMap.set(partnerId, {
+                  partnerId: partnerId,
+                  lastMsg: text,
+                  time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  rawTime: dateObj
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch(e) { console.warn("Local chat scan error:", e); }
+
+    // 2. Query Supabase for remote chat messages involving _currentUserId
+    if (window.supabase && _currentUserId) {
+      try {
+        const { data: dbMsgs } = await supabase
+          .from('unimatch_chats')
+          .select('*')
+          .or(`sender_id.eq.${_currentUserId},receiver_id.eq.${_currentUserId}`)
+          .order('created_at', { ascending: true });
+
+        if (dbMsgs && dbMsgs.length > 0) {
+          dbMsgs.forEach(m => {
+            const partnerId = (m.sender_id === _currentUserId) ? m.receiver_id : m.sender_id;
+            if (partnerId) {
+              let decomp = m.text;
+              if (!decomp && m.compressed_text && window.UniMatchChatEngine) {
+                decomp = UniMatchChatEngine.decompressText(m.compressed_text);
+              }
+              const text = (m.sender_id === _currentUserId ? 'You: ' : '') + (decomp || 'Message');
+              const dateObj = new Date(m.created_at);
+
+              convosMap.set(partnerId, {
+                partnerId: partnerId,
+                lastMsg: text,
+                time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                rawTime: dateObj
+              });
+            }
+          });
+        }
+      } catch(e) { console.warn("Supabase chats scan error:", e); }
+    }
+
+    // 3. For each active conversation partnerId, fetch their Profile details
+    const activeConvos = [];
+    for (const [partnerId, item] of convosMap.entries()) {
+      const profile = await fetchProfileById(partnerId);
+      activeConvos.push({
+        profile: profile,
+        lastMsg: item.lastMsg,
+        time: item.time,
+        rawTime: item.rawTime
+      });
+    }
+
+    return activeConvos;
+  }
+
+  // ── INBOX VIEW MAIN CONTROLLER ──
   async function showInboxView() {
     if (_pollingTimer) clearInterval(_pollingTimer);
 
@@ -533,9 +665,8 @@
     document.getElementById('view-room').classList.add('hidden-view');
     document.getElementById('room-input-bar').classList.add('hidden-view');
 
+    // Render Mutual Matches Stories Row
     const mutualMatches = await fetchRealMutualMatches();
-
-    // Render Mutual Matches Stories Row if matches exist
     const storiesWrapper = document.getElementById('stories-wrapper');
     const storiesContainer = document.getElementById('stories-list');
     
@@ -553,29 +684,11 @@
       storiesWrapper.style.display = 'none';
     }
 
-    // Fetch REAL conversations with actual messages
-    const activeConvos = [];
-    if (_currentUserId && mutualMatches.length > 0) {
-      for (const p of mutualMatches) {
-        try {
-          const msgs = await UniMatchChatEngine.getMessages(_currentUserId, p.id);
-          if (msgs && msgs.length > 0) {
-            const last = msgs[msgs.length - 1];
-            activeConvos.push({
-              profile: p,
-              lastMsg: (last.sender_id === _currentUserId ? 'You: ' : '') + last.text,
-              time: new Date(last.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              rawTime: new Date(last.created_at)
-            });
-          }
-        } catch(e) {}
-      }
-    }
-
+    // Fetch ALL active conversations where messages exist
+    const activeConvos = await getAllActiveConversations();
     const listContainer = document.getElementById('conversations-list');
     
     if (activeConvos.length === 0) {
-      // Empty state when no real conversations exist
       listContainer.innerHTML = `
         <div style="text-align:center;padding:48px 20px;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-radius:24px;border:1px solid var(--um-border);box-shadow:0 4px 14px var(--um-shadow-card);">
           <div style="width:56px;height:56px;border-radius:50%;background:rgba(176,80,112,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--um-primary);">
@@ -595,13 +708,13 @@
       return;
     }
 
-    // Sort by recent time
+    // Sort active conversations by most recent message
     activeConvos.sort((a, b) => b.rawTime - a.rawTime);
 
     listContainer.innerHTML = activeConvos.map((item, idx) => {
-      const p = item.profile;
+      const p = item.profile || {};
       return `
-        <div class="convo-card" onclick="openChatRoom('${p.id}')">
+        <div class="convo-card" onclick="openChatRoom('${p.id || item.partnerId}')">
           <div class="convo-avatar-wrap">
             <img src="${p.avatar_url || DEFAULT_AVATAR}" alt="${escapeHTML(p.full_name || 'Student')}"/>
             <div class="online-indicator"></div>
@@ -609,7 +722,7 @@
           <div class="convo-info">
             <div class="convo-top">
               <h4 class="convo-title">
-                ${escapeHTML(p.full_name || 'Student')}
+                ${escapeHTML(p.full_name || 'Student Partner')}
                 <span class="material-symbols-outlined" style="font-size:14px;color:var(--um-primary);font-variation-settings:'FILL' 1;">verified</span>
               </h4>
               <span class="convo-time">${item.time}</span>
@@ -646,39 +759,13 @@
   async function loadPartnerProfile() {
     if (!_partnerId) return;
 
-    _partnerProfile = null;
-    if (window.supabase) {
-      try {
-        const { data } = await supabase.from('profiles').select('*').eq('id', _partnerId).single();
-        if (data) _partnerProfile = data;
-      } catch(e) {}
-    }
-
-    if (!_partnerProfile) {
-      // Check local unlocked matches
-      try {
-        const localUnlocked = localStorage.getItem(`um_unlocked_matches_${_currentUserId}`) || localStorage.getItem('unimatch_unlocked_matches');
-        if (localUnlocked) {
-          const parsed = JSON.parse(localUnlocked);
-          const found = parsed.find(p => p && p.id === _partnerId);
-          if (found) _partnerProfile = found;
-        }
-      } catch(e) {}
-    }
-
-    if (!_partnerProfile) {
-      _partnerProfile = {
-        full_name: 'Matched Student',
-        major: 'GGSIPU Campus',
-        avatar_url: DEFAULT_AVATAR
-      };
-    }
+    _partnerProfile = await fetchProfileById(_partnerId);
 
     document.getElementById('partner-name').textContent = _partnerProfile.full_name || 'Matched Student';
     if (document.getElementById('welcome-partner-name')) {
       document.getElementById('welcome-partner-name').textContent = _partnerProfile.full_name || 'Partner';
     }
-    const subtext = [_partnerProfile.major, _partnerProfile.year_of_study || _partnerProfile.university].filter(Boolean).join(' • ');
+    const subtext = [_partnerProfile.major || _partnerProfile.college, _partnerProfile.year_of_study || _partnerProfile.university].filter(Boolean).join(' • ');
     document.getElementById('partner-subtext').textContent = subtext || 'GGSIPU Student';
 
     let avatar = _partnerProfile.avatar_url;

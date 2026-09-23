@@ -661,6 +661,18 @@
       openMatchModal(_pendingPayMatchIdx);
     }
 
+    function cacheAndOpenChat(partnerId, idx) {
+      try {
+        if (idx !== undefined && _allMatches && _allMatches[idx]) {
+          const p = _allMatches[idx].profile;
+          if (p && partnerId) {
+            localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(p));
+          }
+        }
+      } catch(e) {}
+      window.location.href = `/unimatch/chat.html?partner_id=${partnerId}`;
+    }
+
     // ── RENDER MUTUAL MATCHES ─────────────────────────────────────────────────
     function renderMutualMatches() {
       const list  = document.getElementById('mutual-matches-list');
@@ -763,10 +775,10 @@
               </div>
               <div class="flex-shrink-0">
                 ${isUnlocked
-                  ? `<a href="/unimatch/chat.html?partner_id=${p.id || (m.user1_id === _currentUserId ? m.user2_id : m.user1_id)}" onclick="event.stopPropagation();"
+                  ? `<button onclick="event.stopPropagation(); cacheAndOpenChat('${p.id || (m.user1_id === _currentUserId ? m.user2_id : m.user1_id)}', ${idx});"
                        class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm transition-all active:scale-95 text-white" style="background: linear-gradient(135deg, var(--um-primary), #8B6B8A);">
                        <span class="material-symbols-outlined text-[14px]">forum</span> Chat 💬
-                     </a>`
+                     </button>`
                   : `<button onclick="event.stopPropagation(); openPayModal(${idx});"
                        class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-md transition-all active:scale-95 text-white bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700">
                        <span class="material-symbols-outlined text-[14px]">lock</span> Unlock ₹21
