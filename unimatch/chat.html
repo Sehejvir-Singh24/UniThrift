@@ -325,14 +325,14 @@
 
   <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;background:rgba(176,80,112,0.12);color:var(--um-primary);padding:4px 10px;border-radius:12px;display:flex;align-items:center;gap:4px;">
     <span class="material-symbols-outlined" style="font-size:14px;">forum</span>
-    <span id="total-convos-count">5 Active</span>
+    <span id="total-convos-count">0 Active</span>
   </span>
 </header>
 
 <main class="inbox-container" id="view-inbox">
   
   <!-- Active Matches Stories Row -->
-  <div style="margin-bottom:12px;">
+  <div style="margin-bottom:12px;" id="stories-wrapper">
     <p style="font-size:12px;font-weight:700;color:var(--um-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 4px;">Mutual Matches</p>
     <div class="stories-row hide-scrollbar" id="stories-list">
       <!-- Rendered via JS -->
@@ -390,7 +390,7 @@
     </div>
     <h4 style="font-size:16px;font-weight:700;color:var(--um-primary);margin:0;">You & <span id="welcome-partner-name">Partner</span> Matched! 💕</h4>
     <p style="font-size:12px;color:var(--um-text-muted);margin:0;max-width:340px;">
-      Start chatting on UniMatch! Messages are compressed and private.
+      Start chatting on UniMatch! All messages are compressed & student-verified.
     </p>
   </div>
 
@@ -435,17 +435,16 @@
 
   const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80";
 
-  // Demo Matches list for multiple older chats
+  // Match Profiles Map
   const MATCH_PROFILES = [
-    { id: 'demo-aarav-001', full_name: 'Aarav Sharma', major: 'Computer Science', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&q=80', defaultMsg: "Hey! Saw we matched. Building any cool projects or skipping lectures today? ☕", time: '10:42 AM' },
-    { id: 'demo-ananya-002', full_name: 'Ananya Verma', major: 'Business Admin', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80', defaultMsg: "Hey there! Happy we matched 😊 What's your favorite coffee spot around campus?", time: 'Yesterday' },
-    { id: 'demo-rohan-003', full_name: 'Rohan Mehta', major: 'Electronics & Comm', year_of_study: '4th Year', avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80', defaultMsg: "Hey! Awesome to connect. Up for a campus study session or gym hit?", time: '2 days ago' },
-    { id: 'demo-priya-004', full_name: 'Priya Nair', major: 'Journalism', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80', defaultMsg: "Hi! Excited we matched 💕 Have you checked out the campus library recently?", time: '3 days ago' },
-    { id: 'demo-kabir-005', full_name: 'Kabir Malhotra', major: 'Mechanical Eng', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=80', defaultMsg: "Hey! What's up? Ready to skip lectures for some street food? 🎸", time: '4 days ago' }
+    { id: 'demo-aarav-001', full_name: 'Aarav Sharma', major: 'Computer Science', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&q=80' },
+    { id: 'demo-ananya-002', full_name: 'Ananya Verma', major: 'Business Admin', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80' },
+    { id: 'demo-rohan-003', full_name: 'Rohan Mehta', major: 'Electronics & Comm', year_of_study: '4th Year', avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80' },
+    { id: 'demo-priya-004', full_name: 'Priya Nair', major: 'Journalism', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80' },
+    { id: 'demo-kabir-005', full_name: 'Kabir Malhotra', major: 'Mechanical Eng', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=80' }
   ];
 
   (async () => {
-    // 1. Check Auth & URL params
     const urlParams = new URLSearchParams(window.location.search);
     const paramPartner = urlParams.get('partner_id') || urlParams.get('user_id');
 
@@ -481,17 +480,15 @@
   async function showInboxView() {
     if (_pollingTimer) clearInterval(_pollingTimer);
 
-    // Update URL query state without reloading page
     window.history.replaceState(null, '', '/unimatch/chat.html');
 
-    // Toggle Header & Views
     document.getElementById('header-inbox').classList.remove('hidden-view');
     document.getElementById('view-inbox').classList.remove('hidden-view');
     document.getElementById('header-room').classList.add('hidden-view');
     document.getElementById('view-room').classList.add('hidden-view');
     document.getElementById('room-input-bar').classList.add('hidden-view');
 
-    // Render Stories Row
+    // Render Mutual Matches Stories Row
     const storiesContainer = document.getElementById('stories-list');
     storiesContainer.innerHTML = MATCH_PROFILES.map(p => `
       <div class="story-item" onclick="openChatRoom('${p.id}')">
@@ -502,25 +499,53 @@
       </div>
     `).join('');
 
-    // Render Conversations List
-    const listContainer = document.getElementById('conversations-list');
-    
-    // Fetch last messages asynchronously for each partner
-    const convoItemsHTML = await Promise.all(MATCH_PROFILES.map(async (p, idx) => {
-      let lastMsgText = p.defaultMsg;
-      let lastMsgTime = p.time;
-
-      if (_currentUserId) {
+    // Fetch REAL conversations with actual messages
+    const activeConvos = [];
+    if (_currentUserId) {
+      for (const p of MATCH_PROFILES) {
         try {
           const msgs = await UniMatchChatEngine.getMessages(_currentUserId, p.id);
           if (msgs && msgs.length > 0) {
             const last = msgs[msgs.length - 1];
-            lastMsgText = (last.sender_id === _currentUserId ? 'You: ' : '') + last.text;
-            lastMsgTime = new Date(last.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            activeConvos.push({
+              profile: p,
+              lastMsg: (last.sender_id === _currentUserId ? 'You: ' : '') + last.text,
+              time: new Date(last.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              rawTime: new Date(last.created_at)
+            });
           }
         } catch(e) {}
       }
+    }
 
+    const listContainer = document.getElementById('conversations-list');
+    
+    if (activeConvos.length === 0) {
+      // Empty state when no real conversations exist
+      listContainer.innerHTML = `
+        <div style="text-align:center;padding:48px 20px;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-radius:24px;border:1px solid var(--um-border);box-shadow:0 4px 14px var(--um-shadow-card);">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(176,80,112,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--um-primary);">
+            <span class="material-symbols-outlined" style="font-size:28px;">chat_bubble_outline</span>
+          </div>
+          <h4 style="font-size:16px;font-weight:700;color:var(--um-text);margin:0 0 6px;">No chats to show right now</h4>
+          <p style="font-size:13px;color:var(--um-text-muted);margin:0 0 16px;max-width:320px;margin-left:auto;margin-right:auto;">
+            When you match with students or start a conversation, your active chats will appear here!
+          </p>
+          <a href="/unimatch/hidden-likes.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white shadow-md transition-transform active:scale-95" style="background:linear-gradient(135deg, var(--um-primary), #8B6B8A);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">favorite</span>
+            View Mutual Matches
+          </a>
+        </div>
+      `;
+      document.getElementById('total-convos-count').textContent = `0 Active`;
+      return;
+    }
+
+    // Sort by recent time
+    activeConvos.sort((a, b) => b.rawTime - a.rawTime);
+
+    listContainer.innerHTML = activeConvos.map((item, idx) => {
+      const p = item.profile;
       return `
         <div class="convo-card" onclick="openChatRoom('${p.id}')">
           <div class="convo-avatar-wrap">
@@ -533,27 +558,24 @@
                 ${escapeHTML(p.full_name)}
                 <span class="material-symbols-outlined" style="font-size:14px;color:var(--um-primary);font-variation-settings:'FILL' 1;">verified</span>
               </h4>
-              <span class="convo-time">${lastMsgTime}</span>
+              <span class="convo-time">${item.time}</span>
             </div>
-            <p class="convo-snippet">${escapeHTML(lastMsgText)}</p>
+            <p class="convo-snippet">${escapeHTML(item.lastMsg)}</p>
           </div>
-          ${idx === 0 ? '<span class="unread-badge">NEW</span>' : ''}
+          ${idx === 0 ? '<span class="unread-badge">ACTIVE</span>' : ''}
         </div>
       `;
-    }));
+    }).join('');
 
-    listContainer.innerHTML = convoItemsHTML.join('');
-    document.getElementById('total-convos-count').textContent = `${MATCH_PROFILES.length} Active`;
+    document.getElementById('total-convos-count').textContent = `${activeConvos.length} Active`;
   }
 
   // ── 1-ON-1 CHAT ROOM RENDERING ──
   async function openChatRoom(partnerId) {
     _partnerId = partnerId;
 
-    // Update URL query parameter
     window.history.replaceState(null, '', `/unimatch/chat.html?partner_id=${_partnerId}`);
 
-    // Toggle Header & Views
     document.getElementById('header-inbox').classList.add('hidden-view');
     document.getElementById('view-inbox').classList.add('hidden-view');
     document.getElementById('header-room').classList.remove('hidden-view');
@@ -611,21 +633,6 @@
     if (!_currentUserId || !_partnerId) return;
 
     _messages = await UniMatchChatEngine.getMessages(_currentUserId, _partnerId);
-
-    if (_messages.length === 0 && _partnerId.startsWith('demo-')) {
-      const demoGreets = {
-        'demo-aarav-001': "Hey! Saw we matched. Building any cool projects or skipping lectures today? ☕",
-        'demo-ananya-002': "Hey there! Happy we matched 😊 What's your favorite coffee spot around campus?",
-        'demo-rohan-003': "Hey! Awesome to connect. Up for a campus study session or gym hit?",
-        'demo-priya-004': "Hi! Excited we matched 💕 Have you checked out the campus library recently?",
-        'demo-kabir-005': "Hey! What's up? Ready to skip lectures for some street food? 🎸"
-      };
-      const greetText = demoGreets[_partnerId] || "Hey! Happy we matched on UniMatch 💕";
-      
-      const seedMsg = await UniMatchChatEngine.sendMessage(_partnerId, _currentUserId, greetText);
-      _messages = [seedMsg];
-    }
-
     renderMessages();
   }
 
@@ -635,8 +642,10 @@
 
     if (_messages.length === 0) {
       container.innerHTML = `
-        <div style="text-align:center;padding:20px;font-size:13px;color:var(--um-text-muted);">
-          No messages yet. Say hi to start the conversation! 👋
+        <div style="text-align:center;padding:36px 20px;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border-radius:20px;border:1px solid var(--um-border);margin-top:10px;">
+          <span class="material-symbols-outlined" style="font-size:36px;color:var(--um-primary);opacity:0.6;">forum</span>
+          <p style="font-size:14px;font-weight:600;color:var(--um-text);margin:8px 0 2px;">No chats to show right now</p>
+          <p style="font-size:12px;color:var(--um-text-muted);margin:0;">Say hi or pick an icebreaker below to start the conversation! 👋</p>
         </div>
       `;
       return;
