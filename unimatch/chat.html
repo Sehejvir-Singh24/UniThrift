@@ -467,47 +467,28 @@
     }
   })();
 
-  // Helper to fetch profile by ID with local cache fallback
+  // Helper to fetch profile by ID directly from Supabase DB (cross-device sync)
   async function fetchProfileById(partnerId) {
     if (!partnerId) return null;
 
-    // 1. Check local cache
-    try {
-      const cached = localStorage.getItem(`um_profile_${partnerId}`);
-      if (cached) return JSON.parse(cached);
-    } catch(e) {}
-
-    // 2. Check local unlocked matches
-    try {
-      const keys = [`um_unlocked_matches_${_currentUserId}`, 'unimatch_unlocked_matches'];
-      for (const k of keys) {
-        const raw = localStorage.getItem(k);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            const found = parsed.find(p => p && (p.id === partnerId || p.liker_id === partnerId));
-            if (found) {
-              const prof = found.profile || found;
-              localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(prof));
-              return prof;
-            }
-          }
-        }
-      }
-    } catch(e) {}
-
-    // 3. Check Supabase profiles
+    // 1. Fetch from Supabase DB profiles table
     if (window.supabase) {
       try {
         const { data } = await supabase.from('profiles').select('*').eq('id', partnerId).single();
         if (data) {
-          localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(data));
+          try { localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(data)); } catch(e) {}
           return data;
         }
       } catch(e) {}
     }
 
-    // 4. Default fallback profile
+    // 2. Check local storage cache
+    try {
+      const cached = localStorage.getItem(`um_profile_${partnerId}`);
+      if (cached) return JSON.parse(cached);
+    } catch(e) {}
+
+    // 3. Fallback profile
     return {
       id: partnerId,
       full_name: 'Matched Student',
@@ -516,7 +497,7 @@
     };
   }
 
-  // Helper to fetch real mutual matches for stories row
+  // Helper to fetch real mutual matches for stories row from Supabase
   async function fetchRealMutualMatches() {
     const matchesMap = new Map();
     if (!_currentUserId) return [];
@@ -559,54 +540,11 @@
     return Array.from(matchesMap.values());
   }
 
-  // ── INBOX RENDERING: FETCH ALL ACTIVE CONVERSATIONS (LOCAL + DB) ──
+  // ── INBOX RENDERING: FETCH ALL ACTIVE CONVERSATIONS DIRECTLY FROM SUPABASE DB ──
   async function getAllActiveConversations() {
     const convosMap = new Map();
 
-    // 1. Scan LocalStorage for all chat stores involving _currentUserId or any um_chat_store_
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('um_chat_store_') || key.startsWith('unimatch_chat_'))) {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            const msgs = JSON.parse(raw);
-            if (Array.isArray(msgs) && msgs.length > 0) {
-              const lastMsgObj = msgs[msgs.length - 1];
-              
-              // Determine partner ID
-              let partnerId = null;
-              if (lastMsgObj.sender_id && lastMsgObj.receiver_id) {
-                partnerId = (lastMsgObj.sender_id === _currentUserId) ? lastMsgObj.receiver_id : lastMsgObj.sender_id;
-              } else {
-                // Extract from key: um_chat_store_ID1_ID2
-                const parts = key.replace('um_chat_store_', '').replace('unimatch_chat_', '').split('_');
-                partnerId = parts.find(p => p !== _currentUserId) || parts[0];
-              }
-
-              if (partnerId) {
-                let text = lastMsgObj.text;
-                if (!text && lastMsgObj.compressed_text && window.UniMatchChatEngine) {
-                  text = UniMatchChatEngine.decompressText(lastMsgObj.compressed_text);
-                }
-                text = (lastMsgObj.sender_id === _currentUserId ? 'You: ' : '') + (text || 'Message sent');
-                
-                const dateObj = new Date(lastMsgObj.created_at || Date.now());
-
-                convosMap.set(partnerId, {
-                  partnerId: partnerId,
-                  lastMsg: text,
-                  time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                  rawTime: dateObj
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch(e) { console.warn("Local chat scan error:", e); }
-
-    // 2. Query Supabase for remote chat messages involving _currentUserId
+    // 1. Query Supabase unimatch_chats DB table (Primary source of truth across all devices)
     if (window.supabase && _currentUserId) {
       try {
         const { data: dbMsgs } = await supabase
@@ -635,10 +573,77 @@
             }
           });
         }
-      } catch(e) { console.warn("Supabase chats scan error:", e); }
+
+        // Also check fallback table chat_messages
+        const { data: fbMsgs } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .or(`sender_id.eq.${_currentUserId},receiver_id.eq.${_currentUserId}`)
+          .order('created_at', { ascending: true });
+
+        if (fbMsgs && fbMsgs.length > 0) {
+          fbMsgs.forEach(m => {
+            const partnerId = (m.sender_id === _currentUserId) ? m.receiver_id : m.sender_id;
+            if (partnerId && !convosMap.has(partnerId)) {
+              let decomp = m.text;
+              if (!decomp && m.compressed_text && window.UniMatchChatEngine) {
+                decomp = UniMatchChatEngine.decompressText(m.compressed_text);
+              }
+              const text = (m.sender_id === _currentUserId ? 'You: ' : '') + (decomp || 'Message');
+              const dateObj = new Date(m.created_at);
+
+              convosMap.set(partnerId, {
+                partnerId: partnerId,
+                lastMsg: text,
+                time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                rawTime: dateObj
+              });
+            }
+          });
+        }
+      } catch(e) { console.warn("Supabase active chats scan error:", e); }
     }
 
-    // 3. For each active conversation partnerId, fetch their Profile details
+    // 2. Secondary check: Scan LocalStorage for local chat stores
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('um_chat_store_') || key.startsWith('unimatch_chat_'))) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const msgs = JSON.parse(raw);
+            if (Array.isArray(msgs) && msgs.length > 0) {
+              const lastMsgObj = msgs[msgs.length - 1];
+              let partnerId = null;
+              if (lastMsgObj.sender_id && lastMsgObj.receiver_id) {
+                partnerId = (lastMsgObj.sender_id === _currentUserId) ? lastMsgObj.receiver_id : lastMsgObj.sender_id;
+              } else {
+                const parts = key.replace('um_chat_store_', '').replace('unimatch_chat_', '').split('_');
+                partnerId = parts.find(p => p !== _currentUserId) || parts[0];
+              }
+
+              if (partnerId && !convosMap.has(partnerId)) {
+                let text = lastMsgObj.text;
+                if (!text && lastMsgObj.compressed_text && window.UniMatchChatEngine) {
+                  text = UniMatchChatEngine.decompressText(lastMsgObj.compressed_text);
+                }
+                text = (lastMsgObj.sender_id === _currentUserId ? 'You: ' : '') + (text || 'Message sent');
+                const dateObj = new Date(lastMsgObj.created_at || Date.now());
+
+                convosMap.set(partnerId, {
+                  partnerId: partnerId,
+                  lastMsg: text,
+                  time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  rawTime: dateObj
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch(e) { console.warn("Local chat scan error:", e); }
+
+    // 3. Fetch Profile details for each active conversation partner directly from Supabase DB
     const activeConvos = [];
     for (const [partnerId, item] of convosMap.entries()) {
       const profile = await fetchProfileById(partnerId);
@@ -684,7 +689,7 @@
       storiesWrapper.style.display = 'none';
     }
 
-    // Fetch ALL active conversations where messages exist
+    // Fetch ALL active conversations where messages exist from Supabase DB
     const activeConvos = await getAllActiveConversations();
     const listContainer = document.getElementById('conversations-list');
     

@@ -1,7 +1,7 @@
 /**
- * UniMatch On-Site Chat Engine with Backend Storage Compression
- * Encodes & compresses chat messages before persisting to Supabase DB or LocalStorage,
- * reducing backend payload size by up to 75%.
+ * UniMatch On-Site Chat Engine with Backend Storage Compression & Multi-Device Sync
+ * Encodes & compresses chat messages before persisting directly to Supabase DB,
+ * enabling seamless multi-device cross-sync (mobile & desktop).
  */
 
 (function(window) {
@@ -110,7 +110,6 @@
             context_enlargeIn = Math.pow(2, context_numBits);
             context_numBits++;
           }
-          context_dictionary[context_wc] = context_dictSize++;
           context_w = String(context_c);
         }
       }
@@ -193,7 +192,6 @@
         }
       }
 
-      // Flush remaining bits
       value = 2;
       for (i = 0; i < context_numBits; i++) {
         context_data_val = (context_data_val << 1) | (value & 1);
@@ -212,15 +210,14 @@
         if (context_data_position == 15) {
           context_data.push(String.fromCharCode(context_data_val));
           break;
-        } else {
-          context_data_position++;
-        }
+        } else context_data_position++;
       }
       return context_data.join('');
     },
 
     decompress: function(compressed) {
-      if (compressed === null || compressed === undefined || compressed === "") return "";
+      if (compressed == null) return "";
+      if (compressed == "") return null;
       let dictionary = [],
           next,
           enlargeIn = 4,
@@ -231,7 +228,7 @@
           i,
           w,
           c,
-          data = { string: compressed, val: compressed.charCodeAt(0), position: 32768, index: 1 };
+          data = { val: compressed.charCodeAt(0), position: 32768, index: 1 };
 
       for (i = 0; i < 3; i += 1) {
         dictionary[i] = i;
@@ -243,7 +240,7 @@
         data.position >>= 1;
         if (data.position == 0) {
           data.position = 32768;
-          data.val = data.string.charCodeAt(data.index++);
+          data.val = compressed.charCodeAt(data.index++);
         }
         bits |= (resb > 0 ? 1 : 0) * power;
         power <<= 1;
@@ -257,7 +254,7 @@
             data.position >>= 1;
             if (data.position == 0) {
               data.position = 32768;
-              data.val = data.string.charCodeAt(data.index++);
+              data.val = compressed.charCodeAt(data.index++);
             }
             bits |= (resb > 0 ? 1 : 0) * power;
             power <<= 1;
@@ -271,7 +268,7 @@
             data.position >>= 1;
             if (data.position == 0) {
               data.position = 32768;
-              data.val = data.string.charCodeAt(data.index++);
+              data.val = compressed.charCodeAt(data.index++);
             }
             bits |= (resb > 0 ? 1 : 0) * power;
             power <<= 1;
@@ -284,16 +281,18 @@
       dictionary[3] = c;
       w = c;
       result.push(c);
-
       while (true) {
-        if (data.index > data.string.length) return "";
+        if (data.index > compressed.length) {
+          return "";
+        }
+
         bits = 0; maxpower = Math.pow(2, numBits); power = 1;
         while (power != maxpower) {
           let resb = data.val & data.position;
           data.position >>= 1;
           if (data.position == 0) {
             data.position = 32768;
-            data.val = data.string.charCodeAt(data.index++);
+            data.val = compressed.charCodeAt(data.index++);
           }
           bits |= (resb > 0 ? 1 : 0) * power;
           power <<= 1;
@@ -307,7 +306,7 @@
               data.position >>= 1;
               if (data.position == 0) {
                 data.position = 32768;
-                data.val = data.string.charCodeAt(data.index++);
+                data.val = compressed.charCodeAt(data.index++);
               }
               bits |= (resb > 0 ? 1 : 0) * power;
               power <<= 1;
@@ -323,7 +322,7 @@
               data.position >>= 1;
               if (data.position == 0) {
                 data.position = 32768;
-                data.val = data.string.charCodeAt(data.index++);
+                data.val = compressed.charCodeAt(data.index++);
               }
               bits |= (resb > 0 ? 1 : 0) * power;
               power <<= 1;
@@ -354,6 +353,7 @@
 
         dictionary[dictSize++] = w + entry.charAt(0);
         enlargeIn--;
+
         if (enlargeIn == 0) {
           enlargeIn = Math.pow(2, numBits);
           numBits++;
@@ -364,61 +364,28 @@
     }
   };
 
-  const COMPRESSION_PREFIX = "⚡cmp:";
-
   const UniMatchChatEngine = {
-    /**
-     * Compresses plain text message into compact payload format
-     */
-    compressText: function(plainText) {
-      if (!plainText) return "";
+    compressText: function(text) {
+      if (!text) return "";
       try {
-        const compressed = LZCompressor.compress(plainText);
-        return COMPRESSION_PREFIX + btoa(unescape(encodeURIComponent(compressed)));
+        return LZCompressor.compress(text);
       } catch(e) {
-        console.warn("Compression fallback to plain text:", e);
-        return plainText;
+        return text;
       }
     },
 
-    /**
-     * Decompresses payload back into plaintext
-     */
     decompressText: function(compressedPayload) {
       if (!compressedPayload) return "";
-      if (typeof compressedPayload !== 'string') return String(compressedPayload);
-
-      if (!compressedPayload.startsWith(COMPRESSION_PREFIX)) {
-        return compressedPayload; // Plain text fallback
-      }
-
       try {
-        const raw = compressedPayload.slice(COMPRESSION_PREFIX.length);
-        const lzData = decodeURIComponent(escape(atob(raw)));
-        const decompressed = LZCompressor.decompress(lzData);
+        const decompressed = LZCompressor.decompress(compressedPayload);
         return decompressed || compressedPayload;
       } catch(e) {
-        console.warn("Decompress error:", e);
         return compressedPayload;
       }
     },
 
     /**
-     * Helper to compute compression efficiency stats
-     */
-    getCompressionStats: function(originalText, compressedPayload) {
-      const origBytes = new Blob([originalText]).size;
-      const compBytes = new Blob([compressedPayload]).size;
-      const savings = origBytes > 0 ? Math.max(0, Math.round((1 - compBytes / origBytes) * 100)) : 0;
-      return {
-        origBytes,
-        compBytes,
-        savingsPercentage: savings
-      };
-    },
-
-    /**
-     * Sends a compressed message between two users
+     * Sends a compressed message between two users directly to Supabase
      */
     sendMessage: async function(senderId, receiverId, text) {
       if (!text || !text.trim()) return null;
@@ -435,11 +402,11 @@
         created_at: new Date().toISOString()
       };
 
-      // 1. Save to local storage cache for instant offline & demo responsiveness
+      // 1. Save to local cache for instant UI rendering
       this._saveLocalMessage(senderId, receiverId, msgObj);
 
-      // 2. Insert compressed message into Supabase database
-      if (window.supabase) {
+      // 2. Persist to Supabase Database (Multi-Device Sync)
+      if (window.supabase && senderId && receiverId) {
         try {
           const { data, error } = await window.supabase
             .from('unimatch_chats')
@@ -447,16 +414,27 @@
               sender_id: senderId,
               receiver_id: receiverId,
               compressed_text: compressedText,
+              text: trimmed,
               is_compressed: true
             })
             .select()
             .single();
 
-          if (!error && data) {
+          if (error) {
+            // Try fallback table chat_messages
+            await window.supabase
+              .from('chat_messages')
+              .insert({
+                sender_id: senderId,
+                receiver_id: receiverId,
+                text: trimmed,
+                compressed_text: compressedText
+              });
+          } else if (data) {
             msgObj.id = data.id;
           }
         } catch(e) {
-          console.warn("Supabase chat insert warning (using local fallback):", e);
+          console.warn("Supabase chat sync warning:", e);
         }
       }
 
@@ -464,16 +442,12 @@
     },
 
     /**
-     * Fetches all chat messages between two users and decompresses them
+     * Fetches all chat messages between two users directly from Supabase Database
      */
     getMessages: async function(userId1, userId2) {
       const messagesMap = new Map();
 
-      // Load local cached messages first
-      const localMsgs = this._getLocalMessages(userId1, userId2);
-      localMsgs.forEach(m => messagesMap.set(m.id, m));
-
-      // Query Supabase DB for remote messages
+      // 1. Query Supabase DB for remote messages
       if (window.supabase && userId1 && userId2) {
         try {
           const { data, error } = await window.supabase
@@ -482,33 +456,66 @@
             .or(`and(sender_id.eq.${userId1},receiver_id.eq.${userId2}),and(sender_id.eq.${userId2},receiver_id.eq.${userId1})`)
             .order('created_at', { ascending: true });
 
-          if (!error && data) {
+          if (!error && data && data.length > 0) {
             data.forEach(m => {
-              const decomp = this.decompressText(m.compressed_text);
+              let decomp = m.text;
+              if (!decomp && m.compressed_text) {
+                decomp = this.decompressText(m.compressed_text);
+              }
               messagesMap.set(m.id, {
                 id: m.id,
                 sender_id: m.sender_id,
                 receiver_id: m.receiver_id,
                 compressed_text: m.compressed_text,
-                text: decomp,
+                text: decomp || m.compressed_text || '',
                 is_compressed: m.is_compressed !== false,
                 created_at: m.created_at
               });
             });
+          } else {
+            // Try fallback table chat_messages
+            const { data: fbData } = await window.supabase
+              .from('chat_messages')
+              .select('*')
+              .or(`and(sender_id.eq.${userId1},receiver_id.eq.${userId2}),and(sender_id.eq.${userId2},receiver_id.eq.${userId1})`)
+              .order('created_at', { ascending: true });
+
+            if (fbData && fbData.length > 0) {
+              fbData.forEach(m => {
+                let decomp = m.text;
+                if (!decomp && m.compressed_text) {
+                  decomp = this.decompressText(m.compressed_text);
+                }
+                messagesMap.set(m.id, {
+                  id: m.id,
+                  sender_id: m.sender_id,
+                  receiver_id: m.receiver_id,
+                  compressed_text: m.compressed_text,
+                  text: decomp || m.text || '',
+                  is_compressed: true,
+                  created_at: m.created_at
+                });
+              });
+            }
           }
         } catch(e) {
           console.warn("Supabase fetch chats warning:", e);
         }
       }
 
+      // 2. Merge local cache if any exists locally
+      const localMsgs = this._getLocalMessages(userId1, userId2);
+      localMsgs.forEach(m => {
+        if (!messagesMap.has(m.id)) {
+          messagesMap.set(m.id, m);
+        }
+      });
+
       const list = Array.from(messagesMap.values());
       list.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
       return list;
     },
 
-    /**
-     * Storage key helper
-     */
     _getStorageKey: function(id1, id2) {
       const pair = [id1, id2].sort().join('_');
       return `um_chat_store_${pair}`;
