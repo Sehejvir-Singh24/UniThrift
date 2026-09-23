@@ -435,14 +435,19 @@
 
   const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80";
 
-  // Match Profiles Map
-  const MATCH_PROFILES = [
-    { id: 'demo-aarav-001', full_name: 'Aarav Sharma', major: 'Computer Science', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&q=80' },
-    { id: 'demo-ananya-002', full_name: 'Ananya Verma', major: 'Business Admin', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80' },
-    { id: 'demo-rohan-003', full_name: 'Rohan Mehta', major: 'Electronics & Comm', year_of_study: '4th Year', avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80' },
-    { id: 'demo-priya-004', full_name: 'Priya Nair', major: 'Journalism', year_of_study: '3rd Year', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80' },
-    { id: 'demo-kabir-005', full_name: 'Kabir Malhotra', major: 'Mechanical Eng', year_of_study: '2nd Year', avatar_url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=80' }
-  ];
+  // Purge any legacy demo messages from localStorage
+  (function purgeDemoLocalStorage() {
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.includes('demo-')) {
+          keysToRemove.push(k);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+    } catch(e) {}
+  })();
 
   (async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -460,7 +465,7 @@
           if (stored) return JSON.parse(stored);
         } catch(e) {}
         return {
-          id: 'demo-current-user',
+          id: 'real-user',
           full_name: 'Campus Student',
           university: 'GGSIPU'
         };
@@ -476,6 +481,46 @@
     }
   })();
 
+  // Helper to fetch real matches
+  async function fetchRealMutualMatches() {
+    const matches = [];
+    if (!_currentUserId) return matches;
+
+    // 1. Try Supabase matches table
+    if (window.supabase) {
+      try {
+        const { data: dbMatches } = await supabase
+          .from('matches')
+          .select('id, user1_id, user2_id, status, created_at')
+          .or(`user1_id.eq.${_currentUserId},user2_id.eq.${_currentUserId}`)
+          .eq('status', 'matched');
+
+        if (dbMatches && dbMatches.length > 0) {
+          const partnerIds = dbMatches.map(m => m.user1_id === _currentUserId ? m.user2_id : m.user1_id);
+          const { data: profiles } = await supabase.from('profiles').select('*').in('id', partnerIds);
+          if (profiles) matches.push(...profiles);
+        }
+      } catch(e) {}
+    }
+
+    // 2. Try LocalStorage unlocked matches
+    try {
+      const localUnlocked = localStorage.getItem(`um_unlocked_matches_${_currentUserId}`) || localStorage.getItem('unimatch_unlocked_matches');
+      if (localUnlocked) {
+        const parsed = JSON.parse(localUnlocked);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(p => {
+            if (p && p.id && !matches.some(m => m.id === p.id)) {
+              matches.push(p);
+            }
+          });
+        }
+      }
+    } catch(e) {}
+
+    return matches;
+  }
+
   // ── INBOX RENDERING ──
   async function showInboxView() {
     if (_pollingTimer) clearInterval(_pollingTimer);
@@ -488,21 +533,30 @@
     document.getElementById('view-room').classList.add('hidden-view');
     document.getElementById('room-input-bar').classList.add('hidden-view');
 
-    // Render Mutual Matches Stories Row
+    const mutualMatches = await fetchRealMutualMatches();
+
+    // Render Mutual Matches Stories Row if matches exist
+    const storiesWrapper = document.getElementById('stories-wrapper');
     const storiesContainer = document.getElementById('stories-list');
-    storiesContainer.innerHTML = MATCH_PROFILES.map(p => `
-      <div class="story-item" onclick="openChatRoom('${p.id}')">
-        <div class="story-avatar-wrap">
-          <img src="${p.avatar_url}" alt="${p.full_name}"/>
+    
+    if (mutualMatches.length > 0) {
+      storiesWrapper.style.display = 'block';
+      storiesContainer.innerHTML = mutualMatches.map(p => `
+        <div class="story-item" onclick="openChatRoom('${p.id}')">
+          <div class="story-avatar-wrap">
+            <img src="${p.avatar_url || DEFAULT_AVATAR}" alt="${escapeHTML(p.full_name || 'Student')}"/>
+          </div>
+          <div class="story-name">${escapeHTML((p.full_name || 'Student').split(' ')[0])}</div>
         </div>
-        <div class="story-name">${escapeHTML(p.full_name.split(' ')[0])}</div>
-      </div>
-    `).join('');
+      `).join('');
+    } else {
+      storiesWrapper.style.display = 'none';
+    }
 
     // Fetch REAL conversations with actual messages
     const activeConvos = [];
-    if (_currentUserId) {
-      for (const p of MATCH_PROFILES) {
+    if (_currentUserId && mutualMatches.length > 0) {
+      for (const p of mutualMatches) {
         try {
           const msgs = await UniMatchChatEngine.getMessages(_currentUserId, p.id);
           if (msgs && msgs.length > 0) {
@@ -531,7 +585,7 @@
           <p style="font-size:13px;color:var(--um-text-muted);margin:0 0 16px;max-width:320px;margin-left:auto;margin-right:auto;">
             When you match with students or start a conversation, your active chats will appear here!
           </p>
-          <a href="/unimatch/hidden-likes.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white shadow-md transition-transform active:scale-95" style="background:linear-gradient(135deg, var(--um-primary), #8B6B8A);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+          <a href="/unimatch/hidden-likes.html" style="background:linear-gradient(135deg, var(--um-primary), #8B6B8A);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;color:white;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(176,80,112,0.25);">
             <span class="material-symbols-outlined" style="font-size:16px;">favorite</span>
             View Mutual Matches
           </a>
@@ -549,13 +603,13 @@
       return `
         <div class="convo-card" onclick="openChatRoom('${p.id}')">
           <div class="convo-avatar-wrap">
-            <img src="${p.avatar_url}" alt="${p.full_name}"/>
+            <img src="${p.avatar_url || DEFAULT_AVATAR}" alt="${escapeHTML(p.full_name || 'Student')}"/>
             <div class="online-indicator"></div>
           </div>
           <div class="convo-info">
             <div class="convo-top">
               <h4 class="convo-title">
-                ${escapeHTML(p.full_name)}
+                ${escapeHTML(p.full_name || 'Student')}
                 <span class="material-symbols-outlined" style="font-size:14px;color:var(--um-primary);font-variation-settings:'FILL' 1;">verified</span>
               </h4>
               <span class="convo-time">${item.time}</span>
@@ -592,14 +646,23 @@
   async function loadPartnerProfile() {
     if (!_partnerId) return;
 
-    const matchedDemo = MATCH_PROFILES.find(p => p.id === _partnerId);
-
-    if (matchedDemo) {
-      _partnerProfile = matchedDemo;
-    } else if (window.supabase) {
+    _partnerProfile = null;
+    if (window.supabase) {
       try {
         const { data } = await supabase.from('profiles').select('*').eq('id', _partnerId).single();
         if (data) _partnerProfile = data;
+      } catch(e) {}
+    }
+
+    if (!_partnerProfile) {
+      // Check local unlocked matches
+      try {
+        const localUnlocked = localStorage.getItem(`um_unlocked_matches_${_currentUserId}`) || localStorage.getItem('unimatch_unlocked_matches');
+        if (localUnlocked) {
+          const parsed = JSON.parse(localUnlocked);
+          const found = parsed.find(p => p && p.id === _partnerId);
+          if (found) _partnerProfile = found;
+        }
       } catch(e) {}
     }
 
