@@ -10,13 +10,19 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
 <link href="/unimatch/unimatch-theme.css" rel="stylesheet"/>
 <style>
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
   body {
     font-family: var(--um-font-body);
     background: var(--um-bg-gradient);
     background-size: 300% 300%;
     animation: cloudDrift 28s ease infinite;
     min-height: 100dvh;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
     display: flex;
@@ -27,7 +33,7 @@
   /* ── HEADERS ── */
   .um-chat-header {
     height: 68px;
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--um-border);
@@ -38,19 +44,23 @@
     z-index: 50;
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: calc(env(safe-area-inset-top, 0px)) 16px 0;
     justify-content: space-between;
+    transform: translateZ(0);
   }
 
   /* ── INBOX VIEW STYLES ── */
   .inbox-container {
     flex: 1;
     overflow-y: auto;
-    padding: 80px 16px 90px;
+    padding: 82px 16px calc(90px + env(safe-area-inset-bottom, 0px));
     max-width: 680px;
     width: 100%;
     margin: 0 auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .stories-row {
@@ -59,6 +69,7 @@
     overflow-x: auto;
     padding-bottom: 12px;
     margin-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .story-item {
@@ -101,7 +112,7 @@
   }
 
   .convo-card {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--um-border);
@@ -111,15 +122,14 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     box-shadow: 0 4px 14px var(--um-shadow-card);
     margin-bottom: 10px;
+    transform: translateZ(0);
   }
 
-  .convo-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(176,80,112,0.18);
-    border-color: rgba(176,80,112,0.3);
+  .convo-card:active {
+    transform: scale(0.98);
   }
 
   .convo-avatar-wrap {
@@ -202,14 +212,17 @@
   .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 84px 16px 90px;
+    padding: 84px 16px calc(86px + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     max-width: 680px;
     width: 100%;
     margin: 0 auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .chat-input-bar {
@@ -217,17 +230,18 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--um-border);
-    padding: 10px 16px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
     z-index: 50;
     display: flex;
     align-items: center;
     gap: 10px;
     max-width: 680px;
     margin: 0 auto;
+    transform: translateZ(0);
   }
 
   .msg-bubble-sent {
@@ -235,30 +249,30 @@
     background: linear-gradient(135deg, var(--um-primary), #8B6B8A);
     color: white;
     border-radius: 20px 20px 4px 20px;
-    padding: 12px 16px;
-    max-width: 78%;
-    box-shadow: 0 4px 14px rgba(176, 80, 112, 0.25);
+    padding: 11px 15px;
+    max-width: 80%;
+    box-shadow: 0 3px 10px rgba(176, 80, 112, 0.22);
     word-break: break-word;
     position: relative;
-    animation: pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: pop-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .msg-bubble-recv {
     align-self: flex-start;
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.96);
     color: var(--um-text);
     border-radius: 20px 20px 20px 4px;
-    padding: 12px 16px;
-    max-width: 78%;
+    padding: 11px 15px;
+    max-width: 80%;
     border: 1px solid var(--um-border);
-    box-shadow: 0 4px 14px var(--um-shadow-card);
+    box-shadow: 0 3px 10px var(--um-shadow-card);
     word-break: break-word;
     position: relative;
-    animation: pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: pop-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @keyframes pop-in {
-    0% { opacity: 0; transform: scale(0.95) translateY(6px); }
+    0% { opacity: 0; transform: scale(0.96) translateY(4px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
 
@@ -285,21 +299,29 @@
     background: rgba(176, 80, 112, 0.08);
     border: 1px solid rgba(176, 80, 112, 0.2);
     color: var(--um-primary);
-    padding: 8px 14px;
+    padding: 7px 13px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all 0.15s;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
   }
 
-  .icebreaker-chip:hover {
+  .icebreaker-chip:active {
     background: var(--um-primary);
     color: white;
+  }
+
+  /* Prevent Mobile Safari Auto Zoom on input focus */
+  @media (max-width: 640px) {
+    #chat-input {
+      font-size: 16px !important;
+    }
   }
 
   .hidden-view { display: none !important; }
@@ -359,7 +381,7 @@
       <span class="material-symbols-outlined" style="font-size:24px;">arrow_back</span>
     </button>
     
-    <div style="position:relative;width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid var(--um-primary);flex-shrink:0;cursor:pointer;" onclick="alert('Student Verified Profile 💕')">
+    <div style="position:relative;width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid var(--um-primary);flex-shrink:0;cursor:pointer;">
       <img id="partner-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80" alt="Partner" style="width:100%;height:100%;object-fit:cover;"/>
       <div style="position:absolute;bottom:0;right:0;width:10px;height:10px;background:#22c55e;border-radius:50%;border:2px solid white;"></div>
     </div>
@@ -384,18 +406,18 @@
 <main class="chat-messages hidden-view" id="view-room">
   
   <!-- Match Welcome Header Banner -->
-  <div style="background:linear-gradient(135deg, rgba(176,80,112,0.12), rgba(139,107,138,0.12));border:1px solid rgba(176,80,112,0.25);border-radius:24px;padding:18px 20px;text-align:center;margin-bottom:8px;display:flex;flex-direction:column;align-items:center;gap:8px;">
-    <div style="width:48px;height:48px;border-radius:50%;background:var(--um-primary-dim);display:flex;align-items:center;justify-content:center;color:var(--um-primary);border:2px solid var(--um-primary);">
-      <span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'FILL' 1;">favorite</span>
+  <div style="background:linear-gradient(135deg, rgba(176,80,112,0.12), rgba(139,107,138,0.12));border:1px solid rgba(176,80,112,0.25);border-radius:24px;padding:16px 18px;text-align:center;margin-bottom:6px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <div style="width:44px;height:44px;border-radius:50%;background:var(--um-primary-dim);display:flex;align-items:center;justify-content:center;color:var(--um-primary);border:2px solid var(--um-primary);">
+      <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;">favorite</span>
     </div>
-    <h4 style="font-size:16px;font-weight:700;color:var(--um-primary);margin:0;">You & <span id="welcome-partner-name">Partner</span> Matched! 💕</h4>
+    <h4 style="font-size:15px;font-weight:700;color:var(--um-primary);margin:0;">You & <span id="welcome-partner-name">Partner</span> Matched! 💕</h4>
     <p style="font-size:12px;color:var(--um-text-muted);margin:0;max-width:340px;">
       Start chatting on UniMatch! All messages are compressed & student-verified.
     </p>
   </div>
 
   <!-- Icebreaker Suggestions Horizontal Bar -->
-  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;" class="hide-scrollbar">
+  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;" class="hide-scrollbar">
     <div onclick="sendIcebreaker('Skipping lectures today, where on campus would we hide out? ☕')" class="icebreaker-chip">
       <span class="material-symbols-outlined" style="font-size:14px;">forum</span> Skipping lectures spot?
     </div>
@@ -416,9 +438,9 @@
 
 <!-- Bottom Input Bar (Only visible in room view) -->
 <div class="chat-input-bar hidden-view" id="room-input-bar">
-  <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1;background:var(--um-bg-alt);border:1px solid var(--um-border);border-radius:24px;padding:12px 18px;font-size:14px;outline:none;color:var(--um-text);font-family:var(--um-font-body);" onkeydown="if(event.key==='Enter') handleSendMessage()"/>
+  <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1;background:var(--um-bg-alt);border:1px solid var(--um-border);border-radius:24px;padding:12px 16px;font-size:16px;outline:none;color:var(--um-text);font-family:var(--um-font-body);" onkeydown="if(event.key==='Enter') handleSendMessage()"/>
   
-  <button onclick="handleSendMessage()" id="send-btn" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, var(--um-primary), #8B6B8A);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(176,80,112,0.3);transition:transform 0.18s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  <button onclick="handleSendMessage()" id="send-btn" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, var(--um-primary), #8B6B8A);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(176,80,112,0.3);flex-shrink:0;">
     <span class="material-symbols-outlined" style="font-size:20px;">send</span>
   </button>
 </div>
@@ -432,6 +454,8 @@
   let _partnerProfile = null;
   let _messages = [];
   let _pollingTimer = null;
+  let _renderedMsgIds = new Set();
+  const _profilesCache = new Map();
 
   const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80";
 
@@ -467,42 +491,65 @@
     }
   })();
 
-  // Helper to fetch profile by ID directly from Supabase DB (cross-device sync)
+  // Memory & Batch Optimized Profile Fetcher
   async function fetchProfileById(partnerId) {
     if (!partnerId) return null;
+    if (_profilesCache.has(partnerId)) return _profilesCache.get(partnerId);
 
-    // 1. Fetch from Supabase DB profiles table
+    // 1. Check local cache
+    try {
+      const cached = localStorage.getItem(`um_profile_${partnerId}`);
+      if (cached) {
+        const prof = JSON.parse(cached);
+        _profilesCache.set(partnerId, prof);
+        return prof;
+      }
+    } catch(e) {}
+
+    // 2. Fetch from Supabase DB profiles table
     if (window.supabase) {
       try {
         const { data } = await supabase.from('profiles').select('*').eq('id', partnerId).single();
         if (data) {
+          _profilesCache.set(partnerId, data);
           try { localStorage.setItem(`um_profile_${partnerId}`, JSON.stringify(data)); } catch(e) {}
           return data;
         }
       } catch(e) {}
     }
 
-    // 2. Check local storage cache
-    try {
-      const cached = localStorage.getItem(`um_profile_${partnerId}`);
-      if (cached) return JSON.parse(cached);
-    } catch(e) {}
-
     // 3. Fallback profile
-    return {
+    const fallback = {
       id: partnerId,
       full_name: 'Matched Student',
       major: 'GGSIPU Campus',
       avatar_url: DEFAULT_AVATAR
     };
+    _profilesCache.set(partnerId, fallback);
+    return fallback;
   }
 
-  // Helper to fetch real mutual matches for stories row from Supabase
+  // Batch query multiple profiles in ONE single HTTP request
+  async function fetchProfilesInBatch(partnerIds) {
+    const uniqueIds = Array.from(new Set(partnerIds)).filter(id => id && !_profilesCache.has(id));
+    if (uniqueIds.length === 0 || !window.supabase) return;
+
+    try {
+      const { data } = await supabase.from('profiles').select('*').in('id', uniqueIds);
+      if (data && data.length > 0) {
+        data.forEach(p => {
+          _profilesCache.set(p.id, p);
+          try { localStorage.setItem(`um_profile_${p.id}`, JSON.stringify(p)); } catch(e) {}
+        });
+      }
+    } catch(e) {}
+  }
+
+  // Helper to fetch real mutual matches for stories row
   async function fetchRealMutualMatches() {
     const matchesMap = new Map();
     if (!_currentUserId) return [];
 
-    // 1. Try Supabase matches table
     if (window.supabase) {
       try {
         const { data: dbMatches } = await supabase
@@ -513,15 +560,15 @@
 
         if (dbMatches && dbMatches.length > 0) {
           const partnerIds = dbMatches.map(m => m.user1_id === _currentUserId ? m.user2_id : m.user1_id);
-          const { data: profiles } = await supabase.from('profiles').select('*').in('id', partnerIds);
-          if (profiles) {
-            profiles.forEach(p => matchesMap.set(p.id, p));
-          }
+          await fetchProfilesInBatch(partnerIds);
+          partnerIds.forEach(id => {
+            const p = _profilesCache.get(id);
+            if (p) matchesMap.set(p.id, p);
+          });
         }
       } catch(e) {}
     }
 
-    // 2. Try LocalStorage unlocked matches
     try {
       const localUnlocked = localStorage.getItem(`um_unlocked_matches_${_currentUserId}`) || localStorage.getItem('unimatch_unlocked_matches');
       if (localUnlocked) {
@@ -531,6 +578,7 @@
             const p = item.profile || item;
             if (p && p.id && !matchesMap.has(p.id)) {
               matchesMap.set(p.id, p);
+              _profilesCache.set(p.id, p);
             }
           });
         }
@@ -540,11 +588,11 @@
     return Array.from(matchesMap.values());
   }
 
-  // ── INBOX RENDERING: FETCH ALL ACTIVE CONVERSATIONS DIRECTLY FROM SUPABASE DB ──
+  // ── INBOX RENDERING: BATCHED & MOBILE PERFORMANCE OPTIMIZED ──
   async function getAllActiveConversations() {
     const convosMap = new Map();
 
-    // 1. Query Supabase unimatch_chats DB table (Primary source of truth across all devices)
+    // 1. Query Supabase unimatch_chats DB table
     if (window.supabase && _currentUserId) {
       try {
         const { data: dbMsgs } = await supabase
@@ -574,7 +622,7 @@
           });
         }
 
-        // Also check fallback table chat_messages
+        // Check fallback table chat_messages
         const { data: fbMsgs } = await supabase
           .from('chat_messages')
           .select('*')
@@ -601,10 +649,10 @@
             }
           });
         }
-      } catch(e) { console.warn("Supabase active chats scan error:", e); }
+      } catch(e) { console.warn("Supabase active chats error:", e); }
     }
 
-    // 2. Secondary check: Scan LocalStorage for local chat stores
+    // 2. Scan LocalStorage for local chat stores
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -643,7 +691,10 @@
       }
     } catch(e) { console.warn("Local chat scan error:", e); }
 
-    // 3. Fetch Profile details for each active conversation partner directly from Supabase DB
+    // 3. Batch fetch ALL missing partner profiles in ONE query
+    const allPartnerIds = Array.from(convosMap.keys());
+    await fetchProfilesInBatch(allPartnerIds);
+
     const activeConvos = [];
     for (const [partnerId, item] of convosMap.entries()) {
       const profile = await fetchProfileById(partnerId);
@@ -660,7 +711,7 @@
 
   // ── INBOX VIEW MAIN CONTROLLER ──
   async function showInboxView() {
-    if (_pollingTimer) clearInterval(_pollingTimer);
+    stopPolling();
 
     window.history.replaceState(null, '', '/unimatch/chat.html');
 
@@ -670,7 +721,6 @@
     document.getElementById('view-room').classList.add('hidden-view');
     document.getElementById('room-input-bar').classList.add('hidden-view');
 
-    // Render Mutual Matches Stories Row
     const mutualMatches = await fetchRealMutualMatches();
     const storiesWrapper = document.getElementById('stories-wrapper');
     const storiesContainer = document.getElementById('stories-list');
@@ -689,7 +739,6 @@
       storiesWrapper.style.display = 'none';
     }
 
-    // Fetch ALL active conversations where messages exist from Supabase DB
     const activeConvos = await getAllActiveConversations();
     const listContainer = document.getElementById('conversations-list');
     
@@ -713,7 +762,6 @@
       return;
     }
 
-    // Sort active conversations by most recent message
     activeConvos.sort((a, b) => b.rawTime - a.rawTime);
 
     listContainer.innerHTML = activeConvos.map((item, idx) => {
@@ -745,6 +793,7 @@
   // ── 1-ON-1 CHAT ROOM RENDERING ──
   async function openChatRoom(partnerId) {
     _partnerId = partnerId;
+    _renderedMsgIds.clear();
 
     window.history.replaceState(null, '', `/unimatch/chat.html?partner_id=${_partnerId}`);
 
@@ -757,8 +806,19 @@
     await loadPartnerProfile();
     await loadChatMessages();
 
-    if (_pollingTimer) clearInterval(_pollingTimer);
-    _pollingTimer = setInterval(loadChatMessages, 2000);
+    startPolling();
+  }
+
+  function startPolling() {
+    stopPolling();
+    _pollingTimer = setInterval(loadChatMessages, 3000);
+  }
+
+  function stopPolling() {
+    if (_pollingTimer) {
+      clearInterval(_pollingTimer);
+      _pollingTimer = null;
+    }
   }
 
   async function loadPartnerProfile() {
@@ -787,46 +847,69 @@
   async function loadChatMessages() {
     if (!_currentUserId || !_partnerId) return;
 
-    _messages = await UniMatchChatEngine.getMessages(_currentUserId, _partnerId);
-    renderMessages();
+    const freshMessages = await UniMatchChatEngine.getMessages(_currentUserId, _partnerId);
+    
+    // Check if new messages arrived
+    if (freshMessages.length !== _messages.length || (freshMessages.length > 0 && freshMessages[freshMessages.length - 1].id !== (_messages[_messages.length - 1]?.id))) {
+      _messages = freshMessages;
+      renderMessagesIncremental();
+    }
   }
 
-  function renderMessages() {
+  // High Performance Incremental DOM Renderer (No Lag / No Jitter on Mobile)
+  function renderMessagesIncremental() {
     const container = document.getElementById('messages-list');
     if (!container) return;
 
     if (_messages.length === 0) {
       container.innerHTML = `
-        <div style="text-align:center;padding:36px 20px;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border-radius:20px;border:1px solid var(--um-border);margin-top:10px;">
-          <span class="material-symbols-outlined" style="font-size:36px;color:var(--um-primary);opacity:0.6;">forum</span>
-          <p style="font-size:14px;font-weight:600;color:var(--um-text);margin:8px 0 2px;">No chats to show right now</p>
+        <div style="text-align:center;padding:32px 18px;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border-radius:20px;border:1px solid var(--um-border);margin-top:8px;">
+          <span class="material-symbols-outlined" style="font-size:32px;color:var(--um-primary);opacity:0.6;">forum</span>
+          <p style="font-size:14px;font-weight:600;color:var(--um-text);margin:6px 0 2px;">No chats to show right now</p>
           <p style="font-size:12px;color:var(--um-text-muted);margin:0;">Say hi or pick an icebreaker below to start the conversation! 👋</p>
         </div>
       `;
+      _renderedMsgIds.clear();
       return;
     }
 
-    container.innerHTML = _messages.map(m => {
-      const isMine = m.sender_id === _currentUserId;
-      const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      return `
-        <div class="${isMine ? 'msg-bubble-sent' : 'msg-bubble-recv'}">
+    // If first render or empty state was displayed, reset container
+    if (_renderedMsgIds.size === 0) {
+      container.innerHTML = '';
+    }
+
+    let hasNew = false;
+    _messages.forEach(m => {
+      if (!_renderedMsgIds.has(m.id)) {
+        hasNew = true;
+        _renderedMsgIds.add(m.id);
+
+        const isMine = m.sender_id === _currentUserId;
+        const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const div = document.createElement('div');
+        div.className = isMine ? 'msg-bubble-sent' : 'msg-bubble-recv';
+        div.innerHTML = `
           <div style="font-size:14px;line-height:1.45;">${escapeHTML(m.text)}</div>
           <div class="msg-time">
             <span>${timeStr}</span>
           </div>
-        </div>
-      `;
-    }).join('');
+        `;
+        container.appendChild(div);
+      }
+    });
 
-    scrollToBottom();
+    if (hasNew) {
+      scrollToBottom();
+    }
   }
 
   function scrollToBottom() {
     const c = document.getElementById('view-room');
     if (c) {
-      c.scrollTop = c.scrollHeight;
+      requestAnimationFrame(() => {
+        c.scrollTop = c.scrollHeight;
+      });
     }
   }
 
@@ -840,7 +923,7 @@
     const newMsg = await UniMatchChatEngine.sendMessage(_currentUserId, _partnerId, text);
     if (newMsg) {
       _messages.push(newMsg);
-      renderMessages();
+      renderMessagesIncremental();
     }
   }
 
@@ -848,7 +931,7 @@
     const newMsg = await UniMatchChatEngine.sendMessage(_currentUserId, _partnerId, text);
     if (newMsg) {
       _messages.push(newMsg);
-      renderMessages();
+      renderMessagesIncremental();
     }
   }
 
@@ -862,9 +945,16 @@
       .replace(/'/g, '&#039;');
   }
 
-  window.addEventListener('beforeunload', () => {
-    if (_pollingTimer) clearInterval(_pollingTimer);
+  // Pause polling when tab is inactive to save phone battery & CPU
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopPolling();
+    } else if (_partnerId) {
+      startPolling();
+    }
   });
+
+  window.addEventListener('beforeunload', stopPolling);
 </script>
 <script src="/unimatch/clouds-init.js" defer></script>
 </body>
