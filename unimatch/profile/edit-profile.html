@@ -68,7 +68,7 @@
     <button onclick="document.getElementById('edit-photo-input').click()" class="font-button text-button text-secondary border border-secondary rounded-full px-6 py-2 hover:bg-secondary/5 transition-colors">
       Change Photo
     </button>
-    <input type="file" id="edit-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(e)"/>
+    <input type="file" id="edit-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)"/>
   </section>
 
   <!-- Form Fields -->
@@ -145,6 +145,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/scripts/supabase.js"></script>
 <script>
+  let _pendingPhotoFile = null;   // holds the File object the user picked
+  let _currentPhotos   = [];      // holds the existing profile_photos array
+
   (async () => {
     const profile = await requireUniMatchAuth();
     if (!profile) return;
@@ -172,21 +175,38 @@
           }
         } catch(e) {}
       }
-      let mainPhoto = null;
+
+      // Load existing photos
       if (profile.profile_photos) {
         try {
-          const photos = typeof profile.profile_photos === 'string' ? JSON.parse(profile.profile_photos) : profile.profile_photos;
-          if (photos && photos.length > 0) mainPhoto = photos[0];
-        } catch (e) {}
+          _currentPhotos = typeof profile.profile_photos === 'string'
+            ? JSON.parse(profile.profile_photos)
+            : profile.profile_photos;
+          if (!Array.isArray(_currentPhotos)) _currentPhotos = [];
+        } catch (e) { _currentPhotos = []; }
       }
-      if (!mainPhoto && profile.avatar_url) {
-        mainPhoto = profile.avatar_url;
-      }
-      if (mainPhoto && document.getElementById('edit-photo-preview')) {
-        document.getElementById('edit-photo-preview').src = mainPhoto;
+      if (_currentPhotos.length === 0 && profile.avatar_url) _currentPhotos = [profile.avatar_url];
+
+      // Show current photo in preview
+      if (_currentPhotos.length > 0 && document.getElementById('edit-photo-preview')) {
+        document.getElementById('edit-photo-preview').src = _currentPhotos[0];
       }
     }
   })();
+
+  // Called when user picks a new photo file
+  function handlePhotoChange(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    _pendingPhotoFile = file;
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = document.getElementById('edit-photo-preview');
+      if (preview) preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function handleSave(e) {
     if (e) e.preventDefault();
@@ -194,16 +214,69 @@
     btn.textContent = 'Saving...';
     btn.disabled = true;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    await supabase.from('profiles').update({
-      full_name: document.getElementById('edit-fullName').value.trim(),
-      major: document.getElementById('edit-major').value.trim(),
-      gender: document.getElementById('edit-gender') ? document.getElementById('edit-gender').value : null,
-      preferred_gender: document.getElementById('edit-preferred_gender') ? document.getElementById('edit-preferred_gender').value : null,
-      bio: document.getElementById('edit-bio').value.trim(),
-    }).eq('id', session.user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { alert('Session expired. Please log in again.'); return; }
 
-    window.location.href = '/unimatch/profile/my-profile.html';
+      const userId = session.user.id;
+      let updatedPhotos = [..._currentPhotos];
+
+      // ── Upload new photo if the user picked one ──────────────────────
+      if (_pendingPhotoFile) {
+        btn.textContent = 'Uploading photo...';
+        const ext  = _pendingPhotoFile.name.split('.').pop() || 'jpg';
+        const path = `${userId}/profile_${Date.now()}.${ext}`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from('profile-photos')
+          .upload(path, _pendingPhotoFile, { upsert: true, contentType: _pendingPhotoFile.type });
+
+        if (uploadErr) {
+          // Storage bucket may not be set up — fallback: store base64 data URL is too large,
+          // so we just alert and skip photo update.
+          console.error('Photo upload error:', uploadErr);
+          alert(`Photo upload failed: ${uploadErr.message}\n\nOther profile details will still be saved.`);
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('profile-photos')
+            .getPublicUrl(path);
+          const publicUrl = urlData?.publicUrl;
+          if (publicUrl) {
+            // Replace the first photo (main photo), keep the rest
+            updatedPhotos[0] = publicUrl;
+          }
+        }
+      }
+
+      // ── Save all profile fields ──────────────────────────────────────
+      btn.textContent = 'Saving...';
+      const { error: updateErr } = await supabase.from('profiles').update({
+        full_name:       document.getElementById('edit-fullName').value.trim(),
+        major:           document.getElementById('edit-major').value.trim(),
+        gender:          document.getElementById('edit-gender')?.value || null,
+        preferred_gender: document.getElementById('edit-preferred_gender')?.value || null,
+        bio:             document.getElementById('edit-bio').value.trim(),
+        profile_photos:  JSON.stringify(updatedPhotos),
+        avatar_url:      updatedPhotos[0] || null,
+        updated_at:      new Date().toISOString(),
+      }).eq('id', userId);
+
+      if (updateErr) {
+        console.error('Profile update error:', updateErr);
+        alert(`Save failed: ${updateErr.message}`);
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+        return;
+      }
+
+      window.location.href = '/unimatch/profile/my-profile.html';
+    } catch (err) {
+      console.error('handleSave error:', err);
+      alert('Something went wrong. Please try again.');
+      btn.textContent = 'Save Changes';
+      btn.disabled = false;
+    }
   }
 </script>
 </body></html>
+
