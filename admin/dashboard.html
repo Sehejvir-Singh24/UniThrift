@@ -649,6 +649,12 @@
 
                 // Init dashboard data
                 await initDashboard();
+
+                // Switch to requested tab if hash is present (e.g. #users or #unimatch)
+                const hash = window.location.hash.replace('#', '');
+                if (hash && document.getElementById(`sec-${hash}`)) {
+                    switchTab(hash);
+                }
             } catch(e) {
                 console.error("Dashboard init error:", e);
                 window.location.href = '/index.html';
