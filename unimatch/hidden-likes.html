@@ -430,19 +430,8 @@
       } catch(e) {}
 
       if (!profile) {
-        profile = (() => {
-          try {
-            const stored = localStorage.getItem('unithrift_user') || sessionStorage.getItem('unimatch_cached_profile');
-            if (stored) return JSON.parse(stored);
-          } catch(e) {}
-          return {
-            id: 'demo-current-user',
-            full_name: 'Campus Student',
-            college: 'GGSIPU Community',
-            unimatch_profile_complete: true,
-            is_verified: true
-          };
-        })();
+        window.location.replace('/unimatch/auth/login.html');
+        return;
       }
 
       _currentProfile = profile;

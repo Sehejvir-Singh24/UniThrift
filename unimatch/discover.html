@@ -810,89 +810,6 @@
     return [...sort(unswiped), ...sort(recycled)].map(mapToCardProfile);
   }
 
-  const FALLBACK_CANDIDATES = [
-    {
-      id: 'demo-aarav-001',
-      full_name: 'Aarav Sharma',
-      age: '21',
-      major: 'Computer Science',
-      year_of_study: '3rd Year',
-      university: 'GGSIPU Main Campus',
-      gender: 'Male',
-      looking_for: '["TECH & STARTUPS"]',
-      instagram_username: 'aarav.dev',
-      bio: 'Building cool web apps, espresso addict ☕, always up for hackathons and late-night coding sessions!',
-      interests: '["AI / ML", "Startups", "Coffee", "Open Source", "Gaming"]',
-      profile_photos: '["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&q=80", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"]',
-      unimatch_profile_complete: true,
-      is_verified: true
-    },
-    {
-      id: 'demo-ananya-002',
-      full_name: 'Ananya Verma',
-      age: '20',
-      major: 'Business Administration',
-      year_of_study: '2nd Year',
-      university: 'MAIT Campus',
-      gender: 'Female',
-      looking_for: '["CAMPUS FRIENDS"]',
-      instagram_username: 'ananya.v',
-      bio: 'Thrifting enthusiast, indie music fan, and amateur photographer. Let\'s find the best coffee spot on campus 📸',
-      interests: '["Photography", "Thrifting", "Music", "Coffee Shops", "Film"]',
-      profile_photos: '["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80"]',
-      unimatch_profile_complete: true,
-      is_verified: true
-    },
-    {
-      id: 'demo-rohan-003',
-      full_name: 'Rohan Mehta',
-      age: '22',
-      major: 'Electronics & Comm.',
-      year_of_study: '4th Year',
-      university: 'USICT',
-      gender: 'Male',
-      looking_for: '["PROJECT PARTNERS"]',
-      instagram_username: 'rohan.mehta',
-      bio: 'Robotics geek & basketball player 🏀. Looking for gym buddies and people passionate about hardware & IoT.',
-      interests: '["Sports", "Gaming", "Fitness", "Tech", "Science"]',
-      profile_photos: '["https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&q=80"]',
-      unimatch_profile_complete: true,
-      is_verified: true
-    },
-    {
-      id: 'demo-priya-004',
-      full_name: 'Priya Nair',
-      age: '21',
-      major: 'Journalism & Mass Comm',
-      year_of_study: '3rd Year',
-      university: 'VIPS',
-      gender: 'Female',
-      looking_for: '["CREATIVE NETWORK"]',
-      instagram_username: 'priyanair.official',
-      bio: 'Podcast host 🎙️, book lover, and theatre artist. Always looking for deep conversations over chai!',
-      interests: '["Literature", "Creative Writing", "Art", "Volunteering", "Dancing"]',
-      profile_photos: '["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80"]',
-      unimatch_profile_complete: true,
-      is_verified: true
-    },
-    {
-      id: 'demo-kabir-005',
-      full_name: 'Kabir Malhotra',
-      age: '20',
-      major: 'Mechanical Engineering',
-      year_of_study: '2nd Year',
-      university: 'MSIT',
-      gender: 'Male',
-      looking_for: '["STUDY & HANG OUT"]',
-      instagram_username: 'kabir.jamming',
-      bio: 'Guitarist in a college rock band 🎸, Formula 1 fan, and street food reviewer. Looking for chill campus buddies.',
-      interests: '["Music", "Cooking", "Sports", "Travel", "Fitness"]',
-      profile_photos: '["https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&q=80", "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=800&q=80"]',
-      unimatch_profile_complete: true,
-      is_verified: true
-    }
-  ];
-
   let currentUserId = null;
   const likedIds         = new Set();
   const recentPassedIds  = new Set();
@@ -918,20 +835,8 @@
     }
 
     if (!myProfile) {
-      myProfile = (() => {
-        try {
-          const stored = localStorage.getItem('unithrift_user') || sessionStorage.getItem('unimatch_cached_profile');
-          if (stored) return JSON.parse(stored);
-        } catch(e) {}
-        return {
-          id: 'demo-current-user',
-          full_name: 'Campus Student',
-          university: 'GGSIPU Community',
-          unimatch_profile_complete: true,
-          is_verified: true,
-          interests: '["Coffee", "Music", "Tech"]'
-        };
-      })();
+      window.location.replace('/unimatch/auth/login.html');
+      return;
     }
 
     currentUserId = myProfile.id;
@@ -945,7 +850,7 @@
     let mutualLikerIds = new Set();
     let candidates = [];
 
-    // Track local swipes for fallback/offline profiles
+    // Track local swipes for offline/recent actions
     try {
       const key = `um_local_swipes_${currentUserId}`;
       const localSwipes = JSON.parse(localStorage.getItem(key) || '[]');
@@ -978,10 +883,8 @@
           } else if (l.action === 'pass') {
             const passTime = l.created_at ? new Date(l.created_at).getTime() : 0;
             if (passTime > 0 && (now - passTime) < PASS_COOLDOWN_MS) {
-              // Crossed less than 24 hours ago -> Hide
               recentPassedIds.add(l.liked_user_id);
             } else if (!recentPassedIds.has(l.liked_user_id)) {
-              // Crossed at least 1 day ago -> Can reappear as recycled fallback
               expiredPassedIds.add(l.liked_user_id);
             }
           }
@@ -995,19 +898,8 @@
       console.warn("Parallel fetch error:", e);
     }
 
-    // Merge database candidates with FALLBACK_CANDIDATES
-    const dbCandidateIds = new Set(candidates.map(c => c.id));
-    const mergedCandidates = [...candidates];
-    
-    if (typeof FALLBACK_CANDIDATES !== 'undefined') {
-      FALLBACK_CANDIDATES.forEach(fb => {
-        if (!dbCandidateIds.has(fb.id) && fb.id !== myProfile.id) {
-          mergedCandidates.push(fb);
-        }
-      });
-    }
-
-    DISCOVERY_PROFILES = buildFeedProfiles(mergedCandidates, myProfile || {}, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds);
+    // Only real profiles from database (no mock or fake profiles)
+    DISCOVERY_PROFILES = buildFeedProfiles(candidates, myProfile || {}, likedIds, recentPassedIds, expiredPassedIds, mutualLikerIds);
 
     renderCard(0);
   })();
@@ -1286,11 +1178,6 @@
           showMatchPopup(p);
         }
       }).catch(() => {});
-
-      // For fallback demo candidate profiles, trigger match popup to demonstrate immediate on-site chat!
-      if (p.id.startsWith('demo-')) {
-        setTimeout(() => showMatchPopup(p), 300);
-      }
     }
 
     setTimeout(() => {
@@ -1298,7 +1185,7 @@
       if (typeof checkUniMatchNotifications === 'function') {
         checkUniMatchNotifications(currentUserId).catch(() => {});
       }
-      if (!p || (!p.id.startsWith('demo-') && (!currentMatchedPartnerId || document.getElementById('match-modal').style.display !== 'flex'))) {
+      if (!p || (!currentMatchedPartnerId || document.getElementById('match-modal').style.display !== 'flex')) {
         cardIndex++;
         renderCard(cardIndex);
       }
