@@ -1151,14 +1151,30 @@
             });
 
             const activeBtn = document.getElementById(`nav-${tabId}`);
-            activeBtn.classList.add('bg-primary-container', 'text-on-primary-container', 'cursor-default');
-            activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-variant/30');
+            if (activeBtn) {
+                activeBtn.classList.add('bg-primary-container', 'text-on-primary-container', 'cursor-default');
+                activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-variant/30');
+            }
 
             // Show/Hide sections
             document.querySelectorAll('.tab-section').forEach(sec => {
                 sec.classList.add('hidden');
             });
-            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const sec = document.getElementById(`sec-${tabId}`);
+            if (sec) sec.classList.remove('hidden');
+
+            // Trigger data load/refresh for the selected tab
+            try {
+                if (tabId === 'verifications') loadVerifications();
+                else if (tabId === 'marketplace') loadMarketplace();
+                else if (tabId === 'flatmates') loadFlatmates();
+                else if (tabId === 'pghostels') loadPGListings();
+                else if (tabId === 'users') loadUsers();
+                else if (tabId === 'unimatch') loadUniMatch();
+                else if (tabId === 'reports') loadReports();
+            } catch(e) {
+                console.warn('Error loading tab data for', tabId, e);
+            }
 
             // Close sidebar on mobile after tab select
             if (window.innerWidth < 768) {
@@ -1308,110 +1324,202 @@
 
         // ── UNIMATCH TAB ──────────────────────────────────────────────
         async function loadUniMatch() {
+            const statProfiles = document.getElementById('um-stat-profiles');
+            const statMatches  = document.getElementById('um-stat-matches');
+            const statLikes    = document.getElementById('um-stat-likes');
+            const statActive   = document.getElementById('um-stat-active');
+            const badge        = document.getElementById('um-profiles-badge');
+            const recentEl     = document.getElementById('um-recent-matches');
+            const intEl        = document.getElementById('um-top-interests');
+            const tbody        = document.getElementById('um-profiles-table');
+
+            let profiles = [];
+            let matches  = [];
+            let likes    = [];
+
+            // 1. Fetch profiles safely (independent query)
             try {
-                const [profilesRes, matchesRes, likesRes] = await Promise.all([
-                    supabase.from('profiles').select('*').eq('unimatch_profile_complete', true),
-                    supabase.from('unimatch_matches').select('*').order('matched_at', { ascending: false }),
-                    supabase.from('unimatch_likes').select('liker_id, liked_user_id, action')
-                ]);
+                const { data, error } = await supabase.from('profiles').select('*');
+                if (!error && Array.isArray(data)) {
+                    profiles = data;
+                } else if (error) {
+                    console.warn('[loadUniMatch] profiles query warning:', error.message);
+                }
+            } catch(e) {
+                console.warn('[loadUniMatch] profiles query threw:', e);
+            }
 
-                const profiles = profilesRes.data || [];
-                const matches  = matchesRes.data  || [];
-                const likes    = likesRes.data     || [];
+            // 2. Fetch matches safely (independent query, table may not exist yet)
+            try {
+                const { data, error } = await supabase.from('unimatch_matches').select('*');
+                if (!error && Array.isArray(data)) {
+                    matches = data;
+                } else if (error) {
+                    console.warn('[loadUniMatch] unimatch_matches query warning:', error.message);
+                }
+            } catch(e) {
+                console.warn('[loadUniMatch] unimatch_matches query threw:', e);
+            }
 
-                // Stats
-                document.getElementById('um-stat-profiles').textContent = profiles.length;
-                document.getElementById('um-stat-matches').textContent  = matches.length;
-                document.getElementById('um-stat-likes').textContent    = likes.filter(l => l.action === 'like').length;
-                const today = Date.now() - 24*60*60*1000;
-                document.getElementById('um-stat-active').textContent   = profiles.filter(p => new Date(p.updated_at).getTime() > today).length;
+            // 3. Fetch likes safely (independent query, table may not exist yet)
+            try {
+                const { data, error } = await supabase.from('unimatch_likes').select('liker_id, liked_user_id, action');
+                if (!error && Array.isArray(data)) {
+                    likes = data;
+                } else if (error) {
+                    console.warn('[loadUniMatch] unimatch_likes query warning:', error.message);
+                }
+            } catch(e) {
+                console.warn('[loadUniMatch] unimatch_likes query threw:', e);
+            }
+
+            try {
+                const completedProfiles = profiles.filter(p => p.unimatch_profile_complete === true);
+                // If some users completed their unimatch dating profile, prioritize them; otherwise display all registered students
+                const displayProfiles = completedProfiles.length > 0 ? completedProfiles : profiles;
+
+                // Update Stats
+                if (statProfiles) statProfiles.textContent = completedProfiles.length > 0 ? completedProfiles.length : profiles.length;
+                if (statMatches)  statMatches.textContent  = matches.length;
+                if (statLikes)    statLikes.textContent    = likes.filter(l => l.action === 'like').length;
+                if (statActive) {
+                    const today = Date.now() - 24*60*60*1000;
+                    statActive.textContent = profiles.filter(p => {
+                        const ts = p.updated_at || p.created_at;
+                        return ts && new Date(ts).getTime() > today;
+                    }).length;
+                }
 
                 // Badge
-                document.getElementById('um-profiles-badge').textContent = `${profiles.length} Profiles`;
+                if (badge) {
+                    badge.textContent = `${displayProfiles.length} Profiles`;
+                }
 
                 // Profile map for names
                 const profileMap = {};
                 profiles.forEach(p => { profileMap[p.id] = p.full_name || 'Student'; });
 
                 // Recent Matches
-                const recentEl = document.getElementById('um-recent-matches');
-                if (matches.length === 0) {
-                    recentEl.innerHTML = '<p class="px-5 py-6 text-center text-sm text-on-surface-variant">No matches yet.</p>';
-                } else {
-                    recentEl.innerHTML = matches.slice(0,10).map(m => {
-                        const u1 = profileMap[m.user1_id] || m.user1_id?.slice(0,8);
-                        const u2 = profileMap[m.user2_id] || m.user2_id?.slice(0,8);
-                        const d  = new Date(m.matched_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-                        return `<div class="px-5 py-3 flex items-center justify-between">
-                            <span class="text-sm font-medium text-on-surface">${u1} 💕 ${u2}</span>
-                            <span class="text-xs text-on-surface-variant">${d}</span>
-                        </div>`;
-                    }).join('');
+                if (recentEl) {
+                    if (matches.length === 0) {
+                        recentEl.innerHTML = '<p class="px-5 py-6 text-center text-sm text-on-surface-variant">No matches recorded yet.</p>';
+                    } else {
+                        const sortedMatches = [...matches].sort((a,b) => {
+                            const tA = new Date(a.matched_at || a.created_at || 0).getTime();
+                            const tB = new Date(b.matched_at || b.created_at || 0).getTime();
+                            return tB - tA;
+                        });
+                        recentEl.innerHTML = sortedMatches.slice(0, 10).map(m => {
+                            const u1 = profileMap[m.user1_id] || m.user1_id?.slice(0, 8);
+                            const u2 = profileMap[m.user2_id] || m.user2_id?.slice(0, 8);
+                            const rawDate = m.matched_at || m.created_at;
+                            const d  = rawDate ? new Date(rawDate).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : 'Recently';
+                            return `<div class="px-5 py-3 flex items-center justify-between">
+                                <span class="text-sm font-medium text-on-surface">${escapeHTML(u1)} 💕 ${escapeHTML(u2)}</span>
+                                <span class="text-xs text-on-surface-variant">${d}</span>
+                            </div>`;
+                        }).join('');
+                    }
                 }
 
                 // Top Interests
-                const interestCount = {};
-                profiles.forEach(p => {
-                    try {
-                        const ints = typeof p.interests === 'string' ? JSON.parse(p.interests) : (p.interests || []);
-                        ints.forEach(i => { const k = i.toLowerCase().trim(); interestCount[k] = (interestCount[k]||0)+1; });
-                    } catch(e) {}
-                });
-                const sorted = Object.entries(interestCount).sort((a,b)=>b[1]-a[1]).slice(0,20);
-                const intEl = document.getElementById('um-top-interests');
-                if (sorted.length === 0) {
-                    intEl.innerHTML = '<p class="text-sm text-on-surface-variant">No interest data yet.</p>';
-                } else {
-                    intEl.innerHTML = sorted.map(([tag, count]) =>
-                        `<span class="px-3 py-1.5 bg-surface-container-high text-on-surface text-xs font-semibold rounded-full">${tag} <span class="text-on-surface-variant">${count}</span></span>`
-                    ).join('');
+                if (intEl) {
+                    const interestCount = {};
+                    profiles.forEach(p => {
+                        try {
+                            const ints = typeof p.interests === 'string' ? JSON.parse(p.interests) : (p.interests || []);
+                            if (Array.isArray(ints)) {
+                                ints.forEach(i => {
+                                    if (i) {
+                                        const k = String(i).toLowerCase().trim();
+                                        if (k) interestCount[k] = (interestCount[k] || 0) + 1;
+                                    }
+                                });
+                            }
+                        } catch(e) {}
+                    });
+                    const sorted = Object.entries(interestCount).sort((a,b) => b[1] - a[1]).slice(0, 20);
+                    if (sorted.length === 0) {
+                        intEl.innerHTML = '<p class="text-sm text-on-surface-variant">No interest data yet.</p>';
+                    } else {
+                        intEl.innerHTML = sorted.map(([tag, count]) =>
+                            `<span class="px-3 py-1.5 bg-surface-container-high text-on-surface text-xs font-semibold rounded-full">${escapeHTML(tag)} <span class="text-on-surface-variant">${count}</span></span>`
+                        ).join('');
+                    }
                 }
 
                 // Profiles Table
-                const tbody = document.getElementById('um-profiles-table');
-                if (profiles.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-sm text-on-surface-variant">No UniMatch profiles yet.</td></tr>';
-                } else {
-                    tbody.innerHTML = profiles.map(p => {
-                        const ints = (() => { try { const a = typeof p.interests==='string'?JSON.parse(p.interests):(p.interests||[]); return a.slice(0,3).join(', '); } catch { return '—'; } })();
-                        const verified = p.id_verified ? '<span class="px-2 py-0.5 text-[11px] bg-green-100 text-green-700 rounded-full font-semibold">✓ Verified</span>' : '<span class="px-2 py-0.5 text-[11px] bg-surface-container-high text-on-surface-variant rounded-full">Pending</span>';
-                        return `<tr class="hover:bg-surface-container-lowest/50 transition-colors">
-                            <td class="py-3 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden flex-shrink-0">
-                                        ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-sm text-on-surface-variant">👤</span>`}
+                if (tbody) {
+                    if (displayProfiles.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-sm text-on-surface-variant">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[36px] text-on-surface-variant/40">person_off</span>
+                                <p class="font-semibold text-on-surface text-base">No Users Found</p>
+                                <p class="text-xs text-secondary max-w-sm">No registered student profiles were found in Supabase. Please ensure you have run the sync script in your Supabase SQL Editor.</p>
+                            </div>
+                        </td></tr>`;
+                    } else {
+                        tbody.innerHTML = displayProfiles.map(p => {
+                            const ints = (() => {
+                                try {
+                                    const a = typeof p.interests === 'string' ? JSON.parse(p.interests) : (p.interests || []);
+                                    return Array.isArray(a) && a.length > 0 ? a.slice(0, 3).join(', ') : '—';
+                                } catch { return '—'; }
+                            })();
+
+                            const verified = p.is_verified || p.unimatch_verification_status === 'verified'
+                                ? '<span class="px-2 py-0.5 text-[11px] bg-green-100 text-green-700 rounded-full font-semibold">✓ Verified</span>'
+                                : '<span class="px-2 py-0.5 text-[11px] bg-surface-container-high text-on-surface-variant rounded-full">Pending</span>';
+
+                            const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCO80v9oBxazBMg4_hybg4dNFOJpVb62CeRrKE7f7GVkyegLDnliILUgYKKo__P7-6eK3S8JJ7hgvjouOiLV-Za-vEsbGYEsKt_BZE7WyZKaDsGZH_MiiA_qFAxjXEGoLEiLK2DJYKTT77SRV0N3zMuN4gbbO7LrAKxcBYXBHcA_3-wi7ghZeza4NFVOW_mXl3tJfLB5T8Yml1sK1Ek-JcYEEYSPDXs8bFE28rnxRw_dq70HNOQL3QFhOyR0jwdIxG1cNgHC5WqmFLz';
+                            const avatarSrc = p.avatar_url || defaultAvatar;
+
+                            const setupBadge = p.unimatch_profile_complete
+                                ? '<span class="text-[10px] text-green-600 font-semibold flex items-center gap-0.5">● Ready</span>'
+                                : '<span class="text-[10px] text-amber-600 font-medium flex items-center gap-0.5">○ Setup Incomplete</span>';
+
+                            return `<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+                                <td class="py-3 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-surface-container-high overflow-hidden flex-shrink-0 border">
+                                            <img src="${avatarSrc}" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.full_name || 'Student')}'"/>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-on-surface">${escapeHTML(p.full_name || 'Student')}</p>
+                                            <div class="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                                                <span>${escapeHTML(p.gender || 'Not set')}${p.age ? ', ' + p.age : ''}</span>
+                                                <span>•</span>
+                                                ${setupBadge}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-on-surface">${p.full_name || '—'}</p>
-                                        <p class="text-xs text-on-surface-variant">${p.gender || ''}${p.age ? ', '+p.age : ''}</p>
+                                </td>
+                                <td class="py-3 px-6 text-sm text-on-surface-variant">${escapeHTML(p.university || p.college || '—')}</td>
+                                <td class="py-3 px-6 text-sm text-on-surface-variant">${escapeHTML(p.year_of_study || p.major || '—')}</td>
+                                <td class="py-3 px-6 text-xs text-on-surface-variant max-w-[180px] truncate">${escapeHTML(ints)}</td>
+                                <td class="py-3 px-6 text-sm text-on-surface-variant">${p.instagram_username ? '@' + escapeHTML(p.instagram_username.replace('@','')) : '—'}</td>
+                                <td class="py-3 px-6">${verified}</td>
+                                <td class="py-3 px-6 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'unimatch')" 
+                                                class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-600 bg-rose-50/50 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1 transition-colors" 
+                                                title="Delete dating profile from UniMatch">
+                                            <span class="material-symbols-outlined text-[14px]">heart_broken</span> Delete Profile
+                                        </button>
+                                        <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'both')" 
+                                                class="p-1 rounded-lg border border-outline-variant/30 text-error hover:bg-error-container/30 transition-colors" 
+                                                title="Delete Entire Account">
+                                            <span class="material-symbols-outlined text-[15px]">delete</span>
+                                        </button>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.university || p.college || '—'}</td>
-                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.year_of_study || '—'}</td>
-                            <td class="py-3 px-6 text-xs text-on-surface-variant max-w-[180px] truncate">${ints || '—'}</td>
-                            <td class="py-3 px-6 text-sm text-on-surface-variant">${p.instagram_username ? `@${p.instagram_username}` : '—'}</td>
-                            <td class="py-3 px-6">${verified}</td>
-                            <td class="py-3 px-6 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'unimatch')" 
-                                            class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-600 bg-rose-50/50 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1 transition-colors" 
-                                            title="Delete dating profile from UniMatch">
-                                        <span class="material-symbols-outlined text-[14px]">heart_broken</span> Delete Profile
-                                    </button>
-                                    <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'both')" 
-                                            class="p-1 rounded-lg border border-outline-variant/30 text-error hover:bg-error-container/30 transition-colors" 
-                                            title="Delete Entire Account">
-                                        <span class="material-symbols-outlined text-[15px]">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
-                    }).join('');
+                                </td>
+                            </tr>`;
+                        }).join('');
+                    }
                 }
 
-            } catch(e) {
-                console.error('loadUniMatch error:', e);
+            } catch(renderErr) {
+                console.error('[loadUniMatch] render error:', renderErr);
             }
         }
 

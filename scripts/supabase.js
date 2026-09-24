@@ -1175,15 +1175,22 @@ async function getAllRoommateListingsAdmin() {
 
 // Helper: Get All Users (for Admins)
 async function getAllUsers() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) {
-    console.error("Error fetching all users:", error);
-    return [];
-  }
-  return data || [];
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && Array.isArray(data)) return data;
+  } catch(e) {}
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*');
+    if (!error && Array.isArray(data)) return data;
+  } catch(e) {}
+
+  return [];
 }
 
 // Helper: Approve Verification (for Admins)
