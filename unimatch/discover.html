@@ -564,14 +564,11 @@
       </div>
       <div>
         <h3 style="font-size:22px;font-weight:700;color:var(--um-text);margin:0 0 6px;">You're all caught up! 🎉</h3>
-        <p id="empty-state-msg" style="font-size:14px;color:var(--um-text-muted);margin:0;line-height:1.5;">You have reviewed all available profiles. Profiles you pass will take at least a day to reappear, or you can reset below anytime.</p>
+        <p id="empty-state-msg" style="font-size:14px;color:var(--um-text-muted);margin:0;line-height:1.5;">You've reviewed all available profiles for now. Check back later for new students or refresh your feed.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:240px;margin-top:8px;">
-        <button onclick="handleResetSwipes()" class="um-btn-primary" style="padding:12px 20px;font-size:14px;">
-          <span class="material-symbols-outlined" style="font-size:18px;">restart_alt</span>
-          Reset Swiped Profiles
-        </button>
-        <button onclick="location.reload()" style="background:transparent;border:1.5px solid var(--um-border);border-radius:999px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--um-text);cursor:pointer;">
+        <button onclick="location.reload()" class="um-btn-primary" style="padding:12px 20px;font-size:14px;">
+          <span class="material-symbols-outlined" style="font-size:18px;">refresh</span>
           Refresh Feed
         </button>
       </div>
@@ -1015,18 +1012,6 @@
     renderCard(0);
   })();
 
-  async function handleResetSwipes() {
-    if (currentUserId) {
-      await resetUserSwipes(currentUserId);
-      if (typeof clearLocalPasses === 'function') {
-        clearLocalPasses(currentUserId);
-      }
-      try {
-        localStorage.removeItem(`um_local_swipes_${currentUserId}`);
-      } catch(e) {}
-      location.reload();
-    }
-  }
 
   function renderCard(idx) {
     const card = document.getElementById('active-card');
