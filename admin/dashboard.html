@@ -1225,26 +1225,35 @@
 
         async function loadReports() {
             try {
-                // Fetch reports and join with profiles to get reporter name
-                const { data, error } = await supabase
+                // 1. Fetch reports (plain – reporter_id → auth.users so auto-join won't work)
+                const { data: reports, error } = await supabase
                     .from('bug_reports')
-                    .select('*, profiles(full_name, avatar_url, email)')
+                    .select('*')
                     .order('created_at', { ascending: false });
+                if (error) throw error;
 
-                // Fallback: if join fails, try plain fetch
-                let reports = data;
-                if (error || !data) {
-                    console.warn('[loadReports] join failed, trying plain fetch:', error?.message);
-                    const { data: plain, error: plainErr } = await supabase
-                        .from('bug_reports')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-                    if (plainErr) throw plainErr;
-                    reports = plain || [];
+                // 2. Collect unique reporter_ids (filter out nulls)
+                const ids = [...new Set((reports || []).map(r => r.reporter_id).filter(Boolean))];
+
+                // 3. Fetch matching profiles in one query
+                let profileMap = {};
+                if (ids.length > 0) {
+                    const { data: profiles } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, avatar_url, email')
+                        .in('id', ids);
+                    (profiles || []).forEach(p => { profileMap[p.id] = p; });
                 }
-                allReports = reports || [];
+
+                // 4. Merge profile data into each report
+                allReports = (reports || []).map(r => ({
+                    ...r,
+                    _reporter: profileMap[r.reporter_id] || null
+                }));
+
                 updateReportsStats();
                 renderReports(allReports);
+
                 // Update sidebar badge
                 const open = allReports.filter(r => r.status === 'open').length;
                 const badge = document.getElementById('reports-open-badge');
@@ -1252,7 +1261,8 @@
                 else { badge.classList.add('hidden'); }
             } catch(e) {
                 console.error('loadReports error:', e);
-                document.getElementById('reports-table-body').innerHTML = `<tr><td colspan="6" class="py-8 text-center text-sm text-red-500">Failed to load reports: ${e.message}</td></tr>`;
+                document.getElementById('reports-table-body').innerHTML = `<tr><td colspan="7" class="py-8 text-center text-sm text-red-500">Failed to load reports: ${e.message}</td></tr>`;
+
             }
         }
 
@@ -1302,9 +1312,9 @@
                 const date = new Date(r.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
                 const page = r.page_url ? r.page_url.replace(/https?:\/\/[^\/]+/, '') : '—';
 
-                // Reporter info — from joined profiles or user_email field
-                const reporter = r.profiles || {};
-                const reporterName = reporter.full_name || r.user_name || r.reporter_name || r.user_email || r.email || 'Anonymous';
+                // Reporter info — from _reporter (manually merged profile)
+                const reporter = r._reporter || {};
+                const reporterName = reporter.full_name || reporter.email || 'Anonymous';
                 const reporterEmail = reporter.email || r.user_email || r.email || '';
                 const reporterAvatar = reporter.avatar_url || '';
                 const reporterInitial = reporterName ? reporterName[0].toUpperCase() : '?';
