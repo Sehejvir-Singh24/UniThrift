@@ -1220,6 +1220,122 @@ async function rejectVerification(userId, feedback) {
   }
 }
 
+// Helper: Auto-Approve All Pending Verifications (for Admins)
+async function autoApproveAllVerificationsAdmin() {
+  try {
+    const { data, error } = await supabase.rpc('admin_auto_approve_all_verifications');
+    if (!error && typeof data === 'number') {
+      return { success: true, count: data };
+    }
+  } catch (rpcErr) {
+    console.warn("RPC admin_auto_approve_all_verifications unavailable, falling back to direct update:", rpcErr);
+  }
+
+  // Client-side batch approval fallback
+  const pending = await getPendingVerifications();
+  if (!pending || pending.length === 0) return { success: true, count: 0 };
+
+  let approvedCount = 0;
+  for (const user of pending) {
+    try {
+      await approveVerification(user.id);
+      approvedCount++;
+    } catch (e) {
+      console.error(`Failed to auto-approve user ${user.id}:`, e);
+    }
+  }
+  return { success: true, count: approvedCount };
+}
+
+// Helper: Delete User / Purge UniMatch Profile (for Admins)
+// mode: 'unimatch' (purges UniMatch dating profile only) | 'both' (deletes entire user from UniThrift + UniMatch)
+async function deleteUserAdmin(userId, mode = 'both') {
+  if (!userId) throw new Error("User ID is required.");
+
+  if (mode === 'unimatch') {
+    // 1. Try stored procedure
+    try {
+      const { data, error } = await supabase.rpc('admin_purge_unimatch_profile', { target_user_id: userId });
+      if (!error && data?.success) return data;
+    } catch (rpcErr) {
+      console.warn("RPC admin_purge_unimatch_profile unavailable, using client fallback:", rpcErr);
+    }
+
+    // 2. Client fallback
+    try { await supabase.from('unimatch_chats').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch (e) {}
+    try { await supabase.from('unimatch_matches').delete().or(`user1_id.eq.${userId},user2_id.eq.${userId}`); } catch (e) {}
+    try { await supabase.from('unimatch_likes').delete().or(`liker_id.eq.${userId},liked_user_id.eq.${userId}`); } catch (e) {}
+
+    const { error: profileErr } = await supabase.from('profiles').update({
+      instagram_username: null,
+      major: null,
+      bio: null,
+      gender: null,
+      preferred_gender: null,
+      looking_for: '[]',
+      interests: '[]',
+      profile_photos: '[]',
+      unimatch_profile_complete: false,
+      unimatch_verification_status: null
+    }).eq('id', userId);
+
+    if (profileErr) throw profileErr;
+    return { success: true, mode: 'unimatch', userId };
+  }
+
+  // mode === 'both' (delete from UniThrift & UniMatch)
+  // 1. Try stored procedure
+  try {
+    const { data, error } = await supabase.rpc('admin_delete_user_complete', { target_user_id: userId });
+    if (!error && data?.success) return data;
+  } catch (rpcErr) {
+    console.warn("RPC admin_delete_user_complete unavailable, using client fallback:", rpcErr);
+  }
+
+  // 2. Client fallback: Cascade delete associated items
+  try { await supabase.from('unimatch_chats').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch (e) {}
+  try { await supabase.from('unimatch_matches').delete().or(`user1_id.eq.${userId},user2_id.eq.${userId}`); } catch (e) {}
+  try { await supabase.from('unimatch_likes').delete().or(`liker_id.eq.${userId},liked_user_id.eq.${userId}`); } catch (e) {}
+  try { await supabase.from('roommate_listings').delete().eq('user_id', userId); } catch (e) {}
+  try { await supabase.from('products').delete().eq('seller_id', userId); } catch (e) {}
+  try { await supabase.from('roommate_likes').delete().or(`liker_id.eq.${userId},liked_user_id.eq.${userId}`); } catch (e) {}
+  try { await supabase.from('notifications').delete().eq('user_id', userId); } catch (e) {}
+  try { await supabase.from('push_subscriptions').delete().eq('user_id', userId); } catch (e) {}
+  try { await supabase.from('bug_reports').delete().eq('user_id', userId); } catch (e) {}
+
+  // 3. Delete or wipe profile
+  const { error: delProfileErr } = await supabase.from('profiles').delete().eq('id', userId);
+  if (delProfileErr) {
+    console.warn("Hard delete from profiles failed, applying complete sanitization purge:", delProfileErr);
+    const { error: updateErr } = await supabase.from('profiles').update({
+      full_name: '[Deleted User]',
+      phone_number: null,
+      enrollment_number: null,
+      year_of_study: null,
+      college: null,
+      id_url: null,
+      father_name: null,
+      avatar_url: null,
+      is_verified: false,
+      verification_status: 'rejected',
+      unimatch_verification_status: 'rejected',
+      verification_feedback: 'Account permanently deleted by administrator.',
+      instagram_username: null,
+      major: null,
+      bio: null,
+      gender: null,
+      preferred_gender: null,
+      looking_for: '[]',
+      interests: '[]',
+      profile_photos: '[]',
+      unimatch_profile_complete: false
+    }).eq('id', userId);
+    if (updateErr) throw updateErr;
+  }
+
+  return { success: true, mode: 'both', userId };
+}
+
 // Helper: Get All Products (for Admin Moderation)
 async function getAdminProducts() {
   const { data, error } = await supabase

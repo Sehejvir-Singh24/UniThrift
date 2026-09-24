@@ -298,7 +298,20 @@
           });
         }
 
-        // Update profile
+        const isAutoApproveOn = localStorage.getItem('unithrift_admin_auto_approve') === 'true';
+        if (isAutoApproveOn) {
+          await updateProfile({
+            id_url: publicUrl,
+            unimatch_verification_status: 'verified',
+            verification_status: 'verified',
+            is_verified: true,
+            verification_feedback: null
+          });
+          window.location.href = '/unimatch/auth/verified.html';
+          return;
+        }
+
+        // Update profile (manual review mode)
         await updateProfile({
           id_url: publicUrl,
           unimatch_verification_status: 'pending',

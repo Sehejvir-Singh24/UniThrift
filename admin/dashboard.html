@@ -207,14 +207,38 @@
 
                 <!-- SECTION: ID VERIFICATIONS -->
                 <section id="sec-verifications" class="tab-section">
-                    <div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-4">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-6 border-b border-outline-variant/10 pb-4">
                         <div>
                             <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Student ID Verifications</h2>
-                            <p class="font-body-lg text-body-lg text-secondary">Review uploaded college ID cards, student emails, and UniMatch profile details to approve or reject verification.</p>
+                            <p class="font-body-lg text-body-lg text-secondary">Review uploaded college ID cards, student emails, and UniMatch profile details to approve, auto-approve, or reject verification.</p>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
+                        <div class="flex items-center gap-3 shrink-0 flex-wrap">
+                            <!-- Auto-Approve Mode Toggle -->
+                            <label class="flex items-center gap-2 cursor-pointer bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/30 hover:bg-surface-container transition-colors select-none" title="When active, all pending and incoming student verifications are verified automatically">
+                                <input type="checkbox" id="auto-approve-toggle" onchange="toggleAutoApproveMode(this.checked)" class="sr-only peer"/>
+                                <div class="w-8 h-4 bg-outline-variant/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600 relative"></div>
+                                <span class="text-xs font-bold text-on-surface flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-emerald-600">bolt</span> Auto-Approve
+                                </span>
+                            </label>
+
+                            <!-- One-Click Auto-Approve All Pending -->
+                            <button id="btn-auto-approve-all" onclick="handleAutoApproveAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-label-caps text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm active:scale-95 transition-all" title="Instantly approve all currently pending verifications">
+                                <span class="material-symbols-outlined text-[15px]">done_all</span>
+                                <span>Auto-Approve All</span>
+                            </button>
+
                             <span id="verifications-count-badge" class="px-3 py-1 bg-surface-container-highest text-primary font-label-caps text-label-caps rounded-full">0 Pending</span>
                         </div>
+                    </div>
+
+                    <!-- Auto-Approve Active Banner -->
+                    <div id="auto-approve-active-banner" class="hidden mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3 text-emerald-900 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-600 text-lg">bolt</span>
+                            <span><b>Auto-Approve Mode is ACTIVE:</b> All student verifications across UniThrift & UniMatch are automatically approved upon upload and retrieval.</span>
+                        </div>
+                        <button onclick="toggleAutoApproveMode(false)" class="text-emerald-700 hover:underline font-bold text-[11px]">Turn Off</button>
                     </div>
                     <div id="verifications-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Rendered dynamically -->
@@ -327,6 +351,7 @@
                                         <th class="py-4 px-6">Verification</th>
                                         <th class="py-4 px-6">ID Document</th>
                                         <th class="py-4 px-6">Role</th>
+                                        <th class="py-4 px-6 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="users-table-body" class="divide-y divide-outline-variant/10">
@@ -416,6 +441,7 @@
                                         <th class="py-4 px-6">Interests</th>
                                         <th class="py-4 px-6">Instagram</th>
                                         <th class="py-4 px-6">Verified</th>
+                                        <th class="py-4 px-6 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="um-profiles-table" class="divide-y divide-outline-variant/10">
@@ -505,16 +531,98 @@
         <img id="lightbox-img" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300" src="" alt="Enlarged Document"/>
     </div>
 
+    <!-- MODAL: DELETE USER / PURGE UNIMATCH -->
+    <div id="delete-user-modal" class="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target === this) closeDeleteModal()">
+        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl animate-fade-in relative flex flex-col gap-6" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-outline-variant/15 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-error-container/40 flex items-center justify-center text-error">
+                        <span class="material-symbols-outlined text-[22px]">person_remove</span>
+                    </div>
+                    <div>
+                        <h3 class="font-title-md text-title-md text-on-surface font-bold">Delete User Account</h3>
+                        <p class="font-body-sm text-xs text-secondary">Manage UniThrift & UniMatch deletion</p>
+                    </div>
+                </div>
+                <button onclick="closeDeleteModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/40 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+
+            <!-- Target User Details Card -->
+            <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/20 flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary text-base flex-shrink-0">
+                    <span id="del-user-initial">U</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p id="del-user-name" class="font-bold text-sm text-on-surface truncate">Student Name</p>
+                    <p id="del-user-email" class="text-xs text-secondary truncate">user@example.com</p>
+                </div>
+            </div>
+
+            <!-- Choose Deletion Scope -->
+            <div class="space-y-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-secondary">Select Deletion Scope</p>
+                
+                <!-- Option 1: UniMatch Profile Only -->
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl border border-outline-variant/30 hover:border-primary/50 cursor-pointer transition-colors bg-surface-container-lowest has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <input type="radio" name="del-mode" id="del-mode-unimatch" value="unimatch" class="mt-1 text-primary focus:ring-primary"/>
+                    <div class="text-xs">
+                        <div class="flex items-center gap-1.5 font-bold text-on-surface mb-0.5">
+                            <span class="material-symbols-outlined text-[16px] text-rose-600">heart_broken</span>
+                            <span>Delete UniMatch Profile Only</span>
+                        </div>
+                        <p class="text-on-surface-variant leading-relaxed">Specifically purges their dating profile, photos, bio, Instagram handle, and all mutual likes, matches, and chats. Their UniThrift marketplace listings and account remain active.</p>
+                    </div>
+                </label>
+
+                <!-- Option 2: Entire Account (UniThrift + UniMatch) -->
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl border border-outline-variant/30 hover:border-error/50 cursor-pointer transition-colors bg-surface-container-lowest has-[:checked]:border-error has-[:checked]:bg-error-container/10">
+                    <input type="radio" name="del-mode" id="del-mode-both" value="both" checked class="mt-1 text-error focus:ring-error"/>
+                    <div class="text-xs">
+                        <div class="flex items-center gap-1.5 font-bold text-error mb-0.5">
+                            <span class="material-symbols-outlined text-[16px]">delete_forever</span>
+                            <span>Delete Entire Account (UniThrift + UniMatch)</span>
+                        </div>
+                        <p class="text-on-surface-variant leading-relaxed">Permanently purges this student's account completely. Wipes all marketplace listings, flatmate posts, chats, likes, verifications, and profile records.</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-outline-variant/15">
+                <button onclick="closeDeleteModal()" class="px-5 py-2.5 rounded-xl border border-outline-variant/40 text-on-surface text-xs font-bold hover:bg-surface-variant/30 transition-colors">
+                    Cancel
+                </button>
+                <button id="btn-confirm-delete" onclick="confirmDeleteUser()" class="px-5 py-2.5 rounded-xl bg-error hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                    <span>Confirm Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="/scripts/supabase.js"></script>
     <script>
+        const AUTO_APPROVE_STORAGE_KEY = 'unithrift_admin_auto_approve';
         let marketplaceItems = [];
         let roommatePostings = [];
         let pgListings = [];
         let allUsers = [];
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
         // Auth guard checked on load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -536,6 +644,9 @@
                     document.getElementById('admin-avatar').src = profile.avatar_url;
                 }
                 
+                // Initialize Auto-Approve state
+                initAutoApproveUI();
+
                 // Init dashboard data
                 await initDashboard();
             } catch(e) {
@@ -561,6 +672,18 @@
 
         async function loadVerifications() {
             pendingVerifications = await getPendingVerifications();
+
+            // Auto-Approve Check: If active and items pending, approve all automatically
+            if (localStorage.getItem(AUTO_APPROVE_STORAGE_KEY) === 'true' && pendingVerifications && pendingVerifications.length > 0) {
+                console.log(`[Auto-Approve] Automatically approving ${pendingVerifications.length} pending student verification(s)...`);
+                try {
+                    await autoApproveAllVerificationsAdmin();
+                    pendingVerifications = await getPendingVerifications();
+                } catch(autoErr) {
+                    console.error("[Auto-Approve] Error auto-approving pending verifications:", autoErr);
+                }
+            }
+
             const grid = document.getElementById('verifications-grid');
             const emptyState = document.getElementById('verifications-empty');
             const badge = document.getElementById('verifications-count-badge');
@@ -646,6 +769,16 @@
                             <span class="material-symbols-outlined text-[16px]">verified</span> Approve Student
                         </button>
                     </div>
+
+                    <!-- Admin User Deletion Links -->
+                    <div class="flex items-center justify-between pt-3 mt-3 border-t border-outline-variant/10 text-xs">
+                        <button onclick="promptDeleteUser('${user.id}', '${escapeHTML(user.full_name || 'Student')}', '${escapeHTML(user.email || user.unimatch_verify_email || '')}', 'unimatch')" class="text-rose-600 hover:text-rose-700 flex items-center gap-1 text-[11px] font-semibold py-0.5" title="Purge UniMatch Profile Only">
+                            <span class="material-symbols-outlined text-[14px]">heart_broken</span> Purge UniMatch
+                        </button>
+                        <button onclick="promptDeleteUser('${user.id}', '${escapeHTML(user.full_name || 'Student')}', '${escapeHTML(user.email || user.unimatch_verify_email || '')}', 'both')" class="text-error hover:text-red-700 flex items-center gap-1 text-[11px] font-semibold py-0.5" title="Delete Entire Account">
+                            <span class="material-symbols-outlined text-[14px]">delete</span> Delete User
+                        </button>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
@@ -727,6 +860,20 @@
                     </td>
                     <td class="py-4 px-6">
                         <span class="font-label-caps text-[11px] uppercase tracking-wider text-secondary">${escapeHTML(user.role) || 'customer'}</span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                            <button onclick="promptDeleteUser('${user.id}', '${escapeHTML(user.full_name || 'Student')}', '${escapeHTML(user.email || '')}', 'unimatch')" 
+                                    class="p-1.5 rounded-lg border border-outline-variant/30 text-rose-600 hover:bg-rose-50 transition-colors" 
+                                    title="Delete UniMatch Profile Only">
+                                <span class="material-symbols-outlined text-[16px]">heart_broken</span>
+                            </button>
+                            <button onclick="promptDeleteUser('${user.id}', '${escapeHTML(user.full_name || 'Student')}', '${escapeHTML(user.email || '')}', 'both')" 
+                                    class="p-1.5 rounded-lg border border-outline-variant/30 text-error hover:bg-error-container/30 transition-colors" 
+                                    title="Delete Entire Account (UniThrift + UniMatch)">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(tr);
@@ -1217,7 +1364,7 @@
                 // Profiles Table
                 const tbody = document.getElementById('um-profiles-table');
                 if (profiles.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-sm text-on-surface-variant">No UniMatch profiles yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-sm text-on-surface-variant">No UniMatch profiles yet.</td></tr>';
                 } else {
                     tbody.innerHTML = profiles.map(p => {
                         const ints = (() => { try { const a = typeof p.interests==='string'?JSON.parse(p.interests):(p.interests||[]); return a.slice(0,3).join(', '); } catch { return '—'; } })();
@@ -1239,12 +1386,179 @@
                             <td class="py-3 px-6 text-xs text-on-surface-variant max-w-[180px] truncate">${ints || '—'}</td>
                             <td class="py-3 px-6 text-sm text-on-surface-variant">${p.instagram_username ? `@${p.instagram_username}` : '—'}</td>
                             <td class="py-3 px-6">${verified}</td>
+                            <td class="py-3 px-6 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'unimatch')" 
+                                            class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-600 bg-rose-50/50 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1 transition-colors" 
+                                            title="Delete dating profile from UniMatch">
+                                        <span class="material-symbols-outlined text-[14px]">heart_broken</span> Delete Profile
+                                    </button>
+                                    <button onclick="promptDeleteUser('${p.id}', '${escapeHTML(p.full_name || 'Student')}', '${escapeHTML(p.email || '')}', 'both')" 
+                                            class="p-1 rounded-lg border border-outline-variant/30 text-error hover:bg-error-container/30 transition-colors" 
+                                            title="Delete Entire Account">
+                                        <span class="material-symbols-outlined text-[15px]">delete</span>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>`;
                     }).join('');
                 }
 
             } catch(e) {
                 console.error('loadUniMatch error:', e);
+            }
+        }
+
+        // ── USER DELETION & PURGE HANDLERS ─────────────────────────
+        let currentTargetUser = null;
+
+        function promptDeleteUser(userId, userName, userEmail, defaultMode = 'both') {
+            currentTargetUser = {
+                id: userId,
+                name: userName || 'Student',
+                email: userEmail || ''
+            };
+
+            const initialEl = document.getElementById('del-user-initial');
+            const nameEl = document.getElementById('del-user-name');
+            const emailEl = document.getElementById('del-user-email');
+
+            if (initialEl) initialEl.textContent = (currentTargetUser.name[0] || 'U').toUpperCase();
+            if (nameEl) nameEl.textContent = currentTargetUser.name;
+            if (emailEl) emailEl.textContent = currentTargetUser.email || 'No email associated';
+
+            if (defaultMode === 'unimatch') {
+                const radio = document.getElementById('del-mode-unimatch');
+                if (radio) radio.checked = true;
+            } else {
+                const radio = document.getElementById('del-mode-both');
+                if (radio) radio.checked = true;
+            }
+
+            const modal = document.getElementById('delete-user-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-user-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            currentTargetUser = null;
+        }
+
+        async function confirmDeleteUser() {
+            if (!currentTargetUser || !currentTargetUser.id) return;
+
+            const selectedRadio = document.querySelector('input[name="del-mode"]:checked');
+            const selectedMode = selectedRadio ? selectedRadio.value : 'both';
+            const btn = document.getElementById('btn-confirm-delete');
+            const originalContent = btn ? btn.innerHTML : '';
+
+            const isUnimatchOnly = selectedMode === 'unimatch';
+            const confirmMsg = isUnimatchOnly
+                ? `Confirm purge: Are you sure you want to delete only the UniMatch dating profile for "${currentTargetUser.name}"?\n\nTheir UniThrift marketplace listings and account will remain untouched.`
+                : `CRITICAL ACTION: Are you sure you want to permanently delete the ENTIRE account for "${currentTargetUser.name}"?\n\nThis will purge all marketplace items, roommate listings, chats, likes, verifications, and profile records across UniThrift & UniMatch.`;
+
+            if (!confirm(confirmMsg)) return;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">sync</span> Deleting...`;
+            }
+
+            try {
+                const result = await deleteUserAdmin(currentTargetUser.id, selectedMode);
+                if (result && result.success) {
+                    alert(isUnimatchOnly
+                        ? `UniMatch profile for "${currentTargetUser.name}" was successfully purged.`
+                        : `Account for "${currentTargetUser.name}" was successfully deleted from UniThrift and UniMatch.`);
+                    closeDeleteModal();
+                    await initDashboard();
+                } else {
+                    alert("Could not delete user: " + (result?.error || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Error deleting user:", err);
+                alert("Failed to delete user: " + (err.message || err));
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
+            }
+        }
+
+        // ── AUTO-APPROVE VERIFICATION HANDLERS ─────────────────────
+        function initAutoApproveUI() {
+            const isAutoApprove = localStorage.getItem(AUTO_APPROVE_STORAGE_KEY) === 'true';
+            const toggle = document.getElementById('auto-approve-toggle');
+            const banner = document.getElementById('auto-approve-active-banner');
+
+            if (toggle) toggle.checked = isAutoApprove;
+            if (banner) {
+                if (isAutoApprove) {
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+        }
+
+        async function toggleAutoApproveMode(enabled) {
+            localStorage.setItem(AUTO_APPROVE_STORAGE_KEY, enabled ? 'true' : 'false');
+            const banner = document.getElementById('auto-approve-active-banner');
+            if (banner) {
+                if (enabled) {
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+
+            if (enabled && pendingVerifications && pendingVerifications.length > 0) {
+                if (confirm(`Auto-Approve is now ENABLED. Would you like to automatically approve all ${pendingVerifications.length} currently pending verification request(s) right now?`)) {
+                    await handleAutoApproveAll();
+                }
+            }
+        }
+
+        async function handleAutoApproveAll() {
+            const btn = document.getElementById('btn-auto-approve-all');
+            const originalContent = btn ? btn.innerHTML : '';
+
+            if (!pendingVerifications || pendingVerifications.length === 0) {
+                alert("No pending verifications to approve.");
+                return;
+            }
+
+            const count = pendingVerifications.length;
+            if (!confirm(`Auto-approve all ${count} pending student verification(s)? This will instantly grant them verified status across UniThrift and UniMatch.`)) {
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin">sync</span> Approving...`;
+            }
+
+            try {
+                const res = await autoApproveAllVerificationsAdmin();
+                const approvedCount = (res && typeof res === 'object') ? res.count : res;
+                alert(`Successfully auto-approved ${approvedCount || count} student verification(s)!`);
+                await initDashboard();
+            } catch (err) {
+                console.error("Auto approve error:", err);
+                alert("Auto-approval failed: " + (err.message || err));
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
             }
         }
 
