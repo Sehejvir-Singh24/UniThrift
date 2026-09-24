@@ -32,7 +32,7 @@ This document serves as the authoritative guide to the structure of the UniThrif
   - `pg_detail.html`: Detailed view for PG & Hostel accommodations with room amenities and booking inquiry forms.
 
 - **`/unimatch` (Campus Social & Dating Ecosystem)**
-  - `welcome.html`: Landing hero screen with warm gradient overlay, trust badges, and automated auth-routing script.
+  - `index.html`: Unified landing screen with interactive hero showcase, trust badges, features & FAQs, and automated auth-routing script.
   - `discover.html`: Primary full-screen discovery feed querying real database profiles (`unimatch_profile_complete = true`) with parallel `Promise.all` queries, free mutual-match Instagram sharing, mobile-proportioned cards (guaranteed 55% photo height), and neutral skeleton loading state.
   - `icebreaker.html`: Bento grid selector featuring mini Q&A prompts (Coffee Match, Music Vibes, Food Debate, Watchlist, Campus Lore) required before Instagram handle exchanges.
   - `insta-exchange-request.html` & `insta-exchange-success.html`: Privacy-first mutual agreement protocol for sharing Instagram handles.

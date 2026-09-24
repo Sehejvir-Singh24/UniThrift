@@ -498,6 +498,11 @@ app.use((req, res, next) => {
   return res.status(503).sendFile(path.join(__dirname, '..', 'launching-soon.html'));
 });
 
+// Redirect legacy welcome.html to unified /unimatch/ landing
+app.get(['/unimatch/welcome.html', '/unimatch/welcome'], (req, res) => {
+  res.redirect(301, '/unimatch/');
+});
+
 // Serve frontend static files if requested
 app.use(express.static(path.join(__dirname, '..')));
 

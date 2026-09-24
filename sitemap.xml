@@ -20,14 +20,6 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- UniMatch welcome / signup -->
-  <url>
-    <loc>https://unithrift.co.in/unimatch/welcome.html</loc>
-    <lastmod>2026-09-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <!-- Marketplace browse -->
   <url>
     <loc>https://unithrift.co.in/marketplace/marketplace.html</loc>

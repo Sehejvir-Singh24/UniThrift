@@ -114,7 +114,7 @@ We executed major feature upgrades across both **UniThrift** and **UniMatch**, t
 - **Drifting Cloud SVG Layer (`unimatch/clouds-init.js`):** Auto-injects 10 blurred SVG cumulus clouds drifting across the sky with keyframe animations.
 - **Non-Scrollable Viewport (`discover.html`):** Refactored layout to use fixed positioning between `top: 64px` header and `bottom: 64px` bottom nav, removing body scrollbars for a clean `100dvh` mobile experience.
 - **Standardized Action Buttons:** Standardized Pass and Like action buttons to 64px × 64px.
-- **Hero Photo Protection:** Enforced rule to exclude cloud overlays over faces on hero landing photos (`welcome.html`).
+- **Hero Photo Protection:** Enforced rule to exclude cloud overlays over faces on hero landing photos (`unimatch/index.html`).
 
 ### 5. Portal Gateway Routing Fix (`index.html`)
 - Fixed hardcoded `/auth/login.html` href on portal choice cards for authenticated users.
@@ -145,7 +145,7 @@ We executed major feature upgrades across both **UniThrift** and **UniMatch**, t
 - **Dynamic Header Auth State:** Integrated Supabase Auth session checks (`supabase.auth.getSession()`) in `index.html` to display a personalized welcome badge (`Hi, <name>`) and Sign Out button for authenticated users.
 
 ### 2. Smart Onboarding & Instagram Verification Journey
-- **Auth Guard & Routing (`welcome.html` & `auth/login.html`):** Integrated Google OAuth and Email OTP login flows.
+- **Auth Guard & Routing (`index.html` & `auth/login.html`):** Integrated Google OAuth and Email OTP login flows.
 - **5-Step Profile Builder:** Basic Info, Intent Selection, Searchable Interests, Photo Grid Upload (up to 6 photos), and Live Preview.
 
 ---
